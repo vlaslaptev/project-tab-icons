@@ -10,6 +10,7 @@
 Иконки, цветные линии, полупрозрачная заливка и Git-информация на **оконных вкладках
 macOS** в IntelliJ IDEA. Каждому проекту — свой образ, рядом с именем — полезный контекст.
 
+[Скачать 0.3.46](https://github.com/vlaslaptev/project-tab-icons/releases/tag/v0.3.46) ·
 [English](README.md) · [Установка](docs/INSTALLATION.md) ·
 [Возможности](docs/FEATURES.md) · [Совместимость](docs/COMPATIBILITY.md) ·
 [Изменения](CHANGELOG.md)
@@ -39,7 +40,7 @@ macOS** в IntelliJ IDEA. Каждому проекту — свой образ,
 
 ## Установка
 
-1. Скачайте `project-tab-icons-0.3.46.zip` в разделе **Releases** этого репозитория.
+1. Скачайте [project-tab-icons-0.3.46.zip](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.46/project-tab-icons-0.3.46.zip) из **Releases**.
    Это неподписанный плагин для ручной установки.
 2. Откройте **Settings → Plugins → ⚙ → Install Plugin from Disk…**, выберите ZIP.
 3. Перезапустите IDE, если она предложит это сделать.
@@ -47,8 +48,7 @@ macOS** в IntelliJ IDEA. Каждому проекту — свой образ,
 5. Откройте **Settings → Appearance & Behavior → Project Tab Icons**.
 
 Выберите пресет, назначьте иконки и нажмите **Apply**.
-Публичный репозиторий и первый GitHub Release пока готовятся; ссылка на ZIP станет
-доступна после их публикации владельцем. [Подробная инструкция](docs/INSTALLATION.md).
+[Подробная инструкция](docs/INSTALLATION.md).
 
 ## От спокойного к заметному
 

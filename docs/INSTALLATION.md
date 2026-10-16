@@ -6,15 +6,14 @@ branch. Check the full build number under **Help → About**. The declared range
 
 ## Install from a GitHub release
 
-1. Open this repository's **Releases** and download `project-tab-icons-0.3.46.zip`.
+1. Open [Releases](https://github.com/vlaslaptev/project-tab-icons/releases/tag/v0.3.46) and download [project-tab-icons-0.3.46.zip](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.46/project-tab-icons-0.3.46.zip).
    Use the plugin ZIP attached to the release, rather than GitHub's source-code archive.
 2. In IDEA, open **Settings → Plugins**.
 3. Use the gear menu and select **Install Plugin from Disk…**.
 4. Choose the ZIP and restart IDEA if prompted.
 
 The ZIP is unsigned and intended for manual installation. No Marketplace account
-or Marketplace token is needed to install it. The first GitHub release still has
-to be published by the repository owner before its download is available.
+or Marketplace token is needed to install it.
 
 ## Show project window tabs
 

@@ -11,6 +11,7 @@ Project icons, colored outlines, translucent fills and Git context for IntelliJ
 IDEA's **macOS window tabs**. Give each project a visual identity and keep the
 information you need beside its name.
 
+[Download 0.3.46](https://github.com/vlaslaptev/project-tab-icons/releases/tag/v0.3.46) ·
 [Русский](README.ru.md) · [Install](docs/INSTALLATION.md) ·
 [Features](docs/FEATURES.md) · [Compatibility](docs/COMPATIBILITY.md) ·
 [Changes](CHANGELOG.md)
@@ -42,7 +43,7 @@ before installing.
 
 ## Install in a minute
 
-1. Download `project-tab-icons-0.3.46.zip` from this repository's **Releases**.
+1. Download [project-tab-icons-0.3.46.zip](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.46/project-tab-icons-0.3.46.zip) from **Releases**.
    The release ZIP is an unsigned, manually installed plugin.
 2. Open **Settings → Plugins → ⚙ → Install Plugin from Disk…** and select the ZIP.
 3. Restart the IDE if prompted.
@@ -51,9 +52,6 @@ before installing.
 
 Choose a preset, assign your project icons, and click **Apply**.
 The [installation guide](docs/INSTALLATION.md) covers missing tabs, updates and removal.
-
-The public repository and Releases are being prepared. A download is available
-only after the owner publishes the first GitHub release.
 
 ## Start with a preset. Make it yours.
 
