@@ -14,5 +14,6 @@
   "license": "MIT",
   "version": "0.3.46",
   "githubUrl": "https://github.com/vlaslaptev/project-tab-icons",
-  "status": "Source code, documentation and gallery published on GitHub; initial binary release in preparation"
+  "status": "Source code, documentation and gallery on GitHub; plugin ZIP distributed through Releases",
+  "releaseUrl": "https://github.com/vlaslaptev/project-tab-icons/releases/tag/v0.3.46"
 }
