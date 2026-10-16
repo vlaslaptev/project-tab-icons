@@ -1,0 +1,128 @@
+<!--
+Creative Commons Legal Code
+
+CC0 1.0 Universal
+
+    CREATIVE COMMONS CORPORATION IS NOT A LAW FIRM AND DOES NOT PROVIDE
+    LEGAL SERVICES. DISTRIBUTION OF THIS DOCUMENT DOES NOT CREATE AN
+    ATTORNEY-CLIENT RELATIONSHIP. CREATIVE COMMONS PROVIDES THIS
+    INFORMATION ON AN "AS-IS" BASIS. CREATIVE COMMONS MAKES NO WARRANTIES
+    REGARDING THE USE OF THIS DOCUMENT OR THE INFORMATION OR WORKS
+    PROVIDED HEREUNDER, AND DISCLAIMS LIABILITY FOR DAMAGES RESULTING FROM
+    THE USE OF THIS DOCUMENT OR THE INFORMATION OR WORKS PROVIDED
+    HEREUNDER.
+
+Statement of Purpose
+
+The laws of most jurisdictions throughout the world automatically confer
+exclusive Copyright and Related Rights (defined below) upon the creator
+and subsequent owner(s) (each and all, an "owner") of an original work of
+authorship and/or a database (each, a "Work").
+
+Certain owners wish to permanently relinquish those rights to a Work for
+the purpose of contributing to a commons of creative, cultural and
+scientific works ("Commons") that the public can reliably and without fear
+of later claims of infringement build upon, modify, incorporate in other
+works, reuse and redistribute as freely as possible in any form whatsoever
+and for any purposes, including without limitation commercial purposes.
+These owners may contribute to the Commons to promote the ideal of a free
+culture and the further production of creative, cultural and scientific
+works, or to gain reputation or greater distribution for their Work in
+part through the use and efforts of others.
+
+For these and/or other purposes and motivations, and without any
+expectation of additional consideration or compensation, the person
+associating CC0 with a Work (the "Affirmer"), to the extent that he or she
+is an owner of Copyright and Related Rights in the Work, voluntarily
+elects to apply CC0 to the Work and publicly distribute the Work under its
+terms, with knowledge of his or her Copyright and Related Rights in the
+Work and the meaning and intended legal effect of CC0 on those rights.
+
+1. Copyright and Related Rights. A Work made available under CC0 may be
+protected by copyright and related or neighboring rights ("Copyright and
+Related Rights"). Copyright and Related Rights include, but are not
+limited to, the following:
+
+  i. the right to reproduce, adapt, distribute, perform, display,
+     communicate, and translate a Work;
+ ii. moral rights retained by the original author(s) and/or performer(s);
+iii. publicity and privacy rights pertaining to a person's image or
+     likeness depicted in a Work;
+ iv. rights protecting against unfair competition in regards to a Work,
+     subject to the limitations in paragraph 4(a), below;
+  v. rights protecting the extraction, dissemination, use and reuse of data
+     in a Work;
+ vi. database rights (such as those arising under Directive 96/9/EC of the
+     European Parliament and of the Council of 11 March 1996 on the legal
+     protection of databases, and under any national implementation
+     thereof, including any amended or successor version of such
+     directive); and
+vii. other similar, equivalent or corresponding rights throughout the
+     world based on applicable law or treaty, and any national
+     implementations thereof.
+
+2. Waiver. To the greatest extent permitted by, but not in contravention
+of, applicable law, Affirmer hereby overtly, fully, permanently,
+irrevocably and unconditionally waives, abandons, and surrenders all of
+Affirmer's Copyright and Related Rights and associated claims and causes
+of action, whether now known or unknown (including existing as well as
+future claims and causes of action), in the Work (i) in all territories
+worldwide, (ii) for the maximum duration provided by applicable law or
+treaty (including future time extensions), (iii) in any current or future
+medium and for any number of copies, and (iv) for any purpose whatsoever,
+including without limitation commercial, advertising or promotional
+purposes (the "Waiver"). Affirmer makes the Waiver for the benefit of each
+member of the public at large and to the detriment of Affirmer's heirs and
+successors, fully intending that such Waiver shall not be subject to
+revocation, rescission, cancellation, termination, or any other legal or
+equitable action to disrupt the quiet enjoyment of the Work by the public
+as contemplated by Affirmer's express Statement of Purpose.
+
+3. Public License Fallback. Should any part of the Waiver for any reason
+be judged legally invalid or ineffective under applicable law, then the
+Waiver shall be preserved to the maximum extent permitted taking into
+account Affirmer's express Statement of Purpose. In addition, to the
+extent the Waiver is so judged Affirmer hereby grants to each affected
+person a royalty-free, non transferable, non sublicensable, non exclusive,
+irrevocable and unconditional license to exercise Affirmer's Copyright and
+Related Rights in the Work (i) in all territories worldwide, (ii) for the
+maximum duration provided by applicable law or treaty (including future
+time extensions), (iii) in any current or future medium and for any number
+of copies, and (iv) for any purpose whatsoever, including without
+limitation commercial, advertising or promotional purposes (the
+"License"). The License shall be deemed effective as of the date CC0 was
+applied by Affirmer to the Work. Should any part of the License for any
+reason be judged legally invalid or ineffective under applicable law, such
+partial invalidity or ineffectiveness shall not invalidate the remainder
+of the License, and in such case Affirmer hereby affirms that he or she
+will not (i) exercise any of his or her remaining Copyright and Related
+Rights in the Work or (ii) assert any associated claims and causes of
+action with respect to the Work, in either case contrary to Affirmer's
+express Statement of Purpose.
+
+4. Limitations and Disclaimers.
+
+ a. No trademark or patent rights held by Affirmer are waived, abandoned,
+    surrendered, licensed or otherwise affected by this document.
+ b. Affirmer offers the Work as-is and makes no representations or
+    warranties of any kind concerning the Work, express, implied,
+    statutory or otherwise, including without limitation warranties of
+    title, merchantability, fitness for a particular purpose, non
+    infringement, or the absence of latent or other defects, accuracy, or
+    the present or absence of errors, whether or not discoverable, all to
+    the greatest extent permissible under applicable law.
+ c. Affirmer disclaims responsibility for clearing rights of other persons
+    that may apply to the Work or any use thereof, including without
+    limitation any person's Copyright and Related Rights in the Work.
+    Further, Affirmer disclaims responsibility for obtaining any necessary
+    consents, permissions or other rights required for any use of the
+    Work.
+ d. Affirmer understands and acknowledges that Creative Commons is not a
+    party to this document and has no duty or obligation with respect to
+    this CC0 or use of the Work.
+
+-->
+<svg data-project-tab-icons-contour="language-java" data-project-tab-icons-color="#60A5FA" data-project-tab-icons-background="auto" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#60A5FA" stroke="none">
+<rect width="24" height="24" rx="4.5" fill="#12161E" fill-opacity="0.5" stroke="none"/>
+<g transform="matrix(0.12047391 0 0 0.12047391 -0.75962036 -0.04659208)"><path d="M94.191071 42.834297L94.181877 42.840717L94.176445 42.844524Q83.274574 50.496796 78.065933 55.356472Q69.100746 63.721016 64.674377 73.346611Q57.065769 89.947212 72.159256 110.39748Q79.485535 120.32391 89.34082 128.0759Q90.578575 129.20001 92.400002 129.20001Q94.368546 129.20001 95.627548 128.01241Q98.158676 125.77911 96.908981 122.44662L96.680817 121.83817L96.221321 121.37868Q95.211136 120.36849 90.798668 108.52744Q85.102478 93.241463 85.398674 83.289246Q85.474243 78.919975 100.86638 66.393181L101.19382 66.126678Q118.47891 52.123573 123.95911 43.16555Q131.88567 30.387486 128.03203 15.27139Q126.83345 10.56992 124.60491 6.2159348Q123.18887 3.4493608 122.35808 2.4419682Q120.04207 -0.68625242 116.60155 0.94692695Q112.87341 2.4236951 113.75125 6.2674327Q113.75581 6.2972188 113.76067 6.3271976Q115.68189 18.178471 109.66872 29.159052Q107.19807 33.747219 94.191071 42.834297ZM141.5676 55.924042Q141.3855 56.071022 141.12018 56.277035Q120.30519 72.438896 116.32247 79.556931Q114.19887 83.379425 114.91029 86.346405Q115.40115 88.393555 118.45551 92.974945L118.47418 93.00341Q123.79076 100.75675 125.03097 106.96011Q127.27438 117.23643 118.72325 127.84279Q115.84573 131.4119 112.48135 134.2729Q129.38632 133.04863 139.70354 130.20766L139.73785 130.19821L139.77238 130.18958Q141.66289 129.71696 143.04622 130.37047Q142.83115 129.89392 142.68958 129.32761L142.68001 129.28934L142.67145 129.25082Q141.89029 125.73577 144.92363 123.94634Q146.54163 122.90335 150.64777 121.48863Q157.00014 119.3 162.60001 119.3Q179.92284 119.29999 183.25055 138.15752Q186.22133 154.31561 165.9989 165.09726Q155.60698 170.63774 145.43993 172.59407Q144.83842 172.8 144.20001 172.8Q141.07945 172.8 139.77837 169.86389Q137.97609 166.1615 141.55888 163.88821Q149.39296 158.58365 155.60896 152.39842Q163.79996 144.24799 163.13524 140.25847Q162.13603 133.79694 147.63574 132.92722Q147.45979 132.91666 147.29724 132.89935Q146.06276 132.88356 145.14053 132.4863Q145.19397 132.58337 145.24568 132.68417Q147.14272 136.08621 144.12057 138.60464L144.11475 138.6095Q139.57629 142.39439 130.50433 145.84981Q113.03339 152.5043 88.066406 153.39539Q84.383186 153.60001 77.5 153.60001Q71.243187 153.60001 65.781029 153.32533Q65.897034 154.83058 65.09948 155.9485Q65.970192 156.08151 67.034302 156.22807Q74.091438 157.20001 83.499992 157.20001Q91.906517 157.20001 101.07815 156.21733Q113.36722 154.89117 123.85831 152.26566Q124.16309 152.18938 124.40807 152.14822L124.40684 152.14082Q126.35726 151.81578 128.04349 152.82753L128.1368 152.88351L137.29984 159.32785Q139.76175 160.99304 139.37683 164.07213L139.34813 164.30171L139.28456 164.52417Q138.52542 167.18123 135.89267 167.9646Q132.31467 169.1396 118.04321 171.64243Q97.757401 175.20001 83.399994 175.20001Q80 175.20001 76.900429 174.99338Q73.589127 174.77263 70.547287 174.40785Q70.800835 174.90414 70.967018 175.50711Q71.29837 176.45891 71.288223 177.31281Q73.451698 177.7249 77.012505 178.17351Q85.160133 179.19998 92.800011 179.19998Q97.586876 179.19998 100.19826 178.82701Q107.31107 177.86581 113.44843 176.77156Q115.61834 176.38467 117.12764 176.07632Q117.37354 176.02609 117.57367 175.98364L117.85731 175.69998L119.10001 175.69998Q120.87205 175.69998 122.03519 176.48282L133.60788 183.46634L133.66412 183.50383Q135.90001 184.99442 135.90001 187.69998L135.90001 187.91319L135.86986 188.12427Q135.48601 190.8111 133.14165 191.98328Q129.23885 193.93468 121.68989 195.96001Q108.12267 199.59999 93.599998 199.59999Q90.303345 199.59999 87.130775 199.39522Q59.447563 197.83119 53.00288 190.02957Q50.092598 186.56496 50.519962 182.15448Q51.245617 175.89568 58.797699 173.36765Q59.881596 173.00482 60.959637 172.74583Q58.506046 172.16611 56.295464 171.45642Q44.597439 167.70087 44.008827 160.9301Q43.585129 155.42198 50.512955 151.77321Q34.849655 149.1364 30.194643 142.69362Q27.135693 138.71884 28.750822 133.86073L28.753933 133.85132Q32.576935 122.30001 69.099983 122.30001Q73.407349 122.30001 73.885101 126.6015Q74.076866 128.5192 72.915062 130.05066Q71.742897 131.59578 69.895432 131.86078Q64.479698 132.97151 59.97031 134.46629Q68.075089 135.20001 83.099991 135.20001Q93.390678 135.20001 102.2261 134.84283Q101.13333 132.82513 102.31671 130.45837Q106.44241 122.20692 105.24203 118.11404Q104.85326 117.01891 102.28421 113.80711Q97.527718 108.03138 95.368874 103.51995Q91.699997 95.852936 91.699997 86.399994Q91.699997 72.884193 113.11591 59.418762Q123.60264 52.82515 136.61041 47.625309Q136.81841 47.54216 136.85774 47.525967L136.95329 47.486622L137.05133 47.453945Q141.04254 46.123554 142.92451 49.743103Q143.85899 51.340088 143.41554 53.169304Q142.99831 54.890362 141.5676 55.924042Z"/></g>
+</svg>

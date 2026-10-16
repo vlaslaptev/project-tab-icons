@@ -1,0 +1,5 @@
+<idea-plugin>
+  <extensions defaultExtensionNs="dev.vlas.projecttabicons">
+    <branchProvider implementation="dev.vlas.projecttabicons.GitProjectTabBranchProvider"/>
+  </extensions>
+</idea-plugin>

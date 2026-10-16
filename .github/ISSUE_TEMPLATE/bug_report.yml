@@ -1,0 +1,36 @@
+name: Bug report
+description: Report a problem with project window tab icons
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: input
+    id: ide
+    attributes:
+      label: IDE version and build
+      placeholder: IntelliJ IDEA 2026.2.3, IU-262.10968.63
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: macOS version, architecture, theme, and UI scale
+    validations:
+      required: true
+  - type: dropdown
+    id: icon
+    attributes:
+      label: Icon type
+      options: [Custom SVG, Custom PNG, Generated initials]
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Steps, expected behavior, and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Relevant screenshot or log excerpt
+      description: Remove personal paths, private project names, credentials, and source code.

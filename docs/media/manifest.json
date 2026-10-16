@@ -1,0 +1,43 @@
+{
+  "version": "0.3.46",
+  "kind": "informational illustrations, not runtime screenshots",
+  "iconCount": 121,
+  "files": [
+    {
+      "name": "hero-dark",
+      "title": "Project Tab Icons — Find your project at a glance",
+      "width": 1600,
+      "height": 900
+    },
+    {
+      "name": "hero-light",
+      "title": "Project Tab Icons — Find your project at a glance",
+      "width": 1600,
+      "height": 900
+    },
+    {
+      "name": "appearance-presets",
+      "title": "Project Tab Icons appearance presets",
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "name": "icon-library",
+      "title": "All 121 icons bundled in Project Tab Icons",
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "name": "git-context",
+      "title": "Git branch and line-count examples for Project Tab Icons",
+      "width": 1600,
+      "height": 1000
+    },
+    {
+      "name": "social-preview",
+      "title": "Project Tab Icons GitHub social preview",
+      "width": 1280,
+      "height": 640
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+cat	Cat	OWN	Nature	кот кошка
+rabbit	Rabbit	PHOSPHOR	Nature	кролик заяц
+bird	Bird	PHOSPHOR	Nature	птица
+fish	Fish	PHOSPHOR	Nature	рыба
+bug	Bug	PHOSPHOR	Nature	жук ошибка debug
+rocket	Rocket	PHOSPHOR	Travel	ракета запуск
+plane	Plane	PHOSPHOR	Travel	самолёт
+car	Car	PHOSPHOR	Travel	машина автомобиль
+language-swift	Swift	DEVICON	Languages	свифт ios
+ship	Ship	PHOSPHOR	Travel	корабль лодка
+train-front	Train	PHOSPHOR	Travel	поезд
+flame	Flame	PHOSPHOR	Nature	огонь пламя
+zap	Lightning	PHOSPHOR	Objects	молния энергия
+sun	Sun	PHOSPHOR	Nature	солнце
+moon	Moon	PHOSPHOR	Nature	луна
+paw-print	Paw print	PHOSPHOR	Nature	лапа след
+umbrella	Umbrella	PHOSPHOR	Nature	зонт дождь
+tree-pine	Pine tree	PHOSPHOR	Nature	ёлка сосна
+leaf	Leaf	PHOSPHOR	Nature	лист
+mountain	Mountain	PHOSPHOR	Nature	гора
+shark-face	Shark	CC0	Nature	акула
+tent	Tent	PHOSPHOR	Travel	палатка
+compass	Compass	PHOSPHOR	Travel	компас
+globe	Globe	PHOSPHOR	Travel	глобус мир
+crown	Crown	PHOSPHOR	Objects	корона
+trophy	Trophy	PHOSPHOR	Objects	кубок награда
+shield	Shield	PHOSPHOR	Objects	щит защита
+sword	Sword	PHOSPHOR	Objects	меч
+lock	Lock	PHOSPHOR	Objects	замок безопасность
+heart	Heart	PHOSPHOR	Objects	сердце
+star	Star	PHOSPHOR	Objects	звезда
+ghost	Ghost	PHOSPHOR	Objects	призрак
+terminal-window	Terminal	PHOSPHOR	Development	терминал консоль shell cli
+lightbulb	Light bulb	PHOSPHOR	Development	лампочка идея
+puzzle	Puzzle	PHOSPHOR	Development	пазл
+gamepad-2	Game controller	PHOSPHOR	Objects	геймпад игра
+pizza	Pizza	PHOSPHOR	Objects	пицца
+cherry	Cherries	PHOSPHOR	Objects	вишня
+music	Music	PHOSPHOR	Objects	музыка
+headphones	Headphones	PHOSPHOR	Objects	наушники
+camera	Camera	PHOSPHOR	Objects	камера фото
+package	Package	PHOSPHOR	Development	пакет коробка
+language-java	Java	CC0	Languages	джава jvm
+language-ruby	Ruby	DEVICON	Languages	руби рубин
+language-kotlin	Kotlin	DEVICON	Languages	котлин jvm
+language-javascript	JavaScript	DEVICON	Languages	джаваскрипт js
+language-python	Python	DEVICON	Languages	питон пайтон py
+language-go	Go	DEVICON	Languages	го golang
+language-typescript	TypeScript	DEVICON	Languages	тайпскрипт ts
+code	Code	PHOSPHOR	Development	код разработка html
+brackets-curly	Braces	PHOSPHOR	Development	скобки json объект
+git-branch	Git branch	PHOSPHOR	Development	ветка гит branch
+git-commit	Git commit	PHOSPHOR	Development	коммит гит revision
+git-merge	Git merge	PHOSPHOR	Development	слияние гит
+git-pull-request	Pull request	PHOSPHOR	Development	ревью гит pr review
+tree-structure	Structure	PHOSPHOR	Development	структура дерево hierarchy
+stack	Stack	PHOSPHOR	Development	стек слои layers
+cube	Cube	PHOSPHOR	Development	куб модуль module
+squares-four	Modules	PHOSPHOR	Development	модули dashboard grid
+function	Function	PHOSPHOR	Development	функция метод method
+cpu	CPU	PHOSPHOR	Development	процессор чип chip
+plug	Plugin	PHOSPHOR	Development	плагин расширение extension
+wrench	Wrench	PHOSPHOR	Development	инструмент ремонт repair
+gear-six	Settings	PHOSPHOR	Development	настройки шестерёнка gear
+hammer	Build	PHOSPHOR	Development	сборка молоток hammer
+play	Run	PHOSPHOR	Development	запуск play
+flask	Experiment	PHOSPHOR	Development	эксперимент колба test lab
+database	Database	PHOSPHOR	Infrastructure	база данных sql storage
+hard-drives	Server	PHOSPHOR	Infrastructure	сервер диски storage
+cloud	Cloud	PHOSPHOR	Infrastructure	облако remote
+cloud-arrow-up	Deploy	PHOSPHOR	Infrastructure	деплой загрузка upload
+wifi-high	Wi-Fi	PHOSPHOR	Infrastructure	сеть интернет wireless
+globe-simple	Web	PHOSPHOR	Infrastructure	сайт веб интернет world
+desktop	Desktop	PHOSPHOR	Infrastructure	компьютер монитор monitor
+laptop	Laptop	PHOSPHOR	Infrastructure	ноутбук computer
+device-mobile	Mobile	PHOSPHOR	Infrastructure	телефон мобильный phone
+network	Network	PHOSPHOR	Infrastructure	сеть соединения nodes
+robot	Robot	PHOSPHOR	Infrastructure	робот бот автоматизация bot
+browser	Browser	PHOSPHOR	Infrastructure	браузер окно window
+folder	Folder	PHOSPHOR	Files & work	папка каталог directory
+folder-open	Open folder	PHOSPHOR	Files & work	открытая папка directory
+file	File	PHOSPHOR	Files & work	файл документ document
+file-code	Code file	PHOSPHOR	Files & work	код файл source
+file-text	Text file	PHOSPHOR	Files & work	текст файл document
+archive	Archive	PHOSPHOR	Files & work	архив коробка backup
+clipboard	Clipboard	PHOSPHOR	Files & work	буфер список copy
+book-open	Book	PHOSPHOR	Files & work	книга документация docs
+notebook	Notebook	PHOSPHOR	Files & work	блокнот заметки notes
+briefcase	Work	PHOSPHOR	Files & work	работа портфель business
+calendar-blank	Calendar	PHOSPHOR	Files & work	календарь дата date
+clock	Clock	PHOSPHOR	Files & work	часы время time
+flag	Flag	PHOSPHOR	Files & work	флаг цель milestone
+tag	Tag	PHOSPHOR	Files & work	метка тег label
+bookmark-simple	Bookmark	PHOSPHOR	Files & work	закладка save
+magnifying-glass	Search	PHOSPHOR	Files & work	поиск лупа find
+funnel	Filter	PHOSPHOR	Files & work	фильтр отбор
+chart-bar	Chart	PHOSPHOR	Files & work	график статистика analytics
+bell	Bell	PHOSPHOR	Objects	колокол уведомления notification
+key	Key	PHOSPHOR	Objects	ключ доступ access
+house	Home	PHOSPHOR	Objects	дом главная
+envelope-simple	Mail	PHOSPHOR	Objects	почта письмо email
+chat-circle	Chat	PHOSPHOR	Objects	чат сообщение message
+link-simple	Link	PHOSPHOR	Objects	ссылка связь url
+paperclip	Attachment	PHOSPHOR	Objects	скрепка вложение attach
+eye	Eye	PHOSPHOR	Objects	глаз просмотр view
+diamond	Diamond	PHOSPHOR	Objects	ромб алмаз gem
+hexagon	Hexagon	PHOSPHOR	Objects	шестиугольник shape
+crosshair	Target	PHOSPHOR	Objects	цель прицел focus
+anchor	Anchor	PHOSPHOR	Objects	якорь море sea
+dog	Dog	PHOSPHOR	Nature	собака пёс pet
+butterfly	Butterfly	PHOSPHOR	Nature	бабочка insect
+flower	Flower	PHOSPHOR	Nature	цветок bloom
+plant	Plant	PHOSPHOR	Nature	растение рост growth
+cactus	Cactus	PHOSPHOR	Nature	кактус desert
+tree	Tree	PHOSPHOR	Nature	дерево лес forest
+cloud-sun	Weather	PHOSPHOR	Nature	погода облако солнце
+snowflake	Snowflake	PHOSPHOR	Nature	снежинка зима snow
+bicycle	Bicycle	PHOSPHOR	Travel	велосипед bike
+sailboat	Sailboat	PHOSPHOR	Travel	парусник лодка boat
+steering-wheel	Steering wheel	PHOSPHOR	Travel	руль вождение drive
+suitcase-simple	Suitcase	PHOSPHOR	Travel	чемодан путешествие luggage

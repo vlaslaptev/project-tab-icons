@@ -1,0 +1,1595 @@
+{
+  "style": "filled silhouettes",
+  "collections": [
+    {
+      "collection": "Phosphor",
+      "commit": "2b75f3ad12b420c9504ef05df8d2564a28f8500e",
+      "date": "2026-01-06T21:28:48Z",
+      "license": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/LICENSE",
+      "licenseSha256": "b5b1f1da112d18ea2147decfd48ddc1bf2b5aeb6c265381579340e95b15a2bb2",
+      "icons": [
+        {
+          "id": "rabbit",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/rabbit-fill.svg",
+          "sourceSha256": "d8b14c2ad2b482e5627568ea7841cec21bc0608b0804e537031fd2a8bdf067f5",
+          "sha256": "dd4ce520e0a5b051b852968affa56a0654a387987bdaf6f4dc51f87be1dbd79e",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 40,
+            "y": 8,
+            "width": 176.16666666666666,
+            "height": 232.16666666666666
+          },
+          "normalizationMatrix": [
+            0.10337401292175162,
+            0,
+            0,
+            0.10337401292175162,
+            -1.2404881550610192,
+            -0.826992103374013
+          ]
+        },
+        {
+          "id": "bird",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/bird-fill.svg",
+          "sourceSha256": "8509262cd0642bb63c977207f53823760a0be6dd43f12ad7444df19914b9b085",
+          "sha256": "d74c17571310c33b87d8e34580f88d2448a533097ce0fcd533ad609a79cb6a43",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 8,
+            "y": 16,
+            "width": 232.08333333333334,
+            "height": 208
+          },
+          "normalizationMatrix": [
+            0.10341113105924596,
+            0,
+            0,
+            0.10341113105924596,
+            -0.8272890484739677,
+            -0.4093357271095148
+          ]
+        },
+        {
+          "id": "fish",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/fish-fill.svg",
+          "sourceSha256": "292791230553f517bd10a26437ce3469f4a7fda2c91f7082dc5eef62e1dddf21",
+          "sha256": "fa4fdcbc1c99af311988b331a4196dcd8916a4d271bbe7a7a9b0a99a9c8c1918",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 0,
+            "y": 24,
+            "width": 232,
+            "height": 232
+          },
+          "normalizationMatrix": [
+            0.10344827586206896,
+            0,
+            0,
+            0.10344827586206896,
+            0,
+            -2.4827586206896552
+          ]
+        },
+        {
+          "id": "bug",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/bug-fill.svg",
+          "sourceSha256": "91e955a8df4bdf30dc335e12efba12db482bf112a0609c3918c10872d3c1994b",
+          "sha256": "564f09fe01eafc779089c7b34eae254a4f53a1f9461be546ae04e6c03a3801d5",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 8,
+            "y": 23.916666666666668,
+            "width": 240,
+            "height": 208.16666666666666
+          },
+          "normalizationMatrix": [
+            0.1,
+            0,
+            0,
+            0.1,
+            -0.8,
+            -0.8000000000000003
+          ]
+        },
+        {
+          "id": "rocket",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/rocket-fill.svg",
+          "sourceSha256": "dd88c6f79e898060c8853db5e8a777bd1fcbced752f34440a709f358c94c7bb0",
+          "sha256": "5c5d65f55931d5765c0b23f7f25ac62761550a993f69abc8bcc655a8b24bfd08",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 32,
+            "y": 7.916666666666667,
+            "width": 192,
+            "height": 224.08333333333334
+          },
+          "normalizationMatrix": [
+            0.10710301227222015,
+            0,
+            0,
+            0.10710301227222015,
+            -1.7091855708441792,
+            -0.8478988471550762
+          ]
+        },
+        {
+          "id": "plane",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/airplane-fill.svg",
+          "sourceSha256": "7333303f2a0240f3d4156f84a887b499f9d5dde90ee3a3b5df45064f8a781a36",
+          "sha256": "dfed30fad14e84a5b87f301a739f79508bdcf2498be7ebb5edf4d13a5fc9b8db",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 16,
+            "y": 16,
+            "width": 224,
+            "height": 224.08333333333334
+          },
+          "normalizationMatrix": [
+            0.10710301227222015,
+            0,
+            0,
+            0.10710301227222015,
+            -1.709185570844178,
+            -1.7136481963555223
+          ]
+        },
+        {
+          "id": "car",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/car-fill.svg",
+          "sourceSha256": "ba61d87b3526dec2adee1311ebc83518a0c85893384b068d2dd7b2c51d4dc917",
+          "sha256": "d2b1d8485c1a5b2cebf2b8eef959963179aeda4876ddfbe21d76dd4901b5b1f6",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 8,
+            "y": 32,
+            "width": 240,
+            "height": 184
+          },
+          "normalizationMatrix": [
+            0.1,
+            0,
+            0,
+            0.1,
+            -0.8,
+            -0.40000000000000124
+          ]
+        },
+        {
+          "id": "ship",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/boat-fill.svg",
+          "sourceSha256": "6ba5d06831d41cbdd951feb5e85387a3ad99ebe8afebaf8d58021a9fb886747e",
+          "sha256": "a0a47863f69a383bcdb6064b2b268614b914b717514e92bbc24538ece9b555de",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 24,
+            "y": 16,
+            "width": 208,
+            "height": 224
+          },
+          "normalizationMatrix": [
+            0.10714285714285714,
+            0,
+            0,
+            0.10714285714285714,
+            -1.7142857142857135,
+            -1.7142857142857142
+          ]
+        },
+        {
+          "id": "train-front",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/train-fill.svg",
+          "sourceSha256": "559c7f2fbed4fe9cb1ccb38900b6a2f24f9c2d0ce3c77347dddeeca4c7914a08",
+          "sha256": "08f8d28013d9a831284269d85e24cd68fcb28ae8a0796e3bbd33544b4502c1a2",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 40,
+            "y": 24,
+            "width": 176,
+            "height": 224
+          },
+          "normalizationMatrix": [
+            0.10714285714285714,
+            0,
+            0,
+            0.10714285714285714,
+            -1.7142857142857144,
+            -2.571428571428571
+          ]
+        },
+        {
+          "id": "flame",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/fire-fill.svg",
+          "sourceSha256": "512355fb2a156f0c39485a28bc6f81cf1df3de35faed9c5ad62c30cec5d8d63c",
+          "sha256": "05e914543202eb1d264853ef3a9e98e35e420a4856ca44882af3df0daf4e77d0",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 40,
+            "y": 16,
+            "width": 176,
+            "height": 216
+          },
+          "normalizationMatrix": [
+            0.1111111111111111,
+            0,
+            0,
+            0.1111111111111111,
+            -2.2222222222222214,
+            -1.7777777777777777
+          ]
+        },
+        {
+          "id": "zap",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/lightning-fill.svg",
+          "sourceSha256": "024d190cc1ce86eb59184eb7a598604ad28946248243fbc0cf07b9887babf88d",
+          "sha256": "62d7e903e1e70463736e3a904db78478f7efd045616d1db419f01595d5292bb5",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 39.916666666666664,
+            "y": 7.916666666666667,
+            "width": 176.08333333333334,
+            "height": 240.08333333333334
+          },
+          "normalizationMatrix": [
+            0.09996528982992016,
+            0,
+            0,
+            0.09996528982992016,
+            -0.7913918778202014,
+            -0.7913918778202013
+          ]
+        },
+        {
+          "id": "sun",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/sun-fill.svg",
+          "sourceSha256": "343fb225b7f7dddd7b6b80e1cec533cf7839da96e0513c6da40e88dd24306154",
+          "sha256": "16239d089d8608bd85d38702418b1d421409dc880c2cf3eb1c7aa3082340afc4",
+          "modifications": "Phosphor filled sun adapted with 20-unit rays instead of 16 and a 54-unit center radius instead of 64; monochrome and normalized to maximum ink bounds.",
+          "sourceBounds": {
+            "x": 8,
+            "y": 8,
+            "width": 240,
+            "height": 240
+          },
+          "normalizationMatrix": [
+            0.1,
+            0,
+            0,
+            0.1,
+            -0.8,
+            -0.8
+          ]
+        },
+        {
+          "id": "moon",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/moon-fill.svg",
+          "sourceSha256": "099574dba1662cf9cdff50a1859ae8cc605a9b6a10bace00d89a0f52205e76df",
+          "sha256": "6d7a3c87a6474c0af462fa08098f5cafbab137de19b0da798c893fde8c9926b1",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 32,
+            "y": 20.083333333333332,
+            "width": 204,
+            "height": 204
+          },
+          "normalizationMatrix": [
+            0.11764705882352941,
+            0,
+            0,
+            0.11764705882352941,
+            -3.764705882352941,
+            -2.3627450980392157
+          ]
+        },
+        {
+          "id": "paw-print",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/paw-print-fill.svg",
+          "sourceSha256": "7eafc5e69cf447b8eaa919b7b5c229f92e8901750c65a12ef5bf9d03c4c474db",
+          "sha256": "c71beb7ba5ac92c948c2ee649e44f209cdcde2be384a6395723a8bf8e28e2a16",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 16,
+            "y": 32,
+            "width": 224,
+            "height": 192.25
+          },
+          "normalizationMatrix": [
+            0.10714285714285714,
+            0,
+            0,
+            0.10714285714285714,
+            -1.7142857142857142,
+            -1.7276785714285707
+          ]
+        },
+        {
+          "id": "umbrella",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/umbrella-fill.svg",
+          "sourceSha256": "9ed07a79565a8bfa1706b7368ce636338062821ed4667db01a998b9bf751439e",
+          "sha256": "0bd53d9a26f00fed144357df597e1d31533756b5a5be81bf04ae77fb2c7d408c",
+          "modifications": "Simplified filled umbrella adaptation: solid canopy; internal ribs removed.",
+          "sourceBounds": {
+            "x": 1,
+            "y": 0,
+            "width": 22,
+            "height": 24
+          },
+          "normalizationMatrix": [
+            1,
+            0,
+            0,
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "tree-pine",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/tree-evergreen-fill.svg",
+          "sourceSha256": "7b266525b4a903718b1f3f016b89f6f38bde3c65eb4e26690be2f81862564514",
+          "sha256": "d05736782882f215cbc6f1699934893a42c7d85f58a526e7f747afc409d083f2",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 24,
+            "y": 8,
+            "width": 208,
+            "height": 240
+          },
+          "normalizationMatrix": [
+            0.1,
+            0,
+            0,
+            0.1,
+            -0.8000000000000007,
+            -0.8
+          ]
+        },
+        {
+          "id": "leaf",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/leaf-fill.svg",
+          "sourceSha256": "4158fa6059b4f921314b6cf638a094147a7577efa3d887fa929ec542d0359c91",
+          "sha256": "86bcecafec318f3cea156bb7675a9efae543f254a568b43d723c9b8545156d8c",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 39.916666666666664,
+            "y": 32,
+            "width": 184.16666666666666,
+            "height": 192
+          },
+          "normalizationMatrix": [
+            0.125,
+            0,
+            0,
+            0.125,
+            -4.499999999999999,
+            -4
+          ]
+        },
+        {
+          "id": "mountain",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/mountains-fill.svg",
+          "sourceSha256": "84d635ae899a9eb916fc1ed698d809cca60be8650bd0c2e83144899ff0498b18",
+          "sha256": "e0b7641ff04cba327c1be0892f1b0359994119c43784acb1cc2d2927ab4cbf97",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 0,
+            "y": 28,
+            "width": 256,
+            "height": 180
+          },
+          "normalizationMatrix": [
+            0.09375,
+            0,
+            0,
+            0.09375,
+            0,
+            0.9375
+          ]
+        },
+        {
+          "id": "tent",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/tent-fill.svg",
+          "sourceSha256": "451e06f7a577e4097f140aa3673eafa2204b0d6588392b587292870f2d3f9d5f",
+          "sha256": "96badc858b06618d376c07b54154ccc81e57d2b14f549980b17406383c2c67a6",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 0,
+            "y": 40,
+            "width": 256,
+            "height": 160
+          },
+          "normalizationMatrix": [
+            0.09375,
+            0,
+            0,
+            0.09375,
+            0,
+            0.75
+          ]
+        },
+        {
+          "id": "compass",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/compass-fill.svg",
+          "sourceSha256": "9663ec833384ba767b617ba3c256a3e00a23bd666810e2f2214171896498b6dc",
+          "sha256": "776815694edcf5fbff2be994aab0e84bfebe68a3eec271f581960999cb2fa5cf",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 24,
+            "y": 24,
+            "width": 208,
+            "height": 208
+          },
+          "normalizationMatrix": [
+            0.11538461538461539,
+            0,
+            0,
+            0.11538461538461539,
+            -2.769230769230769,
+            -2.769230769230769
+          ]
+        },
+        {
+          "id": "globe",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/globe-hemisphere-west-fill.svg",
+          "sourceSha256": "ea3bc8e9cb32d330074de373a73e5b95dfca38ae46f601768e82246c01bd9e9a",
+          "sha256": "40300e5e3698a872cf3e6025e1e5f2781422ab7db50e1f050cfc703bd15552da",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 24,
+            "y": 24,
+            "width": 208,
+            "height": 208
+          },
+          "normalizationMatrix": [
+            0.11538461538461539,
+            0,
+            0,
+            0.11538461538461539,
+            -2.769230769230769,
+            -2.769230769230769
+          ]
+        },
+        {
+          "id": "crown",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/crown-fill.svg",
+          "sourceSha256": "a285272ce54401826e1458e5437aaa5dd78b5bb92b75092093f091eb024b0a45",
+          "sha256": "1820b453e2049b89869468fc537f99ad44a855a18ea5a03e8897d12fbd391073",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox. Three tiny crown holes filled.",
+          "sourceBounds": {
+            "x": 7.916666666666667,
+            "y": 23.916666666666668,
+            "width": 240.08333333333334,
+            "height": 184.08333333333334
+          },
+          "normalizationMatrix": [
+            0.09996528982992016,
+            0,
+            0,
+            0.09996528982992016,
+            -0.7913918778202013,
+            0.4081916001388399
+          ]
+        },
+        {
+          "id": "trophy",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/trophy-fill.svg",
+          "sourceSha256": "6d12bce1ad52193fe62e6d9cba30fbce19b355f3f096cafc316c3bc36c1f7ebe",
+          "sha256": "508cddbb99c3bebb0d4668608350f52b66f06f5dbcee55b1e3389f85316d9d03",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 8,
+            "y": 40,
+            "width": 240,
+            "height": 192
+          },
+          "normalizationMatrix": [
+            0.1,
+            0,
+            0,
+            0.1,
+            -0.8,
+            -1.6000000000000014
+          ]
+        },
+        {
+          "id": "shield",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/shield-fill.svg",
+          "sourceSha256": "799e2b0224cb1bdcd2b228609c0494e2e4e4e74a59df92612499803bd7090f9d",
+          "sha256": "92a4a861fba595d0f447a4eccacf90f9c7c729848e0ca1b7998b2e4e39704e49",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 32,
+            "y": 40,
+            "width": 192,
+            "height": 200
+          },
+          "normalizationMatrix": [
+            0.12,
+            0,
+            0,
+            0.12,
+            -3.3599999999999994,
+            -4.8
+          ]
+        },
+        {
+          "id": "sword",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/sword-fill.svg",
+          "sourceSha256": "39d95d1eec8ba2fb846298015c330a7d10dd85fd39b6e400774646788afc3fb2",
+          "sha256": "9d66fbe7ab0cecc43ac285f70cf62ebef12e761992b48cd069bb69a57ca8bcb9",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox. Blade cutout filled; fine groove removed.",
+          "sourceBounds": {
+            "x": 25.916666666666668,
+            "y": 32,
+            "width": 198.08333333333334,
+            "height": 198.08333333333334
+          },
+          "normalizationMatrix": [
+            0.12116112747160286,
+            0,
+            0,
+            0.12116112747160286,
+            -3.140092553639041,
+            -3.8771560790912916
+          ]
+        },
+        {
+          "id": "lock",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/lock-fill.svg",
+          "sourceSha256": "7c3bb342922c2eb313d14a196d50dd897f7048e336da9382c418242e59c4cf79",
+          "sha256": "961248a9e8a0495608724152eb289656eeb4afbc1bf6d86a50b86cbaea80ca1b",
+          "modifications": "Phosphor filled lock adapted with a 24-unit inner shackle radius instead of 32; monochrome and normalized to maximum ink bounds.",
+          "sourceBounds": {
+            "x": 32,
+            "y": 8,
+            "width": 192,
+            "height": 216
+          },
+          "normalizationMatrix": [
+            0.1111111111111111,
+            0,
+            0,
+            0.1111111111111111,
+            -2.2222222222222214,
+            -0.8888888888888888
+          ]
+        },
+        {
+          "id": "heart",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/heart-fill.svg",
+          "sourceSha256": "d90560d4f762f1b345bd2322cd1ef696926ffa74b0c1396933b6d926faf8341e",
+          "sha256": "f19b9f05526f2777e8d9571925189793e2ca2fcf182295e29a59c2a7941b9ed9",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 16,
+            "y": 40,
+            "width": 224,
+            "height": 192
+          },
+          "normalizationMatrix": [
+            0.10714285714285714,
+            0,
+            0,
+            0.10714285714285714,
+            -1.7142857142857142,
+            -2.5714285714285703
+          ]
+        },
+        {
+          "id": "star",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/star-fill.svg",
+          "sourceSha256": "42451b34121b695bdaab88fdcf3eacec9cda9ac36d222349609426dcb9f04b48",
+          "sha256": "b7253b49f8d4354ea72308a3ef4b567e714d7d46bf38de96c98c75e44cc056d1",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 16,
+            "y": 16,
+            "width": 224,
+            "height": 216
+          },
+          "normalizationMatrix": [
+            0.10714285714285714,
+            0,
+            0,
+            0.10714285714285714,
+            -1.7142857142857142,
+            -1.2857142857142854
+          ]
+        },
+        {
+          "id": "ghost",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/ghost-fill.svg",
+          "sourceSha256": "de9cde53225677f9f5cdebc92ffa02a7c150d6736b75d12b2f5b8f46171e9835",
+          "sha256": "a6b8ee3e694587e841ed14de2cfb8aeaee0151fe53422c1c3fffbc31114e51f3",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 32,
+            "y": 24,
+            "width": 192,
+            "height": 200
+          },
+          "normalizationMatrix": [
+            0.12,
+            0,
+            0,
+            0.12,
+            -3.3599999999999994,
+            -2.88
+          ]
+        },
+        {
+          "id": "terminal-window",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/terminal-window-fill.svg",
+          "sourceSha256": "35ae0aa334e570d44ac77ec031f038e89ab82e25d56ba26c18760910130ecdc7",
+          "sha256": "ae86340ef3ab47f6a1d18e5f7073012701e6fc0adedf5e6486b1b27740f0ac28",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 24,
+            "y": 40,
+            "width": 208,
+            "height": 176
+          },
+          "normalizationMatrix": [
+            0.11538461538461539,
+            0,
+            0,
+            0.11538461538461539,
+            -2.769230769230769,
+            -2.769230769230771
+          ]
+        },
+        {
+          "id": "lightbulb",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/lightbulb-fill.svg",
+          "sourceSha256": "31539e7dee97567a4fa3e5c8c8830cf4e23a1050d073b6f871ebb07d1694e664",
+          "sha256": "1235cd58f40860aed558cbab543d3aa8c83f4bedb02ddc48745625d175585689",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 40,
+            "y": 15.916666666666666,
+            "width": 176,
+            "height": 224.08333333333334
+          },
+          "normalizationMatrix": [
+            0.10710301227222015,
+            0,
+            0,
+            0.10710301227222015,
+            -1.7091855708441779,
+            -1.7047229453328372
+          ]
+        },
+        {
+          "id": "puzzle",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/puzzle-piece-fill.svg",
+          "sourceSha256": "1067dab98fff3cdaf27b39f0ebf6e0caa9de0500e72b1655ba932d3e17f06e6d",
+          "sha256": "f984cd0f2bbc442fc05322300d34a7345a0b15232cb186fa7fde2dd89ff20e9f",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 8,
+            "y": 16,
+            "width": 216,
+            "height": 208
+          },
+          "normalizationMatrix": [
+            0.1111111111111111,
+            0,
+            0,
+            0.1111111111111111,
+            -0.8888888888888888,
+            -1.333333333333333
+          ]
+        },
+        {
+          "id": "gamepad-2",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/game-controller-fill.svg",
+          "sourceSha256": "9dcb7af7b4854bb2da15ab1852292428c4d95314b06cd25aa5f45f21b3134884",
+          "sha256": "cab7e1b78d43a65af238b243ae6334658af1d9d9d4fc86043df905205e29ae44",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 8,
+            "y": 40,
+            "width": 240,
+            "height": 176
+          },
+          "normalizationMatrix": [
+            0.1,
+            0,
+            0,
+            0.1,
+            -0.8,
+            -0.8000000000000007
+          ]
+        },
+        {
+          "id": "pizza",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/pizza-fill.svg",
+          "sourceSha256": "a35298a31e8756833ed41827fb7e8397cb56c91d23936490678b3a4aae6ca583",
+          "sha256": "ff3bcf33349560b112035977a98a7e5bd40a0fedddab8be9cf2d0570b09c0b0e",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 16,
+            "y": 24,
+            "width": 224.08333333333334,
+            "height": 216.08333333333334
+          },
+          "normalizationMatrix": [
+            0.10710301227222015,
+            0,
+            0,
+            0.10710301227222015,
+            -1.7136481963555223,
+            -2.1420602454444033
+          ]
+        },
+        {
+          "id": "cherry",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/cherries-fill.svg",
+          "sourceSha256": "01a5e440db7aebd19b5e0bfdc7cd18b872b57d1614968b4406a98b8c115650c5",
+          "sha256": "73e063a02485a2aefac77739a177b779a0edd7cff48417098c2b5b6cdc42a6ce",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 15.75,
+            "y": 23.166666666666668,
+            "width": 233.41666666666666,
+            "height": 209
+          },
+          "normalizationMatrix": [
+            0.10282042127811496,
+            0,
+            0,
+            0.10282042127811496,
+            -1.6194216351303106,
+            -1.126740449839342
+          ]
+        },
+        {
+          "id": "music",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/music-notes-fill.svg",
+          "sourceSha256": "ddfa03bf39856870a4898b830525136583179dc019aa0ab8689eb5b7a65bc50d",
+          "sha256": "85c67cd8e7eecfc71e36fdae0946371b1dfa80daf7adb15a175c950ba9c03f12",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 15.916666666666666,
+            "y": 16,
+            "width": 200.08333333333334,
+            "height": 216.08333333333334
+          },
+          "normalizationMatrix": [
+            0.1110682607018897,
+            0,
+            0,
+            0.1110682607018897,
+            -0.8792903972232944,
+            -1.7770921712302352
+          ]
+        },
+        {
+          "id": "headphones",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/headphones-fill.svg",
+          "sourceSha256": "35db98ea0b59f4c8c81902d066a8f6db58680f99e48d1a36e6e167e3ef1a6751",
+          "sha256": "573e59ca5639fecf5bb0b1aa055d3a3f7414e3aa1ed7f1d80383596499d8fc06",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 24,
+            "y": 24,
+            "width": 208,
+            "height": 184
+          },
+          "normalizationMatrix": [
+            0.11538461538461539,
+            0,
+            0,
+            0.11538461538461539,
+            -2.769230769230769,
+            -1.384615384615386
+          ]
+        },
+        {
+          "id": "camera",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/camera-fill.svg",
+          "sourceSha256": "c7528f079621e9b93eded98c1579463ec3b888dc821d5c238fc50287431d46c6",
+          "sha256": "4e3ed28a4e5d37791db1ee8d12664b54516a21da5b0a892d29e5e47b2af62263",
+          "modifications": "Filled version; monochrome and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 24,
+            "y": 32,
+            "width": 208,
+            "height": 184
+          },
+          "normalizationMatrix": [
+            0.11538461538461539,
+            0,
+            0,
+            0.11538461538461539,
+            -2.769230769230769,
+            -2.3076923076923093
+          ]
+        },
+        {
+          "id": "package",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/package-fill.svg",
+          "sourceSha256": "4fa88054eefc32099e7fdc802cf4b4a1368cbbd914f06ab673fb54c11202bd49",
+          "sha256": "72b314d1788c4c00c60f0d23b174c54f189055cf40eaab3acb7a594cdd1e0e54",
+          "modifications": "Simplified filled cube adaptation: three solid faces separated by one broad transparent Y-shaped seam; tiny flap removed.",
+          "sourceBounds": {
+            "x": 0,
+            "y": 0,
+            "width": 24,
+            "height": 24
+          },
+          "normalizationMatrix": [
+            1,
+            0,
+            0,
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "code",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/code-fill.svg",
+          "sourceSha256": "51cc35968a2f0960da2d7555e5b80925a0fcece8b277f816f549211482da10cb",
+          "sha256": "7bcc8ad31c91460a2bb7b1cb9fbc8ca0b156d66924173acd780fdc22f7f6f9d0",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "brackets-curly",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/brackets-curly-fill.svg",
+          "sourceSha256": "c2531d269aeec03244fc77285e8e387372ebd9530a55f7a3c09622c920777691",
+          "sha256": "9a73a37a7be1dfce6fb8218fd9e5368f4a0894abcf7b7e7df0086a01e507dd9c",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "git-branch",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/git-branch-fill.svg",
+          "sourceSha256": "be2eb99d7524324e266ddf8e17c6843622b4c8b2adda08ac9ffcbac7ec79e295",
+          "sha256": "dbd447f3e24a1673fb39834de993bdd65704eb4c050e59bdef481eb4447da030",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "git-commit",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/git-commit-fill.svg",
+          "sourceSha256": "93d24086c702292abb105b79e98210cb4f7ab150fbf5259e7aeb856b74fd4084",
+          "sha256": "095fbb8fd571d2b667532bc4627935b6b45caa71ba5e493dbecfe4747100d8e6",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "git-merge",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/git-merge-fill.svg",
+          "sourceSha256": "174db20fccb3a9de9381510587a92cac104fd626e083f0371731afa8594f9c14",
+          "sha256": "d47c4fd92913f099b6f951933e7eec449c84eb25ee7bf26994b46b98269cd0cb",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "git-pull-request",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/git-pull-request-fill.svg",
+          "sourceSha256": "9cff21cf5f22353d492b2852910109877403155c0276b4940b3859eab7e373f8",
+          "sha256": "2803da111e78527ae457ddac56360d7466fcc0977878feaec2de6ab05105a2c9",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "tree-structure",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/tree-structure-fill.svg",
+          "sourceSha256": "8299e150bb8d5faaafaf3a42d185b94bb2d9b2329ff2f03e4f96f87007e9d2a4",
+          "sha256": "e69e69b4f45f4c60e67b3a165bd36882818fffba11e3fc3777ea21bd1eaeeeae",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "stack",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/stack-fill.svg",
+          "sourceSha256": "549d53f6eaf6a1da0d66be403180199f1578f0651506bfc137ae036b1fc2a60b",
+          "sha256": "49b6a452f3515856fe9f9fd73a04351d99f91a3efcf9bc222c4e2f2d2d0bea9e",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "cube",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/cube-fill.svg",
+          "sourceSha256": "9c681bfc8547fbb142d5df4d69ad923af5c422fea1013e6d69c32cef9ced3de3",
+          "sha256": "deb54fd9d4e8772918a24ad1a99bc71159879d88d6043d6ea53b44740145a3ec",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "squares-four",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/squares-four-fill.svg",
+          "sourceSha256": "728b2dbfa447ec3fec54f0f8b3b52cec573c51da00c00a6d73f699027758340c",
+          "sha256": "cb696f33c2188a8e4ef0b5a285bdf1941e52fd5375f082473903133d6d72630e",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "function",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/function-fill.svg",
+          "sourceSha256": "d07f3aa6087f922e0bfa3dc02fb79cec388b300446872390d1f3911605d7d0d8",
+          "sha256": "986e292ce0b9c72909c8f6464def9d40855bbfa24e30885bc90b1fc3c2ac8780",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "cpu",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/cpu-fill.svg",
+          "sourceSha256": "03265526233e4f07528aee24d2dee2b0a70e9c080c7cc22b9066486fe62c4b10",
+          "sha256": "b50d7abeaef86ba01d029c862670dc0cdf9fba9f229ba9346759c3bc34534bd0",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "plug",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/plug-fill.svg",
+          "sourceSha256": "b829d148f18ad4cd80776b5a46d04d5cf11a4bbac5a40b96eb978798dd1ecfa6",
+          "sha256": "53fd92115210b15e99a0b3a34543a95924f8a4b7b8085bb9d88d7a703e8753b9",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "wrench",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/wrench-fill.svg",
+          "sourceSha256": "a04703c10ffb2adaae16d1e434c76cd013938027d74adc5d80c66ab8eae9c61d",
+          "sha256": "55607b5788b3ca3bb1d3684db7b3129a3b9fcc2090015924c832ea45f8974060",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "gear-six",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/gear-six-fill.svg",
+          "sourceSha256": "dc303bf88571d9aa8d56c30d2630303aa7aba4ca21c21010be3549d6c17666ce",
+          "sha256": "6d6e9007321af069d0e9b088f3c332ca275333c486b46d0e158ac6f48943ad5a",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "hammer",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/hammer-fill.svg",
+          "sourceSha256": "e1f85a791f0c18b239c2f7597dca64b4e8b55975af8c26f5364fab9278a18ec6",
+          "sha256": "7cb0d247ca479fbc40c4d403f3f62620af6146fcd330a0b075a45005ced3bbeb",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "play",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/play-fill.svg",
+          "sourceSha256": "6d2a75bc5700a68dec50516ebae121c307807e4e6fcca5c863e5b4af006df880",
+          "sha256": "0018b97d34991a6dd8e817da708638fd9791f2c87c6987d772dec985def256ac",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "flask",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/flask-fill.svg",
+          "sourceSha256": "83ff8134febb17c6190bc46e3516d8c5fa7940d8b20f627ca3e45581ca29fece",
+          "sha256": "ca96a3aca5eeace0e8861c87bb72c89127ccf11b3f76f8d878526c81cc626c80",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "database",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/database-fill.svg",
+          "sourceSha256": "4d58652b0dd16a1c6de08174c3ec6617da5d90dd2fa4d5f0147bfa44722fa5ec",
+          "sha256": "29d1dd8b276f162e15e035105d2d1f8da76966586c384bd59bec0a6f887a9284",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "hard-drives",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/hard-drives-fill.svg",
+          "sourceSha256": "16f26a807a05ded561ff3322879e698b70d77f07df5dabda451825ddd8f5ba28",
+          "sha256": "0c54e5ec1206c7577254695247dd3a4353af050c228f85e42e8bcdf5af776090",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "cloud",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/cloud-fill.svg",
+          "sourceSha256": "f6cd33004a4073b56c2df63264711617c8a6cddfba89b19c7029b77b43f55ece",
+          "sha256": "de209531da2924ef94e73fcbab4c015cca2f701f3a0f176b05ca0440dccf5479",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "cloud-arrow-up",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/cloud-arrow-up-fill.svg",
+          "sourceSha256": "868ca259160f1d1116e19580bf9d8045b4055ef6d152cc560a50e95f53ac01d2",
+          "sha256": "a8d243e7a2d87014ccae75cc583e19a4c7a66d7bc737f1f33978c5cc3fddce1c",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "wifi-high",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/wifi-high-fill.svg",
+          "sourceSha256": "d966516341d6e973e7dac9b0885cc905dcbf97f86290b0b6c65791d1206669e0",
+          "sha256": "8632b8df413895dc75c00e158d4c058de495a691642418f1870dd4a852ae9192",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "globe-simple",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/globe-simple-fill.svg",
+          "sourceSha256": "f4e09f0235a4d005ddd1c7ae1861a2a0e77ad52cd9d3b6cd3a4e176926a75113",
+          "sha256": "c21c47485581d34b705232430b0092364054003334a67aedea2f68f499779eaa",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "desktop",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/desktop-fill.svg",
+          "sourceSha256": "aff6ce463c312f9e0d2e3eaeb0e1a5f025b155e454eb44112176e92ad1399300",
+          "sha256": "f00b4e506aee640612644d4fc6154b4f3b54501986b7f1924676a7a535381f4d",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "laptop",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/laptop-fill.svg",
+          "sourceSha256": "b082524e476f16f0c50747d8d90b0b030e55b04cabef466f45b2aefde621e155",
+          "sha256": "7a2f43f81b3abc2d359d8963ba5b957d7d0900a896be3d3be97b60c923b0734d",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "device-mobile",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/device-mobile-fill.svg",
+          "sourceSha256": "cec802e8cbe698b5bdf604770c770e4431f24ad879d441937fc6120b8b29ff28",
+          "sha256": "f9572766c78734ec250e69ead74f91d601e08f61ea691d4898eaa07a9709f296",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "network",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/network-fill.svg",
+          "sourceSha256": "39cb70d9623e9e0ba5e8086d9c1f29d1ada06809945b78e746d17449e32071ea",
+          "sha256": "d1ddd590c7ff366421e3462afb9ebea687205c6ea230db97c0f11bdcafc84e3f",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "robot",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/robot-fill.svg",
+          "sourceSha256": "c969f03339114964a2e7ac516616c3620695ade3aab8411c9f355f3afacf631d",
+          "sha256": "cc973ad0c16ca75974789ff7829b84c4b6c4b00a2acd009fe373d6bb53edc557",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "browser",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/browser-fill.svg",
+          "sourceSha256": "5b01c1791d52c671812dea5ae4eca8f9668db1bd7c53f1efef3c0194fd9e2316",
+          "sha256": "091ec9327db1efe5266f2b473444efb9f7e61a40471f2b46777742e2035d763e",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "folder",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/folder-fill.svg",
+          "sourceSha256": "2217bd2f730884d7a8aec3e3358eb7500448b0e3d86f33a63142f40f0622bfe9",
+          "sha256": "4a791632939557f44851621547870e05ca72fabf1c39fd7c7d80177359a69aa9",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "folder-open",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/folder-open-fill.svg",
+          "sourceSha256": "f9e57c3d40ab536915f8302a4390405f5660ee7b7275a3f80b384d977c59373e",
+          "sha256": "ccb3926949e81580bf12ee696d64bc43cdde0f6e81d61f67d43a8fd6b3932bfd",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "file",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/file-fill.svg",
+          "sourceSha256": "d6fe00691e45b5e9b87ccc5a8fc9022485935408167ab1234817915df4fd1ca4",
+          "sha256": "d71659140aa33b04e57f8e1863b2642d886d8c996bfb79346ab342d371fc64af",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "file-code",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/file-code-fill.svg",
+          "sourceSha256": "127044e7395681d5306c7553cc2287e16c63f9d4578f4f6fe7710f277e5b7624",
+          "sha256": "67ba5c0a74f9e5b09be77d3a5911139901edd77df63351190c2e29ec205aa323",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "file-text",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/file-text-fill.svg",
+          "sourceSha256": "8c6f36452a441d39886ad7929778c2a90ea66cca519490da4918e7da7bade242",
+          "sha256": "bbf8da891c7a608607b69388803cbff0cb4dcb3bdecbf7731733409975358833",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "archive",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/archive-fill.svg",
+          "sourceSha256": "a8df0d704e55ecc356f323f23e659c67ea271fe2036f30543d6f2534b7024339",
+          "sha256": "f45f3a4bc9b9a8e27a8d41fc37b9de046146aba762e8d04068bfef48b71e579a",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "clipboard",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/clipboard-fill.svg",
+          "sourceSha256": "bb7aa6ed8901d7ab227f5745e41abe0671da77be3f01fb9fe5210ef111a2962b",
+          "sha256": "77c9f93ea0d272632c74ad730ed96d8129a139a58bb00a2f83de1b470569ee8a",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "book-open",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/book-open-fill.svg",
+          "sourceSha256": "869e2b75ba601a2915731ac86a52b72110da309b048173ff45400e75e37799ce",
+          "sha256": "11d73521f22bdef806a22031fe8028de3d62aafd382b0db2513550d473cfea42",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "notebook",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/notebook-fill.svg",
+          "sourceSha256": "e58b383d37d18ce45302b0ad6c49d8ebca752e98ba40a75dfe0321583b8b8de0",
+          "sha256": "ee2cc5d0981d9e6bffa6f0c2543f502ba14d75b6b725ba201f9fc3bef2972aa4",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "briefcase",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/briefcase-fill.svg",
+          "sourceSha256": "da09cff8a2bdb1c75b756b14f999e876d1301338a271e9e147a1039db18b3011",
+          "sha256": "363c6582f6837906c93f71b994233b474e19c82748588dc18bbf5f9b4f98a2f1",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "calendar-blank",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/calendar-blank-fill.svg",
+          "sourceSha256": "405596825bf3705baa7d289ed1242106fded80e34967927549a0413f4303a0ac",
+          "sha256": "ea19198dbfb77c7340e4070c4fd6b852a99eaa8f552c2ba4ca051130984ffb78",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "clock",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/clock-fill.svg",
+          "sourceSha256": "4abe98cfc61350de60baf70ce93e85b3a9acbb80e34f9cf19688661aaddbc140",
+          "sha256": "4efeb3e0cd1ebdc01d0f9b2aed71743f9e3c75345e8872bf1c901e1791adf0ed",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "flag",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/flag-fill.svg",
+          "sourceSha256": "fe8b8db7361da173e7c053c6854dafffe9f638d919e2b703e68b5bdf7accc66c",
+          "sha256": "4587e44e53fa8cafc861ef5081e170e2a72e5ec2b3d34224529d896ae015e2a0",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "tag",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/tag-fill.svg",
+          "sourceSha256": "e47e31e6769f655f8a58ad4d243c6fdba13902b02eb70fa3126e58d9b5febb5b",
+          "sha256": "22911e17bb0599f2684151863a0749b69e4bdb52c6c3f68d2a4571d62d738a82",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "bookmark-simple",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/bookmark-simple-fill.svg",
+          "sourceSha256": "379dfd32059dc79b50e9e51a92ff94e028f0325262a985ad8136b0d4c661db65",
+          "sha256": "35b51b51b228dc2e2260b517cd648f39134fa3cff6d82ce3a3e58385f8118a69",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "magnifying-glass",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/magnifying-glass-fill.svg",
+          "sourceSha256": "e7cf953bb787af2a4b11f8a248f35b56aab2f2b44f535d03593f490a4a633244",
+          "sha256": "995e2134bde1fbd2427f6ca7fcc3474bbaab18e94a61cbed4bab857f73248ab3",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "funnel",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/funnel-fill.svg",
+          "sourceSha256": "fd3cd3e6c43a5f76b34e1bb987061c7bff95133d94d4d72668c123e782747417",
+          "sha256": "5ace2fe518f365d29f545ee49259cf4f2b2266dfb88b691627c884694a8dfc58",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "chart-bar",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/chart-bar-fill.svg",
+          "sourceSha256": "a417cc075c304374043e7d47f7622606b15f14e4c65663fd7a8a9898d768362a",
+          "sha256": "cb722cf319575317c57f5d46d61d820900d74c4c6af83b73fb57e73ccc9dcbeb",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "bell",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/bell-fill.svg",
+          "sourceSha256": "26437565edc7418a2c326a74078fb4519aa2316e84fcf1adefbdd1b2c89f4ac5",
+          "sha256": "e72812feadf60ea3b1e6d47871d80b672f552ddf3328643648857020afdd0b09",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "key",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/key-fill.svg",
+          "sourceSha256": "25be8ade7785508b97dc19ed87ae952351d7cfe20a5fbdbe9655df2fe6af4e4a",
+          "sha256": "50d4cfb8e5bd40a1cfbcddc8b7ed32be961432a9d6183d469fedf7362fe1fc55",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "house",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/house-fill.svg",
+          "sourceSha256": "4783cdf0ae5f5ec363df6f77167a41642aac42fe8d73251b9a61232ab43f355d",
+          "sha256": "45e8d529a517288df7478036d9b3e278286c417cfa3d92aad8a6fc6d4cc69c8c",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "envelope-simple",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/envelope-simple-fill.svg",
+          "sourceSha256": "6cde9c0a359e967e36a6d3e54b720c67df75ce78f39e9adc7f29a7799bd09b54",
+          "sha256": "3b0d0c26db6dd11b81c860c9fbf992fb83307316d6d1a662a2d9067080c2df88",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "chat-circle",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/chat-circle-fill.svg",
+          "sourceSha256": "ea4d05ca384dde5c67fb5b15b36e1c6734400147b41471b13665fac87520506b",
+          "sha256": "b0b38e03d1298faaf87b783597c7e2bb2c458c918ac507f4e4f398419cf2175a",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "link-simple",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/link-simple-fill.svg",
+          "sourceSha256": "601ae01a732bdfcfa7a3e01dbe1302a32c4bd03b60d73c5c3a8f051793105e6a",
+          "sha256": "f0914eeb0aec28fc4be93e48ff802fc71e8b7ff7f22f1e52b3bad81b7820b916",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "paperclip",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/paperclip-fill.svg",
+          "sourceSha256": "55f50fbcd95e07780c8dc084a7fc656526ca8268ebc9c39e777a87da583d6344",
+          "sha256": "08f9c5411bf0baf196ae2c5d61120e81d20722664fc3664c5c62044bd409bcc8",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "eye",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/eye-fill.svg",
+          "sourceSha256": "86381b51cb6f305019503b4c5d4b02fe8df5941bab3f1475ee873006a8708420",
+          "sha256": "91db680fa2cc065f7e8506a497d08da4f3f3bab16240da2a4c1548954be4e274",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "diamond",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/diamond-fill.svg",
+          "sourceSha256": "e50d5227db3ca71ba862deb7a6e60b78eb27c7780ed2e2b856c31269b63f4a68",
+          "sha256": "dcb40421e7d83c977ad32acfb1162392d4552a30b721b3e660da2be67ade50e4",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "hexagon",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/hexagon-fill.svg",
+          "sourceSha256": "750b85cbc3245bfb5c176fb7ec24bfb5a941f230d30ceec2ec37a069cf519982",
+          "sha256": "a6741db0c97d5a302233652a2399df94ae607e94ff8aa2acc12aa0af9885871f",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "crosshair",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/crosshair-fill.svg",
+          "sourceSha256": "27084169d0c34bc4d1365e2867a76112062f5164fd58378ff39006212eabe8a6",
+          "sha256": "7bacbbd1c4c940dd9a5abf833f18bda23c21c3f1f03626dea8a65dee02295c25",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "anchor",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/anchor-fill.svg",
+          "sourceSha256": "e767bd46bcc6552011359f38dd7a4172ecfd3c407c27db13d1e5ca3a6d71f450",
+          "sha256": "e0b70e174c3548421d69359361b84c92aa80050d872d49c98e3db6cd1f4e678d",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "dog",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/dog-fill.svg",
+          "sourceSha256": "e2e2b1f336ba876ee984eb971747fd7e8d9bef93d3ea080c340dbad9b0a26114",
+          "sha256": "8e9635caf98fb834c87f639ef4b99138976475830255e5f9b509d7fd36e4d188",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "butterfly",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/butterfly-fill.svg",
+          "sourceSha256": "9c051fc7ee384972e9d39a7281a1987b2b988514abb1f36e706ea1e5ada6c75e",
+          "sha256": "1d22b8542e6f8da0e9da104675a2c5b1169f5a9d3e9f44d7494c0e79050288b1",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "flower",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/flower-fill.svg",
+          "sourceSha256": "2b3e44f333d8d2f643d54616174adbaad6fbd31b25d4eb6dd5225adb0fc31111",
+          "sha256": "15653e48757cc326bb90778a0b2142966b5a69e56b5e7d79c950d8f7a2fa7b18",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "plant",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/plant-fill.svg",
+          "sourceSha256": "5e01035baffa94fd79f61bc5862623adf2eca12acec37d69ad1ef465e646f12c",
+          "sha256": "1650b688c3a9e7f27012a377fd6c27c482dc4a054d00d7604b828b06a5cd6ca2",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "cactus",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/cactus-fill.svg",
+          "sourceSha256": "bc6de75036723ee89a4633fd77747583ec176a1f95b14bbb44087e46588ad1dd",
+          "sha256": "c2b81bcb07ea8cb937b948522be974875f56bf9fa92c6f3b182c9a907b6c0525",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "tree",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/tree-fill.svg",
+          "sourceSha256": "4f0fb03bdee79eb981d6340ffba3a3079b4609e0473b3ae2b370c1aa09d8fc69",
+          "sha256": "13311db25a1b61709a37741808cb93004539081b36f1f450e5a5a66ea63924b7",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "cloud-sun",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/cloud-sun-fill.svg",
+          "sourceSha256": "6d9f3caa7031ffb5847c358a6743fd7536f371ef0c4e40ef3bdcf3617d28255d",
+          "sha256": "6e2b2cc3f9a31ac0af21835d06dfd28403a8407549ef7c6cc41e0d4d166e27e4",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "snowflake",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/snowflake-fill.svg",
+          "sourceSha256": "d24670222e7adfeb1f6d3c1de655a00e01d5095975043566b95a2981ff695f60",
+          "sha256": "94c4d5086b550532158ed46c98217338571fc68635e209453fbec6e1e7b5a244",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "bicycle",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/bicycle-fill.svg",
+          "sourceSha256": "3e5b4e2d74a4a98111fe0d58c2163d86b57f4f957248bcb6433b317ca25ef2c1",
+          "sha256": "a43ae8f014f9a58fafb38368188b0e60a3f4046e703bdbc84a7a44ad88eba446",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "sailboat",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/sailboat-fill.svg",
+          "sourceSha256": "996fcb8e244307c70400c9994ca4ada3802da28772cb2278ada92c8de505c873",
+          "sha256": "2d90d0220fefbcc1400ee3b63497277ffddcc5bcd0abc7103d338648069d1217",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "steering-wheel",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/steering-wheel-fill.svg",
+          "sourceSha256": "2971651312dac31e1c738020200c044790a8e5e70fa7d5e61956756f298c1ffc",
+          "sha256": "e78a913b4c61880d21a35768dc14832c134980043768001b3971ef9ad480aa55",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "suitcase-simple",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/suitcase-simple-fill.svg",
+          "sourceSha256": "4f4805d0b8b0090b9cc3be37f9286f703a2e084f9b4ea12bd1f714ccdd71dbf6",
+          "sha256": "1b344f0893cb0cf16d86e49fde1964485f81d19e6cb8ddc6a5ed35af9b9ab125",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        }
+      ]
+    },
+    {
+      "collection": "Devicon",
+      "commit": "6a37858047b0e8d9c9c0e68f4a071fc410652e89",
+      "date": "2026-10-11T17:43:57Z",
+      "license": "https://raw.githubusercontent.com/devicons/devicon/6a37858047b0e8d9c9c0e68f4a071fc410652e89/LICENSE",
+      "licenseSha256": "121194741d4a915b9f5890fdd6dd95121f9b1f816517c792358d72d7c838d664",
+      "icons": [
+        {
+          "id": "language-ruby",
+          "source": "https://raw.githubusercontent.com/devicons/devicon/6a37858047b0e8d9c9c0e68f4a071fc410652e89/icons/ruby/ruby-plain.svg",
+          "sourceSha256": "5d68fd019984d3525ed667944b14efa8a37359cd21dcb8bf5e6969abdd48dd5f",
+          "sha256": "1e794fe1fe04aad5f9f6ad4b3af08d94887f1fd77078aeaabf2e39e76e9ab7bc",
+          "modifications": "Simplified filled adaptation with only two transparent facet cutouts.",
+          "sourceBounds": {
+            "x": 2.5,
+            "y": 2,
+            "width": 19.5,
+            "height": 19.6015625
+          },
+          "normalizationMatrix": [
+            1.224392188122758,
+            0,
+            0,
+            1.224392188122758,
+            -2.998804304503786,
+            -2.448784376245514
+          ]
+        },
+        {
+          "id": "language-kotlin",
+          "source": "https://raw.githubusercontent.com/devicons/devicon/6a37858047b0e8d9c9c0e68f4a071fc410652e89/icons/kotlin/kotlin-plain.svg",
+          "sourceSha256": "2ee1a71cacd67b1f6b6c5c319cac744c1597b7a5ea2afb7f82c350b9b282504a",
+          "sha256": "d47977a9c712e9998806e1c380c2d024b5fe2bafa853f3b1c48316df8a8793d8",
+          "modifications": "Filled logo; recolored to currentColor and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 15.5,
+            "y": 15.5,
+            "width": 97,
+            "height": 97
+          },
+          "normalizationMatrix": [
+            0.24742268041237114,
+            0,
+            0,
+            0.24742268041237114,
+            -3.8350515463917527,
+            -3.8350515463917527
+          ]
+        },
+        {
+          "id": "language-javascript",
+          "source": "https://raw.githubusercontent.com/devicons/devicon/6a37858047b0e8d9c9c0e68f4a071fc410652e89/icons/javascript/javascript-plain.svg",
+          "sourceSha256": "7aeba12131be6a9c4bf781171d850939c0b1356d63b42f3d4a3b43e187f94e46",
+          "sha256": "28a91c5159a7dc25a2f11a82af743b83749ffd0ca274883b2462306a15269e83",
+          "modifications": "Filled logo; recolored to currentColor and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 2,
+            "y": 1,
+            "width": 125,
+            "height": 125
+          },
+          "normalizationMatrix": [
+            0.192,
+            0,
+            0,
+            0.192,
+            -0.384,
+            -0.192
+          ]
+        },
+        {
+          "id": "language-python",
+          "source": "https://raw.githubusercontent.com/devicons/devicon/6a37858047b0e8d9c9c0e68f4a071fc410652e89/icons/python/python-plain.svg",
+          "sourceSha256": "5b2abd125bf9cb2ac6b0b9f0cdbcc9c8005886fa974d26f2b3438b831b6d8365",
+          "sha256": "7fdfd2ba5900e5f330c6a0b8a010ac1dfe15512affa3ae3a04912085e72abdd3",
+          "modifications": "Filled logo; recolored to currentColor and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 3.4583333333333335,
+            "y": 2.7916666666666665,
+            "width": 121.08333333333333,
+            "height": 122.41666666666667
+          },
+          "normalizationMatrix": [
+            0.19605173587474473,
+            0,
+            0,
+            0.19605173587474473,
+            -0.5473110959836629,
+            -0.5473110959836623
+          ]
+        },
+        {
+          "id": "language-go",
+          "source": "https://raw.githubusercontent.com/devicons/devicon/6a37858047b0e8d9c9c0e68f4a071fc410652e89/icons/go/go-plain.svg",
+          "sourceSha256": "c9a2ed5df4af306c751bd4652fc0c87106bfa73dc234dc60a5d2ac2491b17af9",
+          "sha256": "7dfb2715dc8333464d492f3ee038086a6cbf1c970853c75572a37ff78d489ddc",
+          "modifications": "Simplified filled gopher adaptation: large eyes and teeth cutouts; pupils, limbs and tiny details removed.",
+          "sourceBounds": {
+            "x": 2.2109375,
+            "y": 0.96875,
+            "width": 19.578125,
+            "height": 21.53125
+          },
+          "normalizationMatrix": [
+            1.1146589259796806,
+            0,
+            0,
+            1.1146589259796806,
+            -1.3759071117561672,
+            -1.0798258345428156
+          ]
+        },
+        {
+          "id": "language-typescript",
+          "source": "https://raw.githubusercontent.com/devicons/devicon/6a37858047b0e8d9c9c0e68f4a071fc410652e89/icons/typescript/typescript-plain.svg",
+          "sourceSha256": "dbdda8a49cf4f4eac68ebea33bd532644d1dfb94142a6ed3f2c7a619605b8116",
+          "sha256": "5b30ea4a61520db94d8792633f4654f028ee859bf96620c8577a91dc106bc26d",
+          "modifications": "Filled logo; recolored to currentColor and normalized to a tight square viewBox.",
+          "sourceBounds": {
+            "x": 2,
+            "y": 1.375,
+            "width": 125,
+            "height": 125.04166666666667
+          },
+          "normalizationMatrix": [
+            0.1919360213262246,
+            0,
+            0,
+            0.1919360213262246,
+            -0.3798733755414861,
+            -0.2639120293235588
+          ]
+        },
+        {
+          "id": "language-swift",
+          "source": "https://raw.githubusercontent.com/devicons/devicon/6a37858047b0e8d9c9c0e68f4a071fc410652e89/icons/swift/swift-plain.svg",
+          "sourceSha256": "b653c8a3255d34cea4550e090cc928d3b095890093eea522f7f2917f21ea7f8b",
+          "sha256": "ab370eb0e81e695716ae87c1b3fe5f2add81f4840cfd09fb3fe97c6a313cbae2",
+          "modifications": "Devicon Swift bird silhouette; rounded-square container removed, monochrome and normalized to maximum ink bounds.",
+          "sourceBounds": {
+            "x": 13.833333333333334,
+            "y": 21.416666666666668,
+            "width": 94.33333333333333,
+            "height": 80.66666666666667
+          },
+          "normalizationMatrix": [
+            0.2544169611307421,
+            0,
+            0,
+            0.2544169611307421,
+            -3.5194346289752656,
+            -3.710247349823325
+          ]
+        }
+      ]
+    },
+    {
+      "collection": "SVG Repo",
+      "date": "2026-10-13",
+      "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "licenseTextSource": "https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt",
+      "licenseSha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499",
+      "icons": [
+        {
+          "id": "language-java",
+          "source": "https://www.svgrepo.com/show/71269/java.svg",
+          "sourcePage": "https://www.svgrepo.com/svg/71269/java",
+          "sourceLicense": "CC0-1.0",
+          "sourceSha256": "8279eb1d23fb5483eb388ad1d6d780a662dd0dbadf8ba844568ced07661efddf",
+          "suppliedReference": "assets/sources/java-reference.svg",
+          "suppliedReferenceSha256": "dea07e7321c254e59790ef945437a47e6511c497b139d6cffa7e541bd25e876e",
+          "sha256": "cabd2bef2f63d6be09c3f4312d9595d8a247b1a26f57feb7b4bc658251e30918",
+          "modifications": "Use the supplied six-path variant, preserving its 6-unit stroke weight. Expand the stroke into filled vector geometry, merge fill and outline, remove CSS and fixed black, normalize to maximum ink bounds, and recolor through currentColor. The supplied paths match the first six original SVG Repo components after scaling and rounding.",
+          "sourceBounds": {
+            "x": 28.19271469116211,
+            "y": 0.38673996925354004,
+            "width": 155.43835830688477,
+            "height": 199.21325087547302
+          },
+          "normalizationMatrix": [
+            0.12047391373078015,
+            0,
+            0,
+            0.12047391373078015,
+            -0.7596203620984263,
+            -0.04659207769209555
+          ],
+          "referencePathCount": 6,
+          "expandedStrokeWidth": 6,
+          "sourceSilhouetteIoU": 0.9965505070707547
+        },
+        {
+          "id": "shark-face",
+          "source": "https://www.svgrepo.com/show/307542/shark-danger-predator-angry.svg",
+          "sourcePage": "https://www.svgrepo.com/svg/307542/shark-danger-predator-angry",
+          "sourceLicense": "CC0-1.0",
+          "sourceSha256": "ad854a47b45d539b5f6d636a15dc4c417b4efa1e5699d1cf0c85d4f3c1b28a5b",
+          "suppliedReference": "assets/sources/shark-reference.svg",
+          "suppliedReferenceSha256": "c8a83fe7eb229095dac299573d6d9f93e132a2cc80e765e23dc802046dabe6c4",
+          "sha256": "678ac177dff27bc50a190b237e0995a683012fa6c181041a1c8fcc97ce8bf214",
+          "modifications": "Use the supplied edited version of SVG Repo 307542: rounded dorsal and tail fins, a fuller body, and simplified teeth. Preserve that silhouette and its transparent eye; remove the empty stylesheet, use currentColor, and normalize exact cubic Bezier bounds to a tight 24 × 24 viewBox. Keep the shark-face ID for saved project SVG compatibility. Place at row 3, column 7 in the 7 × 7 catalog.",
+          "sourceBounds": {
+            "x": 3.330862087146465,
+            "y": 13.999602474734768,
+            "width": 845.2192232768832,
+            "height": 817.5793876349735
+          },
+          "normalizationMatrix": [
+            0.028395000183446966,
+            0,
+            0,
+            0.028395000183446966,
+            -0.09457982957556041,
+            -0.005102145777043876
+          ],
+          "catalogRow": 3,
+          "catalogColumn": 7,
+          "sourceCorrespondence": {
+            "sharedRelativeCoordinates": 48,
+            "bestScale": 3.575972591970398,
+            "maximumReferenceUnitError": 0.08747608157846543,
+            "region": "Inner mouth and head profile from SVG Repo 307542; rounded to one decimal in the supplied edited variant."
+          }
+        }
+      ]
+    }
+  ],
+  "customIcons": [
+    {
+      "id": "cat",
+      "source": "src/main/resources/icons/contours/cat.svg",
+      "author": "Vlas",
+      "license": "MIT",
+      "sha256": "75718ffc3ec35ee6ee9fd241349c706ff2382315df4720bead8472907c95c630",
+      "modifications": "Original filled cat face with sharp triangular ears and transparent eyes and nose; normalized to maximum ink bounds.",
+      "sourceBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 22,
+        "height": 22
+      },
+      "normalizationMatrix": [
+        1.0909090909090908,
+        0,
+        0,
+        1.0909090909090908,
+        -1.0909090909090908,
+        -1.0909090909090908
+      ]
+    }
+  ],
+  "research": {
+    "javaAlternatives": [
+      "https://github.com/devicons/devicon/blob/6a37858047b0e8d9c9c0e68f4a071fc410652e89/icons/java/java-plain.svg",
+      "https://fontawesome.com/icons/java",
+      "https://www.svgrepo.com/svg/71269/java"
+    ],
+    "decision": "Use the supplied modified SVG Repo Java shape, preserving its thickened appearance as filled vector geometry. Devicon Java and Font Awesome remain research references and are not bundled as Java."
+  }
+}

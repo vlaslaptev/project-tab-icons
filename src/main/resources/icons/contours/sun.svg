@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+<g transform="matrix(0.1 0 0 0.1 -0.8 -0.8)">
+<circle cx="128" cy="128" r="54"/>
+<rect x="118" y="8" width="20" height="40" rx="10" transform="rotate(0 128 128)"/>
+<rect x="118" y="8" width="20" height="40" rx="10" transform="rotate(45 128 128)"/>
+<rect x="118" y="8" width="20" height="40" rx="10" transform="rotate(90 128 128)"/>
+<rect x="118" y="8" width="20" height="40" rx="10" transform="rotate(135 128 128)"/>
+<rect x="118" y="8" width="20" height="40" rx="10" transform="rotate(180 128 128)"/>
+<rect x="118" y="8" width="20" height="40" rx="10" transform="rotate(225 128 128)"/>
+<rect x="118" y="8" width="20" height="40" rx="10" transform="rotate(270 128 128)"/>
+<rect x="118" y="8" width="20" height="40" rx="10" transform="rotate(315 128 128)"/>
+</g>
+</svg>

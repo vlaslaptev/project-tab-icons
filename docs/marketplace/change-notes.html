@@ -1,0 +1,288 @@
+<h2>0.3.46</h2>
+<ul>
+  <li>Remove Edited labels from individual project rows while keeping the summary of pending changes below the table.</li>
+  <li>Use the Braces icon for Tools in the settings preview.</li>
+</ul>
+<h2>0.3.45</h2>
+<ul>
+  <li>Keep the gap between long Git branches and changed-line counts visible in the preview with the default IDE font.</li>
+  <li>Measure captions using the same graphics context as text rendering. Preserve Compact limits, truncation direction and the smaller status font.</li>
+</ul>
+<h2>0.3.44</h2>
+<ul>
+  <li>Keep the end of long Git branches in both modes, with a leading ellipsis.</li>
+  <li>Retain the 13-character Compact limit, including the ellipsis, and keep full branch names in tooltips and accessibility text.</li>
+</ul>
+<h2>0.3.43</h2>
+<ul>
+  <li>Increase Git Branch Compact to 13 Unicode characters, including a trailing ellipsis.</li>
+  <li>Keep the beginning of long branches in both branch modes when tab space is limited. Full names remain available in tooltips and accessibility text.</li>
+</ul>
+<h2>0.3.42</h2>
+<ul>
+  <li>Enable Show Git status automatically when selecting Git branch or Git Branch Compact under Show more info.</li>
+  <li>Keep manual opt-out, preserve it when re-clicking the active mode, and retain saved settings and appearance presets.</li>
+</ul>
+<h2>0.3.41</h2>
+<ul>
+  <li>Restore whole-tab centering for the project name when Show more info is None, including Filled.</li>
+  <li>Place Git captions within the available area between controls, preserving responsive branch fitting.</li>
+</ul>
+<h2>0.3.40</h2>
+<ul>
+  <li>Render Git status 3 px smaller than the project name and branch.</li>
+  <li>Add Git: Default without icons, with Git Branch Compact and line counts on the right.</li>
+  <li>Rename Dzen to Relax, keep it last and preserve saved settings.</li>
+  <li>Fix unnecessary branch truncation in Preview, recalculate on resize and font changes, and retain whole-tab centering.</li>
+</ul>
+<h2>0.3.39</h2>
+<ul>
+  <li>Show a Git branch and added/removed line counts together using Show Git status next to the position selector.</li>
+  <li>Rename the selector to Git info position and move the whole Git group to either side of the project name.</li>
+  <li>Update Preview, tooltips and accessibility together; preserve existing standalone modes, defaults and project assignments.</li>
+</ul>
+<h2>0.3.38</h2>
+<ul>
+  <li>Add Git Branch Compact: the part after the last slash, limited to 11 characters including an ellipsis.</li>
+  <li>Add Git status with green added-line and red removed-line counts from saved tracked changes against HEAD, including staged and unstaged changes.</li>
+  <li>Calculate counts in the background through Git4Idea, with cancellation, a timeout and event-driven updates; no fetching.</li>
+  <li>Preview both modes, choose their side with Info position and wrap the radio group in narrow windows.</li>
+</ul>
+<h2>0.3.37</h2>
+<ul>
+  <li>Place Font size on its own row immediately after Tab height, followed by Close button.</li>
+  <li>Show the Git branch on the right for new settings, Default and Restore defaults, preserving existing saved choices.</li>
+  <li>Use a full 4 px outline for Bold, keeping its icon size, font size and tab height.</li>
+</ul>
+<h2>0.3.36</h2>
+<ul>
+  <li>Replace separate path and branch checkboxes with Show more info: None, Project path or Git branch radio buttons.</li>
+  <li>Keep None as the default and enable Branch position only for Git branch.</li>
+  <li>Rename Height to Tab height and place it first in Tab layout.</li>
+  <li>Preserve existing appearances, live previews and responsive forms.</li>
+</ul>
+<h2>0.3.35</h2>
+<ul>
+  <li>Show the current Git branch before or after the project name when Show project path is off.</li>
+  <li>Shorten long branch names from the left, keeping the ending visible; show the full branch in the tooltip.</li>
+  <li>Preview both positions immediately and update tabs after Git branch or repository changes.</li>
+  <li>Keep branch display off by default, with optional Git plugin integration.</li>
+</ul>
+<h2>0.3.34</h2>
+<ul>
+  <li>Add more horizontal padding and visible dividers between inactive settings segments.</li>
+  <li>Outline the shared Icon, Color and Tab layout area to make its scope clear.</li>
+  <li>Keep native selection, hover and focus handling, responsive forms and pending edits.</li>
+</ul>
+<h2>0.3.33</h2>
+<ul>
+  <li>Use the IDE's native segmented control for Icon, Color and Tab layout navigation.</li>
+  <li>Make click areas and the active group clearer without framing the settings content.</li>
+</ul>
+<h2>0.3.32</h2>
+<ul>
+  <li>Remove the separator line beneath the Icon, Color and Tab layout settings tabs.</li>
+  <li>Keep native selected-tab styling and keyboard navigation.</li>
+</ul>
+<h2>0.3.31</h2>
+<ul>
+  <li>Remove the All projects hint from the global customization divider.</li>
+  <li>Use Two initials · Ab when an older settings file omits the initials option; keep explicitly saved choices.</li>
+</ul>
+<h2>0.3.30</h2>
+<ul>
+  <li>Place Enable tab customization and the section divider on one line.</li>
+  <li>Remove the redundant Window tabs heading and keep the All projects scope hint.</li>
+</ul>
+<h2>0.3.29</h2>
+<ul>
+  <li>Use Icon, Color and Tab layout settings tabs with presets in one radio-button row.</li>
+  <li>Adapt fields to one or two columns, keep full labels and allow vertical scrolling in short windows.</li>
+  <li>Keep live previews, pending edits, presets and per-project icon/color editing when switching groups.</li>
+</ul>
+<h2>0.3.28</h2>
+<ul>
+  <li>Make Two initials · Ab the default for generated letter icons, Restore defaults and all appearance presets.</li>
+  <li>Preserve saved appearance choices, Bold letter weight and SVG/PNG artwork.</li>
+</ul>
+<h2>0.3.27</h2>
+<ul>
+  <li>Use the first two letters for a single project word without inner capitals: Backend → BA or Ba.</li>
+  <li>Keep IDE initials for compound names and CamelCase in both two-letter modes.</li>
+  <li>Rename the mixed-case choice to Two initials · Ab, preserving saved selections, presets and SVG/PNG artwork.</li>
+</ul>
+<h2>0.3.26</h2>
+<ul>
+  <li>Add First two letters · Ab for generated icons: Backend → Ba, using the project name.</li>
+  <li>Keep existing IDE initials modes and use the real IDE abbreviation algorithm in Preview.</li>
+  <li>Preserve two bold initials by default, presets, SVG/PNG artwork and project assignments.</li>
+</ul>
+<h2>0.3.25</h2>
+<ul>
+  <li>Match inactive Islands tabs in Preview to the IDE, using the shared strip background instead of black cards.</li>
+  <li>Apply the same rule to Current and locally selected Islands preview themes.</li>
+  <li>Preserve tab fills, outlines and saved settings.</li>
+</ul>
+<h2>0.3.24</h2>
+<ul>
+  <li>Add Initials (One letter / Two initials) and Letter weight (Normal / Bold) to Icon.</li>
+  <li>Preview generated letters in the Backend example, open-project table and color dialog; apply them to window tabs.</li>
+  <li>Keep two bold initials by default and preserve SVG/PNG artwork and project assignments.</li>
+</ul>
+<h2>0.3.23</h2>
+<ul>
+  <li>Keep appearance controls editable for all presets.</li>
+  <li>Select Custom automatically after a manual change in Icon, Color or Tab layout, keeping the other values.</li>
+  <li>Keep the preset when toggling the global switch, choosing a Preview theme or editing project assignments.</li>
+</ul>
+<h2>0.3.22</h2>
+<ul>
+  <li>Filled: full 1 px outline and 5 px fill inset. Bold: 16 px text.</li>
+  <li>Default: bottom-only outline and 33 px tab height, also used by Restore defaults.</li>
+  <li>Add Dzen: no icons or fill, a bottom-only 1 px outline, 14 px text and 33 px height.</li>
+  <li>Preserve saved appearances until another preset or Restore defaults is selected.</li>
+</ul>
+<h2>0.3.21</h2>
+<ul>
+  <li>Remove dark corner pixels from colored tabs in Preview and IDE window tabs.</li>
+  <li>Compose the theme background and translucent fill before smoothing the outer contour.</li>
+  <li>Keep fill opacity, inset, outline and tab layout settings.</li>
+</ul>
+<h2>0.3.20</h2>
+<ul>
+  <li>Clarify that the IDE theme selector affects only this preview window.</li>
+</ul>
+<h2>0.3.19</h2>
+<ul>
+  <li>Preview the tabs inside a miniature IDE window with macOS traffic lights, a toolbar, file tabs and an editor fragment.</li>
+  <li>IDE theme recolors the entire example window without changing the IDE or Apply.</li>
+  <li>Keep Preview height fixed while changing project tab height.</li>
+</ul>
+<h2>0.3.18</h2>
+<ul>
+  <li>Add IDE theme beside Preview: Current and eight bundled IDEA themes.</li>
+  <li>Preview theme-specific backgrounds, title colors, close icons and corner geometry.</li>
+  <li>Keep the IDE theme, plugin presets, project assignments and Apply state unchanged.</li>
+  <li>Start each Settings session with Current; follow IDE theme changes in that mode.</li>
+</ul>
+<h2>0.3.17</h2>
+<ul>
+  <li>Update Filled to use a full 2 px outline and a 4 px fill inset.</li>
+  <li>Increase Filled tab height from 30 to 34 px. Other presets and project assignments stay unchanged.</li>
+</ul>
+<h2>0.3.16</h2>
+<ul>
+  <li>Add Fill inset in Color: 0–6 px from every tab edge, in one-pixel steps.</li>
+  <li>Preview inset changes immediately without moving outlines, titles, icons or close buttons.</li>
+  <li>The Filled preset now uses a 2 px fill inset. Existing saved appearances keep a zero inset.</li>
+  <li>Keep the inset value when Fill tab is off; disable its controls until filling is enabled.</li>
+</ul>
+<h2>0.3.15</h2>
+<ul>
+  <li>Rename the global switch to Enable tab customization and add a separator beneath it.</li>
+  <li>Add four mutually exclusive preset radio buttons in a narrow left column: Custom, Default, Filled and Bold.</li>
+  <li>Custom enables the three manual groups; built-in presets show their values with manual controls disabled.</li>
+  <li>Filled adds a 50% tab fill. Bold uses 28 px icons, a 4 px outline and text 2 px larger than the IDE font.</li>
+  <li>Adjust tab font size alongside Close button, with matching preview and native tab rendering.</li>
+  <li>Preserve existing configurations as Custom and keep per-project assignments unchanged.</li>
+</ul>
+<h2>0.3.14</h2>
+<ul>
+  <li>Mute project names, icons, colors and row actions when customization is disabled.</li>
+  <li>Restore available row actions when re-enabled, including after asynchronous row reloads.</li>
+  <li>Move Restore defaults to the bottom left and align status messages on the right.</li>
+  <li>Preserve project assignments and pending edits while customization is disabled.</li>
+</ul>
+<h2>0.3.13</h2>
+<ul>
+  <li>Place the labeled Preview section first, with the global switch and Restore defaults beneath it.</li>
+  <li>Put Style on the left and Fill tab on the right in the same Color row.</li>
+  <li>Preserve all appearance settings, icons and per-project assignments.</li>
+</ul>
+<h2>0.3.12</h2>
+<ul>
+  <li>Place Size and Position in one row, and Fill tab alongside Style.</li>
+  <li>Remove icon background controls from Settings and the icon chooser. Built-in SVGs and generated initials have no added background.</li>
+  <li>Preserve existing project SVG files, custom artwork, all 121 icons and whole-tab fills.</li>
+</ul>
+<h2>0.3.11</h2>
+<ul>
+  <li>Place group checkboxes in a shared top row: two in Icon, two in Color, and one in Tab layout.</li>
+  <li>Align the controls beneath them and remove the standalone opacity hint. Tab fills remain at 50%.</li>
+  <li>Show all three automatic color swatches for generated letter icons, including before deferred icons have loaded.</li>
+</ul>
+<h2>0.3.10</h2>
+<ul>
+  <li>Center project names relative to the whole tab, in the preview and actual window tabs.</li>
+  <li>Keep icon and close-button positions unchanged.</li>
+  <li>Let long names use the available width while protecting the icon and close button.</li>
+</ul>
+<h2>0.3.9</h2>
+<ul>
+  <li>Clearly label the Icon, Color and Tab layout settings groups.</li>
+  <li>Optionally fill the whole tab at 50% opacity. Preview it on three example tabs.</li>
+  <li>Choose separate Icon color, Outline color and Tab color for each open project.</li>
+  <li>Match outline and tab colors to the icon automatically, or assign independent colors.</li>
+  <li>Preserve the original colors of imported SVG/PNG artwork. Generated initials can use a custom color.</li>
+  <li>Keep manual outline and tab colors when changing an icon. Revert pending changes per row.</li>
+</ul>
+<h2>0.3.8</h2>
+<ul>
+  <li>Hide project paths by default and when restoring defaults.</li>
+  <li>Center project names between the icon, close button and available tab edges.</li>
+  <li>Use the same alignment in the preview without moving icons or close buttons.</li>
+</ul>
+<h2>0.3.7</h2>
+<ul>
+  <li>Add Show project path to Tab layout. Turn it off to show only the project name.</li>
+  <li>Preview path visibility on three example tabs before applying changes.</li>
+  <li>Restore the current IDE titles when path display is enabled or the plugin is disabled.</li>
+</ul>
+<h2>0.3.6</h2>
+<ul>
+  <li>Refine generated avatar initials: Medium matches the previous Small, Large matches the previous Medium, and Small is smaller.</li>
+  <li>Keep initials centered while preserving icon slots, custom SVG/PNG icons and appearance settings.</li>
+</ul>
+<h2>0.3.5</h2>
+<ul>
+  <li>Let long titles use empty positions on the right without moving the icon or close button.</li>
+  <li>Make generated avatar initials larger and proportional to Small, Medium and Large icon sizes.</li>
+  <li>Preserve all 121 icons, per-project assignments and appearance settings.</li>
+</ul>
+<h2>0.3.4</h2>
+<ul>
+  <li>Global Enable Project Tab Icons checkbox with native tab restoration when disabled.</li>
+  <li>Restore defaults for medium icons, no background, left icon and close button, rounded 2 px outline and 30 px height.</li>
+  <li>Keep per-project icons, colors and the global switch unchanged when restoring defaults.</li>
+  <li>Preserve selected appearance settings while customization is disabled.</li>
+</ul>
+<h2>0.3.3</h2>
+<ul>
+  <li>Place the native close button and project icon independently on either side.</li>
+  <li>Preserve empty positions in a five-part layout so titles stay centered.</li>
+  <li>Adjust tab height from 30 to 60 px in one-pixel steps.</li>
+  <li>Three aligned settings columns with vertical separators and a live three-tab preview.</li>
+</ul>
+<h2>0.3.2</h2>
+<ul>
+  <li>Live preview with three example tabs above the window tab settings.</li>
+  <li>Independent icon and outline groups with clearly disabled dependent controls.</li>
+  <li>Choose bottom-only, rounded-corner, or full outlines, with a thickness from 1 to 6 px.</li>
+  <li>Preserve all 121 icons, per-project assignments, and the previous appearance by default.</li>
+</ul>
+<h2>0.3.1</h2>
+<ul>
+  <li>Refined settings layout: aligned controls, consistent project rows, and a fixed table header.</li>
+  <li>Lightweight icon and color actions with current values, hover feedback, and keyboard focus.</li>
+  <li>Compact labeled color palette, clearer HEX input, and balanced previews.</li>
+  <li>Polished searchable galleries, consistent preview sizes, and focus-aware selection.</li>
+  <li>All 121 icons, per-project assignments, and existing settings are preserved.</li>
+</ul>
+<h2>0.3.0</h2>
+<ul>
+  <li>Clearer window tab settings and inline icon and color actions for each open project.</li>
+  <li>Search 121 icons by name or keyword, filter by category, and browse with scrolling or the keyboard.</li>
+  <li>72 new simple filled icons; all 49 existing icons preserved.</li>
+  <li>Named color presets, selected-state checkmarks, and icon previews at 20, 24, and 28 px.</li>
+  <li>Searchable project SVG gallery with import. Existing settings and Apply/Cancel behavior preserved.</li>
+</ul>

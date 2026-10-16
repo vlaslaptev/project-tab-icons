@@ -1,0 +1,53 @@
+<idea-plugin>
+  <id>dev.vlas.projecttabicons</id>
+  <name>Project Tab Icons</name>
+  <version>0.3.35</version>
+  <vendor>Vlas</vendor>
+  <idea-version since-build="262.10968.63" strict-until-build="262.*"/>
+  <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.os.mac</depends>
+  <depends optional="true" config-file="dev.vlas.projecttabicons-git.xml">Git4Idea</depends>
+
+  <extensionPoints>
+    <extensionPoint qualifiedName="dev.vlas.projecttabicons.branchProvider"
+                    interface="dev.vlas.projecttabicons.ProjectTabBranchProvider" dynamic="true"/>
+  </extensionPoints>
+
+  <description><![CDATA[
+    Shows project icons, configurable outlines and optional colored fills in macOS window tabs.
+    Enable tab customization globally and choose Custom, Default, Filled, Bold or Dzen appearance presets.
+    Preview changes in a miniature IDE window with macOS traffic lights, a toolbar, three project tabs and an editor fragment.
+    Choose bottom, rounded or full outlines from 1 to 6 px.
+    Choose one letter or two initials in uppercase or mixed case (Ab), with normal or bold text for generated letter icons.
+    Toggle icons and outlines independently, and choose Small (20 px), Medium (24 px) or Large (28 px).
+    Position the close button and icon independently on either side without shifting the title.
+    Show or hide project paths in tabs, with a live preview.
+    Adjust tab height from 30 to 60 px. Icons are displayed without plugin-added backgrounds.
+    Saved project SVGs are preserved. Corners follow the current theme.
+    Manage all open projects in a compact table with separate icon, outline and tab colors.
+    Fill tabs at 50% opacity, matching the icon color by default, with an optional 0–6 px edge inset.
+    Search and browse 121 filled icons by name or category,
+    select a color with the IDE color picker, or reuse a custom SVG from a project.
+    Custom icons follow the IDE's project icon settings; generated letter icons
+    have centered text and padding.
+    Requires IntelliJ IDEA 2026.2.3 or a later 2026.2 update, with project windows
+    merged into tabs. Selected icons are saved as native project SVG files.
+  ]]></description>
+  <change-notes><![CDATA[
+    Show the current Git branch before or after the project name when project paths are hidden.
+    Keep the ending of long branch names visible and preview both positions live.
+  ]]></change-notes>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <projectConfigurable
+        parentId="appearance"
+        instance="dev.vlas.projecttabicons.IconSettingsConfigurable"
+        id="dev.vlas.projecttabicons.settings"
+        displayName="Project Tab Icons"
+        nonDefaultProject="true"
+        os="mac"/>
+    <postStartupActivity
+        implementation="dev.vlas.projecttabicons.ProjectTabIconsStartupActivity"
+        os="mac"/>
+  </extensions>
+</idea-plugin>

@@ -1,0 +1,13 @@
+* text=auto
+*.kt text eol=lf
+*.kts text eol=lf
+*.md text eol=lf
+*.html text eol=lf
+*.svg text eol=lf
+# Keep downloaded source assets byte-identical to their recorded SHA-256.
+assets/sources/** -text -eol
+*.properties text eol=lf
+gradlew text eol=lf
+gradlew.bat text eol=crlf
+*.jar binary
+*.png binary

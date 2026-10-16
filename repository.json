@@ -1,0 +1,11 @@
+{
+  "suggestedName": "project-tab-icons",
+  "description": "Project icons, colored outlines, translucent fills and Git context for IntelliJ IDEA macOS window tabs.",
+  "suggestedVisibility": "public",
+  "topics": ["intellij-plugin", "macos", "kotlin", "project-icons", "window-tabs", "developer-tools"],
+  "socialPreview": "docs/media/social-preview.png",
+  "license": "MIT",
+  "version": "0.3.46",
+  "githubUrl": null,
+  "status": "Prepared locally; GitHub repository and release have not been published"
+}

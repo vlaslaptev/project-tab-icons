@@ -1,0 +1,50 @@
+# Architecture
+
+## Observe, decorate, restore
+
+`ProjectTabIconsStartupActivity` connects the application service when a project
+opens. The service coalesces window, theme, icon and appearance changes onto the
+UI thread. It observes the relevant frame/tab components instead of walking the
+editor and tool-window trees.
+
+Each macOS merged window has its own representation of the project tab strip.
+The decorator resolves the frame stored on a tab to the corresponding project,
+so icons follow projects when windows are switched.
+
+Original presentation values are tracked by identity. Disabling customization
+removes observers and restores values still owned by the plugin. A compatibility
+failure stops decoration and records a message in the IDE's local log.
+
+## Project identity
+
+The IDE's native project-icon provider supplies custom artwork. The plugin draws
+generated initials with controlled padding and sizing. Native SVG/PNG artwork is
+requested at its display size and pixel density.
+
+`ProjectIconStore` reads project icon variants and applies explicit icon assignments.
+It checks snapshots before writing, uses atomic file replacement and attempts to
+restore already-written icons if a batch fails. Newer external changes are not
+overwritten by rollback.
+
+## Settings
+
+Appearance is application state, persisted through the IntelliJ settings mechanism.
+The settings page manages a draft, a preview and a table of open projects. Applying
+appearance alone does not install or rewrite project SVG icons.
+
+The icon catalog and its licenses are bundled resources. Exported generated SVGs
+carry the selected icon's attribution. Public asset provenance is retained in
+`icon-provenance.json` and [third-party notices](../THIRD_PARTY_NOTICES.md).
+
+## Optional Git integration
+
+A plugin-owned branch-provider extension point isolates the optional Git4Idea
+integration. Branch captions come from the IDE's repository model. Saved tracked
+line counts use a local Git diff on a background worker, with debouncing,
+cancellation and a timeout. No fetch is performed.
+
+## Internal APIs
+
+Window-tab decoration, project frame lookup, icon wrappers and project icon storage
+depend on internal APIs in the target platform. The strict IDE build range is an
+intentional part of the implementation. See [compatibility](COMPATIBILITY.md).
