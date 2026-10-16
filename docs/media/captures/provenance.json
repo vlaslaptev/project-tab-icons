@@ -1,0 +1,31 @@
+{
+  "capturedOn": "2026-10-16",
+  "plugin": "Project Tab Icons",
+  "pluginVersion": "0.3.46",
+  "application": "IntelliJ IDEA 2026.2.3",
+  "previewTheme": "Current · Islands Darcula",
+  "source": "Native screenshot of the installed plugin Settings page, captured through the app UI.",
+  "crop": "Preview, preset row and appearance controls only. Settings navigation, window title and the open-project table are excluded.",
+  "demoData": "Frontend, Backend, Tools, example editor text, branch names and line counts are built-in preview fixtures.",
+  "processing": "Rectangular crop and lossless PNG encoding; UI pixels and labels were not redrawn or retouched.",
+  "settings": "Presets were selected only in the pending Settings draft. Cancel discarded both draft changes; Apply was disabled after reopening.",
+  "files": [
+    {
+      "file": "appearance-settings.png",
+      "sha256": "30bcf0a10c6e62e1462eb248c09018636614cde7f17daaff57c3d6fe5bbff2cd",
+      "width": 2816,
+      "height": 1280,
+      "preset": "Filled",
+      "section": "Color"
+    },
+    {
+      "file": "git-settings.png",
+      "sha256": "7e0aa2a168ab043f1a1883841b14a9ee5313ee2ab16fa28e6dd807f693ec3f12",
+      "width": 2816,
+      "height": 1280,
+      "preset": "Git",
+      "section": "Tab layout"
+    }
+  ],
+  "pixelScale": 2
+}

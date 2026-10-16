@@ -38,7 +38,7 @@ before installing.
 - **Preview before Apply.** Try appearance presets and preview themes, then save
   the changes you want. Disable customization to restore the IDE's normal tab layout.
 
-![Default, Filled, Bold, Git and Relax appearance presets](docs/media/appearance-presets.png)
+![Real Settings preview with the Filled preset and Color controls](docs/media/appearance-presets.png)
 
 ## Install in a minute
 
@@ -83,7 +83,7 @@ light and dark variants; keep a copy if you want to restore custom artwork later
 
 ## Useful Git context, quietly
 
-![Full branch names, compact branch names and changed-line counts](docs/media/git-context.png)
+![Real Settings preview with compact Git branches, changed-line counts and Tab layout controls](docs/media/git-context.png)
 
 Compact mode keeps the part after the final `/`, up to 13 Unicode characters,
 including a leading ellipsis when needed. The full branch remains in the tooltip.
@@ -110,9 +110,9 @@ comes from local repositories. See [privacy](PRIVACY.md).
 - [Contributing](CONTRIBUTING.md)
 - [Third-party artwork and licenses](THIRD_PARTY_NOTICES.md)
 
-The gallery contains **informational illustrations**, not screenshots of plugin
-execution. Demo names and Git values are fictional. The icon library uses the
-plugin's actual SVG resources. Media sources and provenance are in
-[docs/media](docs/media/README.md).
+The appearance and Git slides show **real captures of the plugin’s Settings
+preview**, with built-in demo projects and Git values. Covers and the icon-library
+slide are illustrations; the library uses the plugin’s actual SVG resources.
+Media sources and capture provenance are in [docs/media](docs/media/README.md).
 
 This project is independent of JetBrains and is not an official JetBrains product.
