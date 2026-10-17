@@ -20,19 +20,19 @@
 
 The [installation guide](docs/INSTALLATION.md) covers missing tabs, updates and removal.
 
----
 
 ## Main features
 ![Real Settings preview with the Filled preset and Color controls](docs/media/appearance-presets.png)
-### ˚˚ You can change tab height, text size and the close button’s position
-### ˚˚ You can give each project its own outline and translucent fill colors
-### ˚˚ You can start with a preset, adjust it and see the result before Apply
-### ˚˚ You can preview your tabs in different IDE themes
+### You can change tab height, text size and the close button’s position
+### You can give each project its own outline and translucent fill colors
+### You can start with a preset, adjust it and see the result before Apply
+### You can preview your tabs in different IDE themes
 
+---
 ![All 121 bundled icons, rendered from the plugin's actual SVG resources](docs/media/icon-library.png)
-### ˚˚ You can assign an icon to each project tab and place it on the left or right
-### ˚˚ You can pick from 121 icons, import your own SVG or use your project’s initials
-### ˚˚ You can adjust the icon’s color and size to make each project easy to recognize
+### You can assign an icon to each project tab and place it on the left or right
+### You can pick from 121 icons, import your own SVG or use your project’s initials
+### You can adjust the icon’s color and size to make each project easy to recognize
 
 ## About the plugin
 
