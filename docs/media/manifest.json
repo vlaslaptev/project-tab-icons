@@ -1,7 +1,6 @@
 {
   "version": "0.3.46",
   "kind": "illustrations and compositions of real Settings screenshots",
-  "iconCount": 121,
   "files": [
     {
       "name": "hero-dark",
@@ -29,10 +28,11 @@
     },
     {
       "name": "icon-library",
-      "title": "All 121 icons bundled in Project Tab Icons",
+      "title": "100+ icons bundled in Project Tab Icons",
       "width": 1600,
       "height": 1000,
-      "kind": "illustration"
+      "kind": "illustration",
+      "fixedArtwork": true
     },
     {
       "name": "git-context",
@@ -51,5 +51,6 @@
       "height": 640,
       "kind": "illustration"
     }
-  ]
+  ],
+  "iconCountLabel": "100+"
 }

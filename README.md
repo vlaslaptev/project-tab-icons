@@ -29,9 +29,9 @@ The [installation guide](docs/INSTALLATION.md) covers missing tabs, updates and 
 ### You can preview your tabs in different IDE themes
 
 ---
-![All 121 bundled icons, rendered from the plugin's actual SVG resources](docs/media/icon-library.png)
+![A selection from 100+ bundled icons, rendered from the plugin's actual SVG resources](docs/media/icon-library.png)
 ### You can assign an icon to each project tab and place it on the left or right
-### You can pick from 121 icons, import your own SVG or use your project’s initials
+### You can pick from 100+ icons, import your own SVG or use your project’s initials
 ### You can adjust the icon’s color and size to make each project easy to recognize
 
 ## About the plugin
@@ -54,7 +54,7 @@ Give each project a visual identity and keep the information you need beside its
 
 **Independent · Experimental · Distributed through GitHub**
 
-## 121 shapes. Your colors.
+## 100+ shapes. Your colors.
 
 Search by name or keyword, filter by category, and choose a color with the native
 IDE picker, a HEX value, or one of 14 swatches. Icon sizes are **20, 24 and 28 px**.

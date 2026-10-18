@@ -27,7 +27,7 @@ the draft. The enable switch and project icon assignments are preserved by a res
 
 ## Icons and colors
 
-The bundled library has **121 filled shapes**, including language symbols, animals,
+The bundled library has **100+ icons**, including language symbols, animals,
 tools and navigation icons. Search by name or keyword and filter by category.
 Use the native IDE color picker, a HEX value, or 14 swatches.
 

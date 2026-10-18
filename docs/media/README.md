@@ -9,7 +9,7 @@ built-in demonstration data from the plugin's preview.
 | --- | --- | --- |
 | `hero-dark.png` / `hero-light.png` | 1600 × 900 | README cover, selected by preferred color scheme |
 | `appearance-presets.png` | 1600 × 1000 | Real Settings preview: Filled preset and Color controls |
-| `icon-library.png` | 1600 × 1000 | All 121 actual bundled SVG icons |
+| `icon-library.png` | 1600 × 1000 | A selection from 100+ bundled SVG icons |
 | `git-context.png` | 1600 × 1000 | Real Settings preview: Git preset, compact branches, line counts and Tab layout controls |
 | `social-preview.png` | 1280 × 640 | Repository social preview |
 | `logo-512.png` | 512 × 512 | Transparent export of the existing plugin logo |
@@ -31,5 +31,7 @@ The Filled and Git presets were selected in a temporary Settings draft and disca
 with Cancel after capture. The IDE's saved appearance was restored. The two slides
 show those specific settings; other themes and combinations can look different.
 The covers, icon-library slide and social preview remain illustrations. The icon
-library renders all 121 actual bundled SVG resources. Code and library attribution are in
+library shows a fixed selection of bundled SVG resources under the 100+ label.
+Adding icons to the plugin does not require rebuilding this slide or updating its count.
+Code and library attribution are in
 [third-party notices](../../THIRD_PARTY_NOTICES.md).
