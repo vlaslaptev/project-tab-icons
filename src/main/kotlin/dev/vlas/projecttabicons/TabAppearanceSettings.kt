@@ -67,7 +67,9 @@ internal const val MAX_TAB_HEIGHT = DEFAULT_TAB_HEIGHT * 2
 internal const val MIN_OUTLINE_THICKNESS = 1
 internal const val MAX_OUTLINE_THICKNESS = 6
 internal const val DEFAULT_OUTLINE_THICKNESS = 2
-internal const val TAB_BACKGROUND_OPACITY = 0.5f
+internal const val MIN_TAB_FILL_INTENSITY = 0
+internal const val MAX_TAB_FILL_INTENSITY = 100
+internal const val DEFAULT_TAB_FILL_INTENSITY = 50
 internal const val MIN_TAB_FILL_INSET = 0
 internal const val MAX_TAB_FILL_INSET = 6
 internal const val MIN_TAB_FONT_SIZE = 10
@@ -115,6 +117,8 @@ internal data class TabAppearanceState(
     // 0 означает исходный шрифт IDEA; в UI показывается его реальный размер.
     @field:OptionTag @JvmField val tabFontSize: Int = 0,
     @field:OptionTag @JvmField val tabFillInset: Int = 0,
+    // Старый XML без этого поля сохраняет прежнюю заливку 50%.
+    @field:OptionTag @JvmField val tabFillIntensity: Int = DEFAULT_TAB_FILL_INTENSITY,
     // Пропущенное поле тоже использует текущий дефолт Ab; явный выбор XML сохраняется.
     @field:OptionTag @JvmField val iconInitials: TabIconInitials = DEFAULT_ICON_INITIALS,
     @field:OptionTag @JvmField val iconLetterWeight: TabIconLetterWeight = TabIconLetterWeight.BOLD,
@@ -123,6 +127,7 @@ internal data class TabAppearanceState(
         outlineThickness = outlineThickness.coerceIn(MIN_OUTLINE_THICKNESS, MAX_OUTLINE_THICKNESS),
         tabHeight = tabHeight.coerceIn(DEFAULT_TAB_HEIGHT, MAX_TAB_HEIGHT),
         tabFillInset = tabFillInset.coerceIn(MIN_TAB_FILL_INSET, MAX_TAB_FILL_INSET),
+        tabFillIntensity = tabFillIntensity.coerceIn(MIN_TAB_FILL_INTENSITY, MAX_TAB_FILL_INTENSITY),
         // Старый XML мог хранить обе галочки: путь уже имел приоритет при отрисовке.
         // Ветка и счётчик совместимы; путь по-прежнему исключает всю Git-информацию.
         showGitStatus = showGitStatus && !showProjectPath,
@@ -159,7 +164,8 @@ internal data class TabAppearanceState(
             return when (preset) {
                 TabAppearancePreset.CUSTOM, TabAppearancePreset.DEFAULT -> base
                 TabAppearancePreset.FILLED -> base.copy(
-                    showTabBackground = true, tabFillInset = 5,
+                    iconSize = TabIconSize.SMALL,
+                    showTabBackground = true, tabFillInset = 3, tabFillIntensity = 12,
                     outlineThickness = 1, outlineStyle = TabOutlineStyle.FULL, tabHeight = 34,
                 )
                 TabAppearancePreset.BOLD -> base.copy(

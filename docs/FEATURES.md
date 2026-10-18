@@ -15,12 +15,16 @@ immediately; changes to real project windows are applied through **Apply**.
 | Outline | Bottom only, Rounded corners, Full outline |
 | Outline thickness | 1–6 px |
 | Tab height | 30–60 px |
-| Tab fill | 50% opacity; an independent project color |
+| Tab fill | 0–100% intensity, in one-percent steps; an independent project color |
 | Fill inset | 0–6 px |
 | Extra information | None, Project path, Git branch, Git Branch Compact, Git status |
 | Git information position | Before or after the project name |
 
 Choose a preset, then adjust any appearance value to switch to **Custom**.
+Click **Custom** to return to the last manual appearance. Apply remembers it across
+IDE sessions; Cancel discards draft changes to that memory. Filled uses Small
+20 px icons, a full 1 px outline, 12% fill intensity, a 3 px inset and 34 px height.
+Existing settings default to 50% intensity; other presets and Restore defaults use 50%.
 Changing the preview theme or a project's icon assignment does not change the preset.
 **Restore defaults** changes the draft and takes effect after Apply; Cancel abandons
 the draft. The enable switch and project icon assignments are preserved by a reset.
@@ -41,6 +45,12 @@ The open-project table separates **Icon**, **Icon color**, **Outline color** and
 **Tab color**. Keep colors matched to the icon or choose them independently.
 Pending project changes are saved together with Apply. An icon changed outside
 the settings is checked before replacement; reload the row when requested.
+Small dots identify unsaved appearance fields and project icon/color values.
+Apply or returning to a saved value clears the corresponding mark.
+
+SVG import failures explain the cause and a recovery step, including empty or
+oversized files, invalid XML, unsupported content and unavailable files. Error
+messages wrap across lines and preserve the previous icon selection.
 
 Choosing a new icon replaces that project's native light/dark icon variants.
 The result remains a native project icon even without this plugin. Keep original
@@ -68,6 +78,7 @@ with cancellation, a delay and a timeout. This does not fetch or contact remotes
 ## Preview and persistence
 
 The preview theme is temporary and does not change the IDE's theme. Appearance
-settings persist in `projectTabIcons.xml`; project SVG icons use IDEA's native
+settings persist in `projectTabIcons.xml`; last Custom memory is saved in
+`projectTabIconsCustom.xml`. Project SVG icons use IDEA's native
 project icon storage. Turning customization off restores the native tab presentation
 while keeping selected settings and saved project icons.

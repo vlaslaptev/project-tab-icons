@@ -135,6 +135,13 @@ internal class IconSettingsPanel(
     }
     private val fillInsetLabel = JBLabel("Fill inset:").apply { labelFor = tabFillInset }
     private val fillInsetValue = JBLabel("0 px", SwingConstants.RIGHT)
+    private val tabFillIntensity = JSlider(MIN_TAB_FILL_INTENSITY, MAX_TAB_FILL_INTENSITY, DEFAULT_TAB_FILL_INTENSITY).apply {
+        minorTickSpacing = 1
+        snapToTicks = true
+        isOpaque = false
+    }
+    private val fillIntensityLabel = JBLabel("Fill intensity:").apply { labelFor = tabFillIntensity }
+    private val fillIntensityValue = JBLabel("$DEFAULT_TAB_FILL_INTENSITY%", SwingConstants.RIGHT)
     private val closeButtonPosition = ComboBox(TabCloseButtonPosition.entries.toTypedArray())
     private val closeButtonLabel = JBLabel("Close button:").apply { labelFor = closeButtonPosition }
     private val fontSizeSelection = TabFontSizeSelection()
@@ -161,10 +168,14 @@ internal class IconSettingsPanel(
     private var syncing = false
     private var displayedAppearance = TabAppearanceState.defaults()
     private var appearanceBaseline = TabAppearanceState.defaults()
+    private var lastCustomAppearance = TabAppearanceState.defaults().asCustomAppearance()
+    private var customAppearanceBaseline = lastCustomAppearance
+    private val pendingMarkers = mutableListOf<Pair<SettingsPendingChange, (TabAppearanceState) -> Boolean>>()
     var rows: List<ProjectIconSettingsRow> = emptyList()
         private set
 
-    val modified: Boolean get() = appearance() != appearanceBaseline || rows.any { it.modified }
+    val modified: Boolean get() = appearance() != appearanceBaseline ||
+        lastCustomAppearance != customAppearanceBaseline || rows.any { it.modified }
     val preferredFocus: JComponent get() = pluginEnabled
 
     init {
@@ -228,6 +239,7 @@ internal class IconSettingsPanel(
         previewTheme.addActionListener { refreshPreviewTheme() }
         pluginEnabled.addActionListener { appearanceChanged(manualEdit = false) }
         restoreDefaults.addActionListener {
+            rememberCurrentCustom()
             setAppearance(TabAppearanceState.defaults().copy(enabled = pluginEnabled.isSelected))
             updateStatus()
         }
@@ -263,17 +275,19 @@ internal class IconSettingsPanel(
         val controls = listOf(iconSize, iconPosition, iconInitials, iconLetterWeight, outlineStyle, closeButtonPosition, gitInfoControl)
         val controlWidth = maxOf(controls.maxOf { it.preferredSize.width }, JBUI.scale(240))
         val labelWidth = listOf(sizeLabel, positionLabel, initialsLabel, letterWeightLabel, styleLabel,
-            thicknessLabel, fillInsetLabel, closeButtonLabel, fontSizeLabel, tabHeightLabel, branchPositionLabel).maxOf { it.preferredSize.width }
+            thicknessLabel, fillInsetLabel, fillIntensityLabel, closeButtonLabel, fontSizeLabel, tabHeightLabel, branchPositionLabel)
+            .maxOf { it.preferredSize.width } + JBUI.scale(12)
         controls.forEach { it.preferredSize = Dimension(controlWidth, rowHeight) }
-        fun sliderControl(slider: JSlider, value: JBLabel, maxValue: Int) = JPanel(BorderLayout(JBUI.scale(6), 0)).apply {
+        fun sliderControl(slider: JSlider, value: JBLabel, maxValue: Int, unit: String = "px") = JPanel(BorderLayout(JBUI.scale(6), 0)).apply {
             isOpaque = false
-            value.preferredSize = Dimension(value.getFontMetrics(value.font).stringWidth("$maxValue px"), rowHeight)
+            value.preferredSize = Dimension(value.getFontMetrics(value.font).stringWidth("$maxValue $unit"), rowHeight)
             add(slider, BorderLayout.CENTER)
             add(value, BorderLayout.EAST)
             preferredSize = Dimension(controlWidth, rowHeight)
         }
         val thicknessControl = sliderControl(outlineThickness, thicknessValue, MAX_OUTLINE_THICKNESS)
         val fillInsetControl = sliderControl(tabFillInset, fillInsetValue, MAX_TAB_FILL_INSET)
+        val fillIntensityControl = sliderControl(tabFillIntensity, fillIntensityValue, MAX_TAB_FILL_INTENSITY, "%")
         val heightControl = sliderControl(tabHeight, tabHeightValue, MAX_TAB_HEIGHT)
         val fontControl = sliderControl(tabFontSize, fontSizeValue, maxOf(MAX_TAB_FONT_SIZE, defaultTabFontSize() + 2))
         fun form(master: JComponent, fields: List<AppearanceField>, masterLabel: JBLabel? = null,
@@ -289,6 +303,7 @@ internal class IconSettingsPanel(
         appearanceTabs.addTab("Color", form(showOutline, listOf(
             AppearanceField(styleLabel, outlineStyle), AppearanceField(null, showTabBackground),
             AppearanceField(thicknessLabel, thicknessControl), AppearanceField(fillInsetLabel, fillInsetControl),
+            AppearanceField(fillIntensityLabel, fillIntensityControl),
         )))
         val moreInfoRow = SettingsRadioRow(moreInfoLabel, moreInfoButtons.values.toList(), wrapChoices = true) {
             (pageWidth() - appearanceTabs.insets.left - appearanceTabs.insets.right - JBUI.scale(24)).coerceAtLeast(1)
@@ -308,16 +323,17 @@ internal class IconSettingsPanel(
         presetButtons.forEach { (preset, button) ->
             button.accessibleContext.accessibleName = "Appearance preset: ${preset.title}"
             button.toolTipText = when (preset) {
-                TabAppearancePreset.CUSTOM -> "Your current appearance. Editing any setting in Icon, Color or Tab layout selects Custom."
+                TabAppearancePreset.CUSTOM -> "Restore your last custom appearance. Editing a setting updates Custom; Apply saves it for the next session."
                 TabAppearancePreset.DEFAULT -> "Medium icons, bottom-only 2 px outline, 33 px height, IDE font, Git branch on the right and no tab fill."
-                TabAppearancePreset.FILLED -> "Full 1 px outline, 50% tab fill with a 5 px inset, and 34 px tab height."
+                TabAppearancePreset.FILLED -> "Small 20 px icons, full 1 px outline, 12% tab fill with a 3 px inset, and 34 px tab height."
                 TabAppearancePreset.BOLD -> "Large icons, full 4 px outline, 16 px text and 38 px tab height."
                 TabAppearancePreset.GIT -> "Default appearance without icons, with Git Branch Compact and changed-line counts on the right."
                 TabAppearancePreset.DZEN -> "No icons or tab fill, bottom-only 1 px outline, 14 px text and 33 px height."
             }
             button.addActionListener {
                 if (!syncing) {
-                    val next = if (preset == TabAppearancePreset.CUSTOM) appearance().copy(preset = preset)
+                    rememberCurrentCustom()
+                    val next = if (preset == TabAppearancePreset.CUSTOM) lastCustomAppearance.copy(enabled = pluginEnabled.isSelected)
                         else TabAppearanceState.forPreset(preset, pluginEnabled.isSelected)
                     setAppearance(next)
                     updateStatus()
@@ -325,12 +341,16 @@ internal class IconSettingsPanel(
             }
         }
         showTabBackground.accessibleContext.accessibleName = "Fill tab"
-        showTabBackground.toolTipText = "Color the tab at 50% opacity. Fill inset controls edge spacing. Matches the icon color unless a Tab color is assigned."
+        showTabBackground.toolTipText = "Color the tab using Fill intensity and Fill inset. Matches the icon color unless a Tab color is assigned."
         showTabBackground.addActionListener { appearanceChanged() }
         tabFillInset.accessibleContext.accessibleName = "Tab fill inset in pixels"
         tabFillInset.accessibleContext.accessibleDescription = "From 0 to 6 pixels. Use arrow keys for one-pixel steps."
         tabFillInset.toolTipText = "Inset the fill from every tab edge. Outline, title and icon stay in place."
         tabFillInset.addChangeListener { appearanceChanged() }
+        tabFillIntensity.accessibleContext.accessibleName = "Tab fill intensity in percent"
+        tabFillIntensity.accessibleContext.accessibleDescription = "From 0% (transparent) to 100% (solid). Use arrow keys for one-percent steps."
+        tabFillIntensity.toolTipText = "Adjust fill opacity. 0% hides the fill; 100% uses the solid tab color. Icon and outline colors stay unchanged."
+        tabFillIntensity.addChangeListener { appearanceChanged() }
         showOutline.toolTipText = "Use each project's icon color or its custom outline color."
         iconSize.accessibleContext.accessibleName = "Project icon size"
         iconPosition.accessibleContext.accessibleName = "Project icon position"
@@ -386,13 +406,52 @@ internal class IconSettingsPanel(
             if (!syncing) fontSizeSelection.select(tabFontSize.value, defaultTabFontSize())
             appearanceChanged()
         }
+        installAppearanceMarkers()
     }
+
+    private fun installAppearanceMarkers() {
+        fun watch(component: JComponent, value: (TabAppearanceState) -> Any?) {
+            pendingMarkers += SettingsPendingChange(component) to { current: TabAppearanceState -> value(current) != value(appearanceBaseline) }
+        }
+        watch(pluginEnabled) { it.enabled }
+        watch(presetTitle) { it.preset }
+        watch(showIcons) { it.showIcons }
+        watch(sizeLabel) { it.iconSize }
+        watch(positionLabel) { it.iconPosition }
+        watch(initialsLabel) { it.iconInitials }
+        watch(letterWeightLabel) { it.iconLetterWeight }
+        watch(showOutline) { it.showOutline }
+        watch(styleLabel) { it.outlineStyle }
+        watch(thicknessLabel) { it.outlineThickness }
+        watch(showTabBackground) { it.showTabBackground }
+        watch(fillInsetLabel) { it.tabFillInset }
+        watch(fillIntensityLabel) { it.tabFillIntensity }
+        watch(tabHeightLabel) { it.tabHeight }
+        watch(fontSizeLabel) { it.tabFontSize }
+        watch(closeButtonLabel) { it.closeButtonPosition }
+        watch(moreInfoLabel) { it.moreInfo() }
+        watch(branchPositionLabel) { it.branchPosition }
+        watch(branchStatus) { it.showGitBranch && it.showGitStatus }
+        pendingMarkers += SettingsPendingChange(presetButtons.getValue(TabAppearancePreset.CUSTOM)) to { _: TabAppearanceState ->
+            lastCustomAppearance != customAppearanceBaseline
+        }
+    }
+
+    private fun rememberCurrentCustom() {
+        // При клике радиокнопка уже переключена; прежний пресет берём из отображённого состояния.
+        if (displayedAppearance.preset == TabAppearancePreset.CUSTOM) {
+            lastCustomAppearance = displayedAppearance.asCustomAppearance()
+        }
+    }
+
+    fun customAppearance(): TabAppearanceState = lastCustomAppearance
 
     fun appearance(): TabAppearanceState = TabAppearanceState(
         showIcons = showIcons.isSelected,
         showOutline = showOutline.isSelected,
         showTabBackground = showTabBackground.isSelected,
         tabFillInset = tabFillInset.value,
+        tabFillIntensity = tabFillIntensity.value,
         iconSize = iconSize.selectedItem as TabIconSize,
         iconPosition = iconPosition.selectedItem as TabIconPosition,
         iconInitials = iconInitials.selectedItem as TabIconInitials,
@@ -414,7 +473,13 @@ internal class IconSettingsPanel(
     )
 
     fun resetAppearance() {
-        appearanceBaseline = ApplicationManager.getApplication().getService(TabAppearanceSettings::class.java).state
+        val app = ApplicationManager.getApplication()
+        appearanceBaseline = app.getService(TabAppearanceSettings::class.java).state
+        lastCustomAppearance = if (appearanceBaseline.preset == TabAppearancePreset.CUSTOM) {
+            appearanceBaseline.asCustomAppearance()
+        } else app.getService(LastCustomAppearanceSettings::class.java).state.appearance
+            ?: appearanceBaseline.asCustomAppearance()
+        customAppearanceBaseline = lastCustomAppearance
         setAppearance(appearanceBaseline)
     }
 
@@ -431,6 +496,7 @@ internal class IconSettingsPanel(
             showOutline.isSelected = value.showOutline
             showTabBackground.isSelected = value.showTabBackground
             tabFillInset.value = value.tabFillInset
+            tabFillIntensity.value = value.tabFillIntensity
             iconSize.selectedItem = value.iconSize
             iconPosition.selectedItem = value.iconPosition
             iconInitials.selectedItem = value.iconInitials
@@ -447,6 +513,7 @@ internal class IconSettingsPanel(
         }
         updateAppearanceEnabled()
         refreshAppearancePreview()
+        refreshPendingChanges()
     }
 
     private fun updateAppearanceEnabled() {
@@ -463,7 +530,7 @@ internal class IconSettingsPanel(
         listOf(outlineStyle, outlineThickness, styleLabel, thicknessLabel, thicknessValue).forEach {
             it.isEnabled = enabled && showOutline.isSelected
         }
-        listOf(tabFillInset, fillInsetLabel, fillInsetValue).forEach {
+        listOf(tabFillInset, fillInsetLabel, fillInsetValue, tabFillIntensity, fillIntensityLabel, fillIntensityValue).forEach {
             it.isEnabled = enabled && showTabBackground.isSelected
         }
         moreInfoButtons.values.forEach { it.isEnabled = enabled }
@@ -474,6 +541,7 @@ internal class IconSettingsPanel(
         updateProjectsEnabled()
         restoreDefaults.isEnabled = appearance() != TabAppearanceState.defaults().copy(enabled = enabled)
         fillInsetValue.text = "${tabFillInset.value} px"
+        fillIntensityValue.text = "${tabFillIntensity.value}%"
         thicknessValue.text = "${outlineThickness.value} px"
         tabHeightValue.text = "${tabHeight.value} px"
         fontSizeValue.text = "${tabFontSize.value} px"
@@ -514,6 +582,7 @@ internal class IconSettingsPanel(
         // Повторный выбор того же значения и начало перетаскивания слайдера — не изменение.
         if (manualEdit && appearance() != displayedAppearance) {
             presetButtons.getValue(TabAppearancePreset.CUSTOM).isSelected = true
+            lastCustomAppearance = appearance().asCustomAppearance()
         }
         updateAppearanceEnabled()
         refreshAppearancePreview()
@@ -568,6 +637,10 @@ internal class IconSettingsPanel(
                        run: () -> Unit) {
                 projectActions.add(ProjectAction(button, button.isEnabled, preserveIconWhenDisabled))
                 button.putClientProperty("projectIconAction", "${row.key}/$name")
+                if (name == "icon") SettingsPendingChange(button).update(row.svgModified)
+                ProjectColorTarget.entries.firstOrNull { name == it.name.lowercase() + "Color" }?.let {
+                    SettingsPendingChange(button).update(row.colorModified(it))
+                }
                 if (button.getClientProperty("projectIconAction") == focusKey) restoredFocus = button
                 if (name == "icon" && (focusKey as? String)?.startsWith("${row.key}/") == true) fallbackFocus = button
                 button.addActionListener { if (pluginEnabled.isSelected) run() }
@@ -600,7 +673,7 @@ internal class IconSettingsPanel(
                         automatic -> "${value?.hex() ?: "Automatic"} · " +
                             if (target == ProjectColorTarget.ICON) "Follows the IDE project color" else "Matches the icon color"
                         else -> "${value?.hex() ?: "Custom"} · Change ${target.title.lowercase()}"
-                    } + if (target == ProjectColorTarget.TAB) " · 50% opacity" else ""
+                    } + if (target == ProjectColorTarget.TAB) " · Uses Fill intensity in Color" else ""
                     accessibleContext.accessibleName =
                         "${if (original) "Original" else "Change"} ${target.title.lowercase()} for ${row.target.name} · ${row.target.path}"
                 }, target.name.lowercase() + "Color", preserveIconWhenDisabled = original) { chooseColor(row, target) }
@@ -636,6 +709,7 @@ internal class IconSettingsPanel(
     }
 
     private fun updateStatus() {
+        refreshPendingChanges()
         val conflict = rows.any { it.conflicted }
         status.foreground = if (conflict) JBColor.RED else UIUtil.getContextHelpForeground()
         val changed = rows.count { it.modified }
@@ -643,6 +717,7 @@ internal class IconSettingsPanel(
             conflict -> "Reload the affected projects before applying changes."
             changed > 0 -> "$changed project${if (changed == 1) "" else "s"} edited · Save with Apply"
             appearance() != appearanceBaseline -> "Window tabs edited · Save with Apply"
+            lastCustomAppearance != customAppearanceBaseline -> "Custom appearance edited · Save with Apply"
             !pluginEnabled.isSelected -> "Tab customization is disabled."
             else -> "Click an icon or color to change it."
         }
@@ -652,10 +727,16 @@ internal class IconSettingsPanel(
 
     fun saved() {
         appearanceBaseline = appearance()
+        customAppearanceBaseline = lastCustomAppearance
         refreshRows()
         status.foreground = UIUtil.getContextHelpForeground()
         status.text = "Changes saved."
         status.toolTipText = status.text
+    }
+
+    private fun refreshPendingChanges() {
+        val current = appearance()
+        pendingMarkers.forEach { (marker, changed) -> marker.update(changed(current)) }
     }
 
     fun failed(message: String) {

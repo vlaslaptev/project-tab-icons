@@ -32,6 +32,11 @@ Appearance is application state, persisted through the IntelliJ settings mechani
 The settings page manages a draft, a preview and a table of open projects. Applying
 appearance alone does not install or rewrite project SVG icons.
 
+The last Custom appearance has separate application storage. Preset browsing updates
+only the settings draft; Apply saves both the active appearance and Custom memory.
+Pending-change markers compare each field or project value with its saved baseline.
+SVG import validation maps file and XML failures to actionable messages in the dialog.
+
 The icon catalog and its licenses are bundled resources. Exported generated SVGs
 carry the selected icon's attribution. Public asset provenance is retained in
 `icon-provenance.json` and [third-party notices](../THIRD_PARTY_NOTICES.md).

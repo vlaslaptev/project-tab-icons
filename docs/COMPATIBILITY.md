@@ -1,6 +1,6 @@
 # Compatibility
 
-| Area | Scope for 0.3.49 |
+| Area | Scope for 0.3.52 |
 | --- | --- |
 | Operating system | macOS |
 | IDE | IntelliJ IDEA 2026.2.3 and later 2026.2 updates within the declared build range |
@@ -27,12 +27,17 @@ change, not a way to make an unreviewed build install on a newer IDE.
 
 ## Evidence and limits
 
-The 0.3.49 release artifact was built and installed locally in IDEA 2026.2.3.
-The recorded checks include the installed plugin version, matching source/artifact
-hashes, icon reloads at 20, 24 and 28 px, and a dimmed window without added icon
-backgrounds. Saved appearance, the IDE theme and project icon files were preserved.
-A manually confirmed focus-switching cycle was deferred; every transient loading
-frame and arbitrary imported artwork were not individually reproduced.
+The 0.3.52 release artifact was built and installed locally in IDEA 2026.2.3.
+The installed version and both installed JAR hashes match the release ZIP.
+Recorded checks cover returning to Custom after preset changes and an IDE restart,
+Apply/Cancel behavior, and appearance-field markers that clear when values return
+to their saved state. Earlier checks cover fill intensity at 0%, 1%, 50% and 100%,
+and the updated Filled preset at 12%, Small 20 px and a 3 px inset.
+Saved appearance, the IDE theme and project icon files were preserved.
+
+SVG import-error interactions and project-row marker interactions were reviewed
+statically; their UI verification was deferred. A manually confirmed focus-switching
+cycle and every transient icon-loading frame were not individually reproduced.
 
 That evidence is limited to the recorded local environment. It does not establish
 every theme, UI scale, macOS release or IDE patch combination. No standalone JVM

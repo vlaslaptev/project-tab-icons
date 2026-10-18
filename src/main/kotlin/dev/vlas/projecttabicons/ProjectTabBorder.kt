@@ -25,6 +25,7 @@ internal class ProjectTabBorder(
     var outlineStyle: TabOutlineStyle = TabOutlineStyle.ROUNDED,
     var tabColor: Color? = null,
     var tabFillInset: Int = 0,
+    var tabFillIntensity: Int = DEFAULT_TAB_FILL_INTENSITY,
     private val geometryOverride: ((Int, Int) -> ProjectTabGeometry)? = null,
     private val surfaceColors: ((Component) -> ProjectTabSurfaceColors?)? = ::nativeProjectTabSurfaceColors,
 ) : Border {
@@ -67,7 +68,7 @@ internal class ProjectTabBorder(
             val geometry = geometryOverride?.invoke(width, height) ?: projectTabGeometry(width, height)
             tabColor?.let { color ->
                 surfaceColors?.invoke(component)?.let { colors ->
-                    ProjectTabSurface.paint(g, width, height, geometry, colors, color, tabFillInset)
+                    ProjectTabSurface.paint(g, width, height, geometry, colors, color, tabFillInset, tabFillIntensity)
                     paintNativeProjectTabEdges(component, g, width, height)
                 }
             }

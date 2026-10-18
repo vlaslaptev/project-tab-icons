@@ -44,6 +44,9 @@ internal class ProjectIconSettingsRow(loaded: LoadedProjectIcon, overrides: Proj
     val svgModified: Boolean get() = choiceDraft != null
     val colorModified: Boolean get() = colorOverrides != colorBaseline
     val modified: Boolean get() = svgModified || colorModified
+    fun colorModified(target: ProjectColorTarget): Boolean =
+        colorOverrides.value(target) != colorBaseline.value(target) ||
+            (target == ProjectColorTarget.ICON && builder != null && choiceDraft != null && choiceDraft?.color != current?.color)
     val activeChoice: IconChoice? get() = choiceDraft ?: current
     val builder: BuilderSelection? get() = activeChoice?.asset?.builder
     val automaticIcon: Boolean get() = activeChoice == null && snapshot?.files?.isEmpty() == true

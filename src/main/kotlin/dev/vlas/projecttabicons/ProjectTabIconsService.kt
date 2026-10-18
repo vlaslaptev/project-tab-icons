@@ -362,12 +362,14 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
                 tabs.revalidateAndRepaint()
             }
             if (applied.outlineColor != color || applied.tabColor != tabColor || applied.outlineThickness != appearance.outlineThickness ||
-                applied.outlineStyle != appearance.outlineStyle || applied.tabFillInset != appearance.tabFillInset) {
+                applied.outlineStyle != appearance.outlineStyle || applied.tabFillInset != appearance.tabFillInset ||
+                applied.tabFillIntensity != appearance.tabFillIntensity) {
                 applied.outlineColor = color
                 applied.tabColor = tabColor
                 applied.outlineThickness = appearance.outlineThickness
                 applied.outlineStyle = appearance.outlineStyle
                 applied.tabFillInset = appearance.tabFillInset
+                applied.tabFillIntensity = appearance.tabFillIntensity
                 label.revalidate()
                 tabs.revalidateAndRepaint()
             }
@@ -375,7 +377,7 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         }
         // Тема может заменить border при updateUI: в этом случае её border становится новой базой.
         val border = ProjectTabBorder(label.border, icon, color,
-            appearance.outlineThickness, appearance.outlineStyle, tabColor, appearance.tabFillInset)
+            appearance.outlineThickness, appearance.outlineStyle, tabColor, appearance.tabFillInset, appearance.tabFillIntensity)
         label.border = border
         appliedLabelBorders[label] = border
         label.revalidate()

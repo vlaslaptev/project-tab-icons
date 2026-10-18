@@ -316,6 +316,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
             val app = ApplicationManager.getApplication()
             app.getService(ProjectOutlineColors::class.java).apply(colors)
             app.getService(TabAppearanceSettings::class.java).apply(view.appearance())
+            app.getService(LastCustomAppearanceSettings::class.java).remember(view.customAppearance())
             pending.forEach { row -> row.saved(row.target.path?.let(installed::get)) }
             writes.forEach { write -> installed[write.path]?.let { ProjectIconStore.refreshUi(write.project, write.path, it) } }
             app.getService(ProjectTabIconsService::class.java).requestRefresh()

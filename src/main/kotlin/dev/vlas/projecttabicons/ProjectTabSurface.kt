@@ -19,7 +19,8 @@ internal data class ProjectTabSurfaceColors(val strip: Color, val background: Co
 /** Сначала смешиваем цвета, затем один раз сглаживаем внешний контур. */
 internal object ProjectTabSurface {
     fun paint(graphics: Graphics2D, width: Int, height: Int, geometry: ProjectTabGeometry,
-              colors: ProjectTabSurfaceColors, tabColor: Color?, fillInset: Int) {
+              colors: ProjectTabSurfaceColors, tabColor: Color?, fillInset: Int,
+              fillIntensity: Int = DEFAULT_TAB_FILL_INTENSITY) {
         if (width <= 0 || height <= 0) return
         val g = graphics.create() as Graphics2D
         try {
@@ -30,7 +31,8 @@ internal object ProjectTabSurface {
             g.color = strip
             g.fillRect(0, 0, width, height)
             val inset = JBUI.scale(fillInset.coerceIn(MIN_TAB_FILL_INSET, MAX_TAB_FILL_INSET)).toDouble()
-            val filled = tabColor?.let { blend(base, it, TAB_BACKGROUND_OPACITY) }
+            val opacity = fillIntensity.coerceIn(MIN_TAB_FILL_INTENSITY, MAX_TAB_FILL_INTENSITY) / 100f
+            val filled = tabColor?.let { blend(base, it, opacity) }
             // При inset=0 фон и заливка попадают в единственную операцию fill с AA.
             g.color = if (inset == 0.0) filled ?: base else base
             g.fill(geometry.shape())

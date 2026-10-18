@@ -38,6 +38,7 @@ import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTabbedPane
+import javax.swing.JTextArea
 import javax.swing.JViewport
 import javax.swing.KeyStroke
 import javax.swing.ScrollPaneConstants
@@ -58,7 +59,16 @@ internal class IconSelectionDialog(
     private val selectionLabel = JBLabel("Choose an icon").apply { font = font.deriveFont(Font.BOLD) }
     private val selectionDetail = settingsHint("Preview at actual tab sizes")
     private val samples = JPanel(FlowLayout(FlowLayout.LEADING, JBUI.scale(12), 0))
-    private val status = settingsHint("Saved with Apply · Replaces light and dark icon variants")
+    private val status = JTextArea("Saved with Apply · Replaces light and dark icon variants", 3, 0).apply {
+        isEditable = false
+        isFocusable = false
+        isOpaque = false
+        lineWrap = true
+        wrapStyleWord = true
+        font = UIUtil.getLabelFont()
+        foreground = UIUtil.getContextHelpForeground()
+        accessibleContext.accessibleName = "Icon import status"
+    }
     private val tabs = JTabbedPane()
     private val search = SearchTextField(false)
     private val customSearch = SearchTextField(false)
@@ -259,7 +269,7 @@ internal class IconSelectionDialog(
 
     private fun importSvg() {
         val descriptor = FileChooserDescriptorFactory.createSingleFileDescriptor("svg")
-        val file = FileChooser.chooseFile(descriptor, project, null) ?: return
+        val file = FileChooser.chooseFile(descriptor, body, project, null) ?: return
         val path = file.toNioPath()
         val token = ++importGeneration
         worker?.cancel(true)
@@ -291,8 +301,9 @@ internal class IconSelectionDialog(
                     showSelection()
                 }, onFailure = { error ->
                     status.foreground = JBColor.RED
-                    status.text = settingsMessage(error.message ?: "Cannot read this SVG.")
-                    showSelection()
+                    status.text = svgImportErrorMessage(error)
+                    status.toolTipText = status.text
+                    showSelection(clearImportError = false)
                 })
             }, ModalityState.any())
         }
@@ -306,7 +317,12 @@ internal class IconSelectionDialog(
         return IconChoice(asset, color)
     }
 
-    private fun showSelection() {
+    private fun showSelection(clearImportError: Boolean = true) {
+        if (clearImportError && importButton.isEnabled) {
+            status.foreground = UIUtil.getContextHelpForeground()
+            status.text = "Saved with Apply · Replaces light and dark icon variants"
+            status.toolTipText = null
+        }
         val selected = selection()
         preview.icon = selected?.let { RecentProjectIconHelper.createIcon(it.asset.tabArtwork() ?: it.asset.bytes, true, 32) }
         selectionLabel.text = selected?.asset?.label?.let { settingsLiteral(it.substringBefore(" · ")) } ?: "Choose an icon"

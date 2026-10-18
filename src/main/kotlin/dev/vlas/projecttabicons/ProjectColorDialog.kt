@@ -140,8 +140,8 @@ internal class ProjectColorDialog(
         body.add(settingsHint(when (target) {
             ProjectColorTarget.ICON -> "Automatic outline and tab colors follow this icon."
             ProjectColorTarget.OUTLINE -> "Changes only the outline. Match icon color keeps it in sync."
-            ProjectColorTarget.TAB -> if (appearance.showTabBackground) "Tab fill uses 50% opacity. Icon and outline colors stay unchanged."
-                else "50% opacity. Enable Fill tab in Color to show it on window tabs."
+            ProjectColorTarget.TAB -> if (appearance.showTabBackground) "Tab fill intensity: ${appearance.tabFillIntensity}%. Icon and outline colors stay unchanged."
+                else "Fill intensity: ${appearance.tabFillIntensity}%. Enable Fill tab in Color to show it on window tabs."
         }), BorderLayout.SOUTH)
         autoColor.addActionListener { updateControls() }
         customColor.addActionListener { updateControls() }
@@ -248,7 +248,7 @@ internal class ProjectColorPreview(projectName: String, private val appearance: 
         super.paintComponent(graphics)
         ProjectTabSurface.paint(graphics as Graphics2D, width, height, projectTabGeometry(width, height),
             ProjectTabSurfaceColors(UIUtil.getPanelBackground(), JBUI.CurrentTheme.MainWindow.Tab.background(true, false, false)),
-            tabColor, appearance.tabFillInset)
+            tabColor, appearance.tabFillInset, appearance.tabFillIntensity)
     }
 }
 

@@ -145,6 +145,7 @@ private class PreviewTab(
     private var palette = PreviewIdeTheme.CURRENT.palette()
     private var tabFillColor: Color? = null
     private var tabFillInset = 0
+    private var tabFillIntensity = DEFAULT_TAB_FILL_INTENSITY
     private val baseLayout = layout as BorderLayout
     private val baseBorder = JBUI.Borders.empty(0, 4)
     private val previewLayout = ProjectTabIconLayout(baseLayout, null, TabIconPosition.RIGHT,
@@ -181,6 +182,7 @@ private class PreviewTab(
         palette = theme
         tabFillColor = color.takeIf { appearance.enabled && appearance.showTabBackground }
         tabFillInset = appearance.tabFillInset
+        tabFillIntensity = appearance.tabFillIntensity
         caption.foreground = if (selected) palette.selectedForeground else palette.foreground
         caption.branchForeground = palette.chrome.muted
         close.icon = when {
@@ -238,7 +240,7 @@ private class PreviewTab(
         super.paintComponent(graphics)
         ProjectTabSurface.paint(graphics as Graphics2D, width, height, palette.geometry(width, height),
             ProjectTabSurfaceColors(palette.stripBackground,
-                if (selected) palette.selectedBackground else palette.background), tabFillColor, tabFillInset)
+                if (selected) palette.selectedBackground else palette.background), tabFillColor, tabFillInset, tabFillIntensity)
     }
 }
 

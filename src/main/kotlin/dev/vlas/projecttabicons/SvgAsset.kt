@@ -1,6 +1,8 @@
 package dev.vlas.projecttabicons
 
 import org.w3c.dom.Element
+import org.xml.sax.SAXParseException
+import org.xml.sax.helpers.DefaultHandler
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.nio.file.Files
@@ -60,12 +62,12 @@ internal data class SvgAsset(val bytes: ByteArray, val label: String, val builde
         fun read(path: Path, label: String): SvgAsset = validate(readIconBytes(path), label)
 
         fun validate(bytes: ByteArray, label: String): SvgAsset {
-            require(bytes.size <= MAX_ICON_BYTES) { "SVG must be smaller than 2 MiB." }
+            if (bytes.size > MAX_ICON_BYTES) throw SvgValidationException(SvgImportProblem.TOO_LARGE)
+            if (bytes.isEmpty()) throw SvgValidationException(SvgImportProblem.EMPTY)
             val document = parseSvgDocument(bytes)
             val root = document.documentElement
-            require(root.localName == "svg" && root.namespaceURI == "http://www.w3.org/2000/svg") {
-                "The selected file must be an SVG image."
-            }
+            if (root.localName != "svg" || root.namespaceURI != "http://www.w3.org/2000/svg")
+                throw SvgValidationException(SvgImportProblem.NOT_SVG)
             val elements = root.getElementsByTagName("*")
             validateElement(root)
             for (index in 0 until elements.length) validateElement(elements.item(index) as Element)
@@ -78,16 +80,14 @@ internal data class SvgAsset(val bytes: ByteArray, val label: String, val builde
         }
 
         private fun validateElement(element: Element) {
-            require(element.localName !in setOf("script", "foreignObject")) {
-                "SVG must not contain scripts or embedded web content."
-            }
+            if (element.localName in setOf("script", "foreignObject"))
+                throw SvgValidationException(SvgImportProblem.ACTIVE_CONTENT)
             for (index in 0 until element.attributes.length) {
                 val attribute = element.attributes.item(index)
                 if (attribute.localName == "href") {
                     val value = attribute.nodeValue.trim()
-                    require(value.startsWith('#') || value.startsWith("data:image/")) {
-                        "SVG must be self-contained; external images are not supported."
-                    }
+                    if (!value.startsWith('#') && !value.startsWith("data:image/"))
+                        throw SvgValidationException(SvgImportProblem.EXTERNAL_RESOURCES)
                 }
                 checkUrls(attribute.nodeValue)
             }
@@ -96,11 +96,11 @@ internal data class SvgAsset(val bytes: ByteArray, val label: String, val builde
 
         private fun checkUrls(value: String) {
             URL_PATTERN.findAll(value).forEach {
-                require(it.groupValues[1].trim().trim('\'', '"').startsWith('#')) {
-                    "SVG must be self-contained; external resources are not supported."
-                }
+                if (!it.groupValues[1].trim().trim('\'', '"').startsWith('#'))
+                    throw SvgValidationException(SvgImportProblem.EXTERNAL_RESOURCES)
             }
-            require(!value.contains("@import", ignoreCase = true)) { "SVG must not import external styles." }
+            if (value.contains("@import", ignoreCase = true))
+                throw SvgValidationException(SvgImportProblem.EXTERNAL_RESOURCES)
         }
     }
 }
@@ -115,11 +115,16 @@ private fun parseSvgDocument(bytes: ByteArray) = DocumentBuilderFactory.newInsta
     setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "")
     isXIncludeAware = false
     isExpandEntityReferences = false
-}.newDocumentBuilder().let { parser -> ByteArrayInputStream(bytes).use(parser::parse) }
+}.newDocumentBuilder().apply {
+    setErrorHandler(object : DefaultHandler() {
+        override fun error(error: SAXParseException) { throw error }
+        override fun fatalError(error: SAXParseException) { throw error }
+    })
+}.let { parser -> ByteArrayInputStream(bytes).use(parser::parse) }
 
 internal fun readIconBytes(path: Path): ByteArray = Files.newInputStream(path).use { input ->
     input.readNBytes(MAX_ICON_BYTES + 1).also {
-        require(it.size <= MAX_ICON_BYTES) { "Project icon exceeds 2 MiB: ${path.fileName}" }
+        if (it.size > MAX_ICON_BYTES) throw SvgValidationException(SvgImportProblem.TOO_LARGE)
     }
 }
 

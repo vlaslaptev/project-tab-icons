@@ -10,7 +10,7 @@
 
 ## Install in a minute
 
-### [↓ Download ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.49/project-tab-icons-0.3.49.zip)
+### [↓ Download ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.52/project-tab-icons-0.3.52.zip)
 
 1. Open **Settings → Plugins → ⚙ → Install Plugin from Disk…** and select the ZIP.
 2. Open several projects in separate windows, then use **Window → Merge All Project Windows**.
@@ -25,6 +25,7 @@ The [installation guide](docs/INSTALLATION.md) covers missing tabs, updates and 
 ![Real Settings preview with the Filled preset and Color controls](docs/media/appearance-presets.png)
 ### You can change tab height, text size and the close button’s position
 ### You can give each project its own outline and translucent fill colors
+### You can adjust fill intensity and return to your last Custom appearance
 ### You can start with a preset, adjust it and see the result before Apply
 ### You can preview your tabs in different IDE themes
 
@@ -45,7 +46,7 @@ Give each project a visual identity and keep the information you need beside its
 
 - **Platform:** macOS
 - **IDE:** IntelliJ IDEA **2026.2.3** / build **262**
-- **Version:** **0.3.49**
+- **Version:** **0.3.52**
 - **License:** MIT
 
 > **Updates & future IDE support**
