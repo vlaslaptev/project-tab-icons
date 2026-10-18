@@ -29,7 +29,7 @@ internal data class IconSnapshot(val directory: Path, val files: Map<String, Byt
     }
 }
 
-internal data class ProjectIconSource(val path: Path, val title: String)
+internal data class ProjectIconSource(val path: Path, val title: String, val snapshot: IconSnapshot? = null)
 internal data class SvgGallery(val assets: List<SvgAsset>, val skipped: Int)
 internal data class ProjectIconWrite(val project: Project, val path: Path, val expected: IconSnapshot, val asset: SvgAsset)
 
@@ -99,25 +99,29 @@ internal object ProjectIconStore {
     fun gallery(sources: List<ProjectIconSource>): SvgGallery {
         val byDigest = linkedMapOf<String, SvgAsset>()
         var skipped = 0
-        sources.forEach { source ->
+        for (source in sources) {
             try {
-                val directory = directory(source.path)
-                listOf("icon.svg", "icon_dark.svg").forEach { name ->
-                    val path = directory.resolve(name)
-                    if (Files.exists(path)) {
-                        try {
-                            val asset = SvgAsset.read(path, "${source.title} · $name")
-                            val previous = byDigest[asset.digest]
-                            byDigest[asset.digest] = if (previous == null) asset else previous.copy(
-                                label = "${previous.label}; ${asset.label}",
-                            )
-                        } catch (_: IllegalArgumentException) {
-                            skipped++
-                        } catch (_: java.io.IOException) {
-                            skipped++
-                        } catch (_: org.xml.sax.SAXException) {
-                            skipped++
-                        }
+                val snapshot = source.snapshot
+                val directory = snapshot?.directory ?: directory(source.path)
+                for (name in listOf("icon.svg", "icon_dark.svg")) {
+                    try {
+                        val label = "${source.title} · $name"
+                        val asset = if (snapshot != null) {
+                            snapshot.files[name]?.let { SvgAsset.validate(it, label) }
+                        } else {
+                            // Даже если другой файл проекта не прочитан, его исправный SVG доступен в галерее.
+                            directory.resolve(name).takeIf { Files.exists(it) }?.let { SvgAsset.read(it, label) }
+                        } ?: continue
+                        val previous = byDigest[asset.digest]
+                        byDigest[asset.digest] = if (previous == null) asset else previous.copy(
+                            label = "${previous.label}; ${asset.label}",
+                        )
+                    } catch (_: IllegalArgumentException) {
+                        skipped++
+                    } catch (_: java.io.IOException) {
+                        skipped++
+                    } catch (_: org.xml.sax.SAXException) {
+                        skipped++
                     }
                 }
             } catch (_: java.io.IOException) {

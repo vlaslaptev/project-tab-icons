@@ -38,7 +38,7 @@ import javax.swing.plaf.basic.BasicGraphicsUtils
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
-internal class ColorSwatch(private val color: Color, private val selected: Boolean = false) : Icon {
+internal class ColorSwatch(private val color: Color) : Icon {
     override fun getIconWidth(): Int = JBUI.scale(18)
     override fun getIconHeight(): Int = JBUI.scale(18)
 
@@ -48,12 +48,6 @@ internal class ColorSwatch(private val color: Color, private val selected: Boole
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
             g.color = color
             g.fillRoundRect(x, y, iconWidth, iconHeight, JBUI.scale(4), JBUI.scale(4))
-            if (selected) {
-                g.color = iconBackground(color)
-                g.stroke = java.awt.BasicStroke(JBUI.scale(2).toFloat())
-                g.drawLine(x + JBUI.scale(4), y + JBUI.scale(9), x + JBUI.scale(8), y + JBUI.scale(13))
-                g.drawLine(x + JBUI.scale(8), y + JBUI.scale(13), x + JBUI.scale(14), y + JBUI.scale(5))
-            }
         } finally {
             g.dispose()
         }
@@ -127,8 +121,6 @@ internal class SettingsValueButton(text: String, icon: Icon? = null) : JButton(t
 }
 
 internal class IconPreviewWell(size: Int = 56) : JBLabel() {
-    var accent: Color? = null
-        set(value) { field = value; repaint() }
     init {
         isOpaque = false
         horizontalAlignment = SwingConstants.CENTER
@@ -141,10 +133,6 @@ internal class IconPreviewWell(size: Int = 56) : JBLabel() {
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
             g.color = UIUtil.getListBackground()
             g.fillRoundRect(0, 0, width, height, JBUI.scale(12), JBUI.scale(12))
-            accent?.let {
-                g.color = it
-                g.fillRoundRect(JBUI.scale(10), height - JBUI.scale(5), width - JBUI.scale(20), JBUI.scale(3), JBUI.scale(3), JBUI.scale(3))
-            }
         } finally { g.dispose() }
         super.paintComponent(graphics)
     }

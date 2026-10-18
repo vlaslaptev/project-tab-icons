@@ -119,3 +119,132 @@ bicycle	Bicycle	PHOSPHOR	Travel	велосипед bike
 sailboat	Sailboat	PHOSPHOR	Travel	парусник лодка boat
 steering-wheel	Steering wheel	PHOSPHOR	Travel	руль вождение drive
 suitcase-simple	Suitcase	PHOSPHOR	Travel	чемодан путешествие luggage
+digit-0	0	JETBRAINS_MONO	Digits	zero ноль нуль number arabic decimal цифра цифры число обычные арабские
+digit-1	1	JETBRAINS_MONO	Digits	one один единица number arabic decimal цифра цифры число обычные арабские
+digit-2	2	JETBRAINS_MONO	Digits	two два двойка number arabic decimal цифра цифры число обычные арабские
+digit-3	3	JETBRAINS_MONO	Digits	three три тройка number arabic decimal цифра цифры число обычные арабские
+digit-4	4	JETBRAINS_MONO	Digits	four четыре четвёрка number arabic decimal цифра цифры число обычные арабские
+digit-5	5	JETBRAINS_MONO	Digits	five пять пятёрка number arabic decimal цифра цифры число обычные арабские
+digit-6	6	JETBRAINS_MONO	Digits	six шесть шестёрка number arabic decimal цифра цифры число обычные арабские
+digit-7	7	JETBRAINS_MONO	Digits	seven семь семёрка number arabic decimal цифра цифры число обычные арабские
+digit-8	8	JETBRAINS_MONO	Digits	eight восемь восьмёрка number arabic decimal цифра цифры число обычные арабские
+digit-9	9	JETBRAINS_MONO	Digits	nine девять девятка number arabic decimal цифра цифры число обычные арабские
+roman-1	I	JETBRAINS_MONO	Roman numerals	I 1 roman numeral number римская римские цифра цифры число
+roman-2	II	JETBRAINS_MONO	Roman numerals	II 2 roman numeral number римская римские цифра цифры число
+roman-3	III	JETBRAINS_MONO	Roman numerals	III 3 roman numeral number римская римские цифра цифры число
+roman-4	IV	JETBRAINS_MONO	Roman numerals	IV 4 roman numeral number римская римские цифра цифры число
+roman-5	V	JETBRAINS_MONO	Roman numerals	V 5 roman numeral number римская римские цифра цифры число
+roman-6	VI	JETBRAINS_MONO	Roman numerals	VI 6 roman numeral number римская римские цифра цифры число
+roman-7	VII	JETBRAINS_MONO	Roman numerals	VII 7 roman numeral number римская римские цифра цифры число
+roman-8	VIII	JETBRAINS_MONO	Roman numerals	VIII 8 roman numeral number римская римские цифра цифры число
+roman-9	IX	JETBRAINS_MONO	Roman numerals	IX 9 roman numeral number римская римские цифра цифры число
+roman-10	X	JETBRAINS_MONO	Roman numerals	X 10 roman numeral number римская римские цифра цифры число
+roman-11	XI	JETBRAINS_MONO	Roman numerals	XI 11 roman numeral number римская римские цифра цифры число
+roman-12	XII	JETBRAINS_MONO	Roman numerals	XII 12 roman numeral number римская римские цифра цифры число
+roman-50	L	JETBRAINS_MONO	Roman numerals	L 50 roman numeral number римская римские цифра цифры число
+roman-100	C	JETBRAINS_MONO	Roman numerals	C 100 roman numeral number римская римские цифра цифры число
+roman-500	D	JETBRAINS_MONO	Roman numerals	D 500 roman numeral number римская римские цифра цифры число
+roman-1000	M	JETBRAINS_MONO	Roman numerals	M 1000 roman numeral number римская римские цифра цифры число
+latin-upper-a	A (uppercase)	JETBRAINS_MONO	Latin letters	A latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-b	B (uppercase)	JETBRAINS_MONO	Latin letters	B latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-c	C (uppercase)	JETBRAINS_MONO	Latin letters	C latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-d	D (uppercase)	JETBRAINS_MONO	Latin letters	D latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-e	E (uppercase)	JETBRAINS_MONO	Latin letters	E latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-f	F (uppercase)	JETBRAINS_MONO	Latin letters	F latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-g	G (uppercase)	JETBRAINS_MONO	Latin letters	G latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-h	H (uppercase)	JETBRAINS_MONO	Latin letters	H latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-i	I (uppercase)	JETBRAINS_MONO	Latin letters	I latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-j	J (uppercase)	JETBRAINS_MONO	Latin letters	J latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-k	K (uppercase)	JETBRAINS_MONO	Latin letters	K latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-l	L (uppercase)	JETBRAINS_MONO	Latin letters	L latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-m	M (uppercase)	JETBRAINS_MONO	Latin letters	M latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-n	N (uppercase)	JETBRAINS_MONO	Latin letters	N latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-o	O (uppercase)	JETBRAINS_MONO	Latin letters	O latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-p	P (uppercase)	JETBRAINS_MONO	Latin letters	P latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-q	Q (uppercase)	JETBRAINS_MONO	Latin letters	Q latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-r	R (uppercase)	JETBRAINS_MONO	Latin letters	R latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-s	S (uppercase)	JETBRAINS_MONO	Latin letters	S latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-t	T (uppercase)	JETBRAINS_MONO	Latin letters	T latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-u	U (uppercase)	JETBRAINS_MONO	Latin letters	U latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-v	V (uppercase)	JETBRAINS_MONO	Latin letters	V latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-w	W (uppercase)	JETBRAINS_MONO	Latin letters	W latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-x	X (uppercase)	JETBRAINS_MONO	Latin letters	X latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-y	Y (uppercase)	JETBRAINS_MONO	Latin letters	Y latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-upper-z	Z (uppercase)	JETBRAINS_MONO	Latin letters	Z latin english alphabet letter uppercase capital заглавная прописная большая латиница английская буква буквы алфавит
+latin-lower-a	a (lowercase)	JETBRAINS_MONO	Latin letters	a latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-b	b (lowercase)	JETBRAINS_MONO	Latin letters	b latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-c	c (lowercase)	JETBRAINS_MONO	Latin letters	c latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-d	d (lowercase)	JETBRAINS_MONO	Latin letters	d latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-e	e (lowercase)	JETBRAINS_MONO	Latin letters	e latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-f	f (lowercase)	JETBRAINS_MONO	Latin letters	f latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-g	g (lowercase)	JETBRAINS_MONO	Latin letters	g latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-h	h (lowercase)	JETBRAINS_MONO	Latin letters	h latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-i	i (lowercase)	JETBRAINS_MONO	Latin letters	i latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-j	j (lowercase)	JETBRAINS_MONO	Latin letters	j latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-k	k (lowercase)	JETBRAINS_MONO	Latin letters	k latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-l	l (lowercase)	JETBRAINS_MONO	Latin letters	l latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-m	m (lowercase)	JETBRAINS_MONO	Latin letters	m latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-n	n (lowercase)	JETBRAINS_MONO	Latin letters	n latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-o	o (lowercase)	JETBRAINS_MONO	Latin letters	o latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-p	p (lowercase)	JETBRAINS_MONO	Latin letters	p latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-q	q (lowercase)	JETBRAINS_MONO	Latin letters	q latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-r	r (lowercase)	JETBRAINS_MONO	Latin letters	r latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-s	s (lowercase)	JETBRAINS_MONO	Latin letters	s latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-t	t (lowercase)	JETBRAINS_MONO	Latin letters	t latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-u	u (lowercase)	JETBRAINS_MONO	Latin letters	u latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-v	v (lowercase)	JETBRAINS_MONO	Latin letters	v latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-w	w (lowercase)	JETBRAINS_MONO	Latin letters	w latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-x	x (lowercase)	JETBRAINS_MONO	Latin letters	x latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-y	y (lowercase)	JETBRAINS_MONO	Latin letters	y latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+latin-lower-z	z (lowercase)	JETBRAINS_MONO	Latin letters	z latin english alphabet letter lowercase small строчная маленькая латиница английская буква буквы алфавит
+greek-upper-alpha	Α · Alpha	JETBRAINS_MONO	Greek letters	Α alpha альфа greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-beta	Β · Beta	JETBRAINS_MONO	Greek letters	Β beta бета greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-gamma	Γ · Gamma	JETBRAINS_MONO	Greek letters	Γ gamma гамма greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-delta	Δ · Delta	JETBRAINS_MONO	Greek letters	Δ delta дельта greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-epsilon	Ε · Epsilon	JETBRAINS_MONO	Greek letters	Ε epsilon эпсилон greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-zeta	Ζ · Zeta	JETBRAINS_MONO	Greek letters	Ζ zeta дзета зета greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-eta	Η · Eta	JETBRAINS_MONO	Greek letters	Η eta эта greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-theta	Θ · Theta	JETBRAINS_MONO	Greek letters	Θ theta тета greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-iota	Ι · Iota	JETBRAINS_MONO	Greek letters	Ι iota йота иота greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-kappa	Κ · Kappa	JETBRAINS_MONO	Greek letters	Κ kappa каппа greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-lambda	Λ · Lambda	JETBRAINS_MONO	Greek letters	Λ lambda лямбда ламбда greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-mu	Μ · Mu	JETBRAINS_MONO	Greek letters	Μ mu мю ми greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-nu	Ν · Nu	JETBRAINS_MONO	Greek letters	Ν nu ню ни greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-xi	Ξ · Xi	JETBRAINS_MONO	Greek letters	Ξ xi кси greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-omicron	Ο · Omicron	JETBRAINS_MONO	Greek letters	Ο omicron омикрон greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-pi	Π · Pi	JETBRAINS_MONO	Greek letters	Π pi пи greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-rho	Ρ · Rho	JETBRAINS_MONO	Greek letters	Ρ rho ро greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-sigma	Σ · Sigma	JETBRAINS_MONO	Greek letters	Σ sigma сигма greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-tau	Τ · Tau	JETBRAINS_MONO	Greek letters	Τ tau тау greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-upsilon	Υ · Upsilon	JETBRAINS_MONO	Greek letters	Υ upsilon ипсилон greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-phi	Φ · Phi	JETBRAINS_MONO	Greek letters	Φ phi фи greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-chi	Χ · Chi	JETBRAINS_MONO	Greek letters	Χ chi хи greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-psi	Ψ · Psi	JETBRAINS_MONO	Greek letters	Ψ psi пси greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-upper-omega	Ω · Omega	JETBRAINS_MONO	Greek letters	Ω omega омега greek alphabet letter uppercase capital заглавная прописная большая греческая греческие буква буквы алфавит
+greek-lower-alpha	α · Alpha	JETBRAINS_MONO	Greek letters	α alpha альфа greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-beta	β · Beta	JETBRAINS_MONO	Greek letters	β beta бета greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-gamma	γ · Gamma	JETBRAINS_MONO	Greek letters	γ gamma гамма greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-delta	δ · Delta	JETBRAINS_MONO	Greek letters	δ delta дельта greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-epsilon	ε · Epsilon	JETBRAINS_MONO	Greek letters	ε epsilon эпсилон greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-zeta	ζ · Zeta	JETBRAINS_MONO	Greek letters	ζ zeta дзета зета greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-eta	η · Eta	JETBRAINS_MONO	Greek letters	η eta эта greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-theta	θ · Theta	JETBRAINS_MONO	Greek letters	θ theta тета greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-iota	ι · Iota	JETBRAINS_MONO	Greek letters	ι iota йота иота greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-kappa	κ · Kappa	JETBRAINS_MONO	Greek letters	κ kappa каппа greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-lambda	λ · Lambda	JETBRAINS_MONO	Greek letters	λ lambda лямбда ламбда greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-mu	μ · Mu	JETBRAINS_MONO	Greek letters	μ mu мю ми greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-nu	ν · Nu	JETBRAINS_MONO	Greek letters	ν nu ню ни greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-xi	ξ · Xi	JETBRAINS_MONO	Greek letters	ξ xi кси greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-omicron	ο · Omicron	JETBRAINS_MONO	Greek letters	ο omicron омикрон greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-pi	π · Pi	JETBRAINS_MONO	Greek letters	π pi пи greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-rho	ρ · Rho	JETBRAINS_MONO	Greek letters	ρ rho ро greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-sigma	σ · Sigma	JETBRAINS_MONO	Greek letters	σ sigma сигма greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-tau	τ · Tau	JETBRAINS_MONO	Greek letters	τ tau тау greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-upsilon	υ · Upsilon	JETBRAINS_MONO	Greek letters	υ upsilon ипсилон greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-phi	φ · Phi	JETBRAINS_MONO	Greek letters	φ phi фи greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-chi	χ · Chi	JETBRAINS_MONO	Greek letters	χ chi хи greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-psi	ψ · Psi	JETBRAINS_MONO	Greek letters	ψ psi пси greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-omega	ω · Omega	JETBRAINS_MONO	Greek letters	ω omega омега greek alphabet letter lowercase small строчная маленькая греческая греческие буква буквы алфавит
+greek-lower-final-sigma	ς · Final sigma	JETBRAINS_MONO	Greek letters	ς sigma final lowercase small сигма конечная строчная греческая буква буквы
+monogram-ai	AI	OWN	AI monograms	AI artificial intelligence monogram serif capital barred i ии искусственный интеллект монограмма засечки перекладины
+monogram-ai-lower	Ai	OWN	AI monograms	Ai artificial intelligence monogram lowercase small i geometric straight sans serif ии искусственный интеллект монограмма маленькая строчная прямая геометрическая

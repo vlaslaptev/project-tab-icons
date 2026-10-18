@@ -139,8 +139,6 @@ internal data class TabAppearanceState(
         else -> TabMoreInfo.NONE
     }
 
-    fun effectiveTabFontSize(): Int = if (tabFontSize == 0) defaultTabFontSize() else tabFontSize
-
     companion object {
         fun defaults(): TabAppearanceState = TabAppearanceState(
             iconSize = TabIconSize.MEDIUM,

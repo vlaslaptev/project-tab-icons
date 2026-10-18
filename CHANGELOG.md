@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.49 — 2026-10-18
+
+- Prevent legacy icon backgrounds from returning during deferred loading or when the IDE window loses focus.
+- Prepare SVG/PNG artwork in the background; keep the last prepared image during reloads or leave the slot empty until it is ready.
+- Expand the 100+ icon library with digits, Roman numerals, Latin and Greek letters, and AI/Ai monograms.
+- Draw capital I in AI with horizontal bars; use straight geometric strokes and a square dot in Ai.
+- Improve preview loading, color-picker tab fills and preservation of explicit font sizes.
+- Preserve existing project artwork, colors and appearance settings.
+- Keep the README and the approved icon-library slide independent of the exact catalog size.
+
 ## 0.3.46 — 2026-10-16
 
 Prepared as the initial public GitHub snapshot of Project Tab Icons.

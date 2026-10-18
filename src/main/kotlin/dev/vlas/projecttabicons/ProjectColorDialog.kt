@@ -10,6 +10,7 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
 import com.intellij.util.ui.JBUI
+import com.intellij.util.ui.UIUtil
 import java.awt.BasicStroke
 import java.awt.BorderLayout
 import java.awt.Color
@@ -217,8 +218,9 @@ internal class ProjectColorDialog(
 }
 
 /** Образец вкладки показывает, какой именно слой меняет выбранный цвет. */
-private class ProjectColorPreview(projectName: String, private val appearance: TabAppearanceState) : JPanel(BorderLayout()) {
+internal class ProjectColorPreview(projectName: String, private val appearance: TabAppearanceState) : JPanel(BorderLayout()) {
     private val baseBorder = JBUI.Borders.empty(8, 12)
+    private var tabColor: Color? = null
     private val caption = JBLabel(projectName).apply {
         iconTextGap = JBUI.scale(10)
         horizontalAlignment = SwingConstants.CENTER
@@ -235,19 +237,18 @@ private class ProjectColorPreview(projectName: String, private val appearance: T
 
     fun showColors(icon: Icon?, outline: Color?, fill: Color?) {
         caption.icon = icon
-        border = ProjectTabBorder(baseBorder, null, outline, appearance.outlineThickness, appearance.outlineStyle, fill)
+        tabColor = fill
+        border = ProjectTabBorder(baseBorder, null, outline, appearance.outlineThickness, appearance.outlineStyle,
+            surfaceColors = null)
         revalidate()
         repaint()
     }
 
     override fun paintComponent(graphics: Graphics) {
         super.paintComponent(graphics)
-        val g = graphics.create() as Graphics2D
-        try {
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-            g.color = JBUI.CurrentTheme.MainWindow.Tab.background(true, false, false)
-            g.fill(projectTabGeometry(width, height).shape())
-        } finally { g.dispose() }
+        ProjectTabSurface.paint(graphics as Graphics2D, width, height, projectTabGeometry(width, height),
+            ProjectTabSurfaceColors(UIUtil.getPanelBackground(), JBUI.CurrentTheme.MainWindow.Tab.background(true, false, false)),
+            tabColor, appearance.tabFillInset)
     }
 }
 

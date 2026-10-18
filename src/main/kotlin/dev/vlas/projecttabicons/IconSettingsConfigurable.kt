@@ -1,6 +1,7 @@
 package dev.vlas.projecttabicons
 
 import com.intellij.ide.DataManager
+import com.intellij.ide.RecentProjectIconHelper
 import com.intellij.ide.RecentProjectsManagerBase
 import com.intellij.ide.ProjectColorChangeListener
 import com.intellij.ide.ProjectWindowCustomizerService
@@ -27,6 +28,7 @@ import com.intellij.ui.JBColor
 import com.intellij.util.ui.AvatarIcon
 import java.nio.file.Path
 import java.util.concurrent.Future
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.JComponent
 
 /** Контекст текущего окна нужен диалогам; таблица содержит все открытые проекты. */
@@ -38,6 +40,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
     @Volatile private var disposed = true
     @Volatile private var iconDirectories = emptySet<String>()
     private var applying = false
+    private val reloadQueued = AtomicBoolean()
     private val models = linkedMapOf<String, ProjectIconSettingsRow>()
     private var gallery = emptyList<IconChoice>()
     private val dialogs = linkedMapOf<DialogWrapper, String>()
@@ -80,7 +83,9 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
     }
 
     private fun scheduleReload() {
+        if (!reloadQueued.compareAndSet(false, true)) return
         ApplicationManager.getApplication().invokeLater({
+            reloadQueued.set(false)
             if (!disposed && !project.isDisposed) reload(keepDraft = true)
         }, ModalityState.any())
     }
@@ -127,10 +132,14 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
             val result = try {
                 ContourCatalog.entries
                 ContourCatalog.licenses
+                val previewArtwork = WindowTabsPreview.loadArtwork()
                 val loaded = targets.map { loadProject(it, dark) }
-                val sources = targets.mapNotNull { target -> target.path?.let { ProjectIconSource(it, target.name) } }
+                val sources = loaded.mapNotNull { row ->
+                    row.target.path?.let { ProjectIconSource(it, row.target.name, row.snapshot) }
+                }
+                val knownColors = loaded.mapNotNull { it.choice }.associate { it.asset.digest to it.color }
                 val assets = ProjectIconStore.gallery(sources).assets.map { asset ->
-                    val color = try {
+                    val color = if (knownColors.containsKey(asset.digest)) knownColors[asset.digest] else try {
                         svgIconColor(asset)
                     } catch (error: ProcessCanceledException) {
                         throw error
@@ -139,7 +148,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
                     }
                     IconChoice(asset, color)
                 }
-                Result.success(LoadedOpenProjects(loaded, assets))
+                Result.success(LoadedOpenProjects(loaded, assets, previewArtwork))
             } catch (error: ProcessCanceledException) {
                 throw error
             } catch (error: Exception) {
@@ -167,7 +176,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
                     }
                     iconDirectories = active.mapNotNull { it.snapshot?.directory?.toString()?.replace('\\', '/') }.toSet()
                     gallery = loaded.gallery
-                    view.loaded(active.mapNotNull { models[it.target.key] })
+                    view.loaded(active.mapNotNull { models[it.target.key] }, loaded.previewArtwork)
                 }, onFailure = { error ->
                     view.failed(error.message ?: "Cannot load open project icons.")
                 })
@@ -202,7 +211,12 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
             } catch (_: Exception) {
                 null
             }
-            LoadedProjectIcon(target, snapshot, svg?.let { IconChoice(it, color) }, color)
+            // PNG тоже получает подготовленную копию: renderer больше не рисует delegate.
+            val prepared = if (svg == null && file?.endsWith(".png") == true) {
+                val image = RecentProjectIconHelper.createIcon(snapshot.files.getValue(file), false, 24)
+                target.copy(preview = (target.preview as? CenteredProjectIcon)?.withArtwork(image) ?: image)
+            } else target
+            LoadedProjectIcon(prepared, snapshot, svg?.let { IconChoice(it, color) }, color)
         } catch (error: ProcessCanceledException) {
             throw error
         } catch (error: Exception) {
@@ -333,4 +347,5 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
     }
 }
 
-private data class LoadedOpenProjects(val rows: List<LoadedProjectIcon>, val gallery: List<IconChoice>)
+private data class LoadedOpenProjects(val rows: List<LoadedProjectIcon>, val gallery: List<IconChoice>,
+                                      val previewArtwork: PreviewArtwork)

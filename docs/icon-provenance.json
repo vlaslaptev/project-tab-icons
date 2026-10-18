@@ -1558,6 +1558,782 @@
           }
         }
       ]
+    },
+    {
+      "collection": "JetBrains Mono",
+      "version": "2.304",
+      "licenseId": "OFL-1.1",
+      "source": "https://github.com/JetBrains/JetBrainsMono/tree/v2.304",
+      "fontSource": "https://raw.githubusercontent.com/JetBrains/JetBrainsMono/v2.304/fonts/ttf/JetBrainsMono-Bold.ttf",
+      "sourceFile": "assets/sources/jetbrains-mono/JetBrainsMono-Bold.ttf",
+      "sourceSha256": "5590990c82e097397517f275f430af4546e1c45cff408bde4255dad142479dcb",
+      "license": "https://raw.githubusercontent.com/JetBrains/JetBrainsMono/v2.304/OFL.txt",
+      "licenseSha256": "30f0c136e3c88e422d0791acd97238870f9054a9729bc34cf2ff0d4ed8cac4ad",
+      "generator": "tools/icons/generate_symbols.py",
+      "icons": [
+        {
+          "id": "digit-0",
+          "sha256": "eec182c64e6bb075d2c76714f2d58e7387a6b642838a201cbb779c018aea2932",
+          "text": "0",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "digit-1",
+          "sha256": "2d73dfbfc61bc2da6993a60240859572011bea1209c61f542ae12f9b5ed72388",
+          "text": "1",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "digit-2",
+          "sha256": "3fc17ce7e4eecb8547574c7911d385f63161351ad44e870c6add88176d79765e",
+          "text": "2",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "digit-3",
+          "sha256": "e7eb7f8735a306d3d503c8724c9ad962f6a991dd83371f1678775dbd2598033f",
+          "text": "3",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "digit-4",
+          "sha256": "2f0acdc669a187e50c558e8639876c0a0d9f8043684430bacd9ff26851473b87",
+          "text": "4",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "digit-5",
+          "sha256": "0229d7b6719ade823c49f788c135cbf6618b55751f7e064e10e17d29992d0a1e",
+          "text": "5",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "digit-6",
+          "sha256": "f37940acedaa94db7fe4e906bc531dcb7b4fd7b1856273a23a618d17b98f2d08",
+          "text": "6",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "digit-7",
+          "sha256": "630dd467c72930fbcbce6e825ca57c1541aeeffdfb81eda7898281c295a37a03",
+          "text": "7",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "digit-8",
+          "sha256": "d816a708ef4ad318bc89f9672ba3e14ef45d26fa7a1ccf2d93e3ee935f22efe5",
+          "text": "8",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "digit-9",
+          "sha256": "b6e12c80561431ac3db09e486fe557f90b2a2204a921df0586f068c5f1018a5f",
+          "text": "9",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "roman-1",
+          "sha256": "432b7e225565f331d8eb2e9377bc11afe7e09b95685555747fb70c66e80fb139",
+          "text": "I",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "roman-2",
+          "sha256": "5039766077846b803d5dd39f9e77ada8aeb4d21d0dd78ed1a7c4da4c941d678a",
+          "text": "II",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "roman-3",
+          "sha256": "61f9919063f6a854b4c9e4e27bf617a5242a2f0a95eb9c7be0a8b781ab4be67a",
+          "text": "III",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "roman-4",
+          "sha256": "56e846d9b5f7b95c47c8d6dfd53224ac5edaf868190744b457ea00b740e49092",
+          "text": "IV",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "roman-5",
+          "sha256": "6532c31ceb575cc656eb1a6e9448ab0d567681fb0f3cf0ccad2cf65f9c5654ad",
+          "text": "V",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "roman-6",
+          "sha256": "3de99a51bf42645c5a948f40703956d35e7b9fe76cb6b68bd801cdbe94aa050c",
+          "text": "VI",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "roman-7",
+          "sha256": "7c04d4ace1506fb577ec757a536dfc33fad048ad1e54153019a579c450a62444",
+          "text": "VII",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "roman-8",
+          "sha256": "c6b1d745aa346210250a4f30554e4645ef451f3f8c77b005d7b67833427655f2",
+          "text": "VIII",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "roman-9",
+          "sha256": "f25dfc945765ec5d7411684423c9b63f94b176e6d156788093b482f0c7909723",
+          "text": "IX",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "roman-10",
+          "sha256": "0a92aa2e24ffc6420cf61f16507713f687e3fd48efdd1dfb74e0198c735b1351",
+          "text": "X",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "roman-11",
+          "sha256": "a6e69dd7657252e83d6d2983288d8a7c01c7e6e184ea23ed0c00480f4057d4fe",
+          "text": "XI",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "roman-12",
+          "sha256": "de1d0f3bfb1eb826deb3cb2757f2542555130ada6bce32337ffff1106a1485ec",
+          "text": "XII",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "roman-50",
+          "sha256": "b58eaf9ce6291efffff59da2a8532cc9979290ee145f4f7a6b8a52f3127cca2b",
+          "text": "L",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "roman-100",
+          "sha256": "c74a895fb3d35e232ecb834a221e94d32da83947e6e1ea98649a0757d232b469",
+          "text": "C",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "roman-500",
+          "sha256": "4f6c6b551e0adb6e864b023e58abc9d196510bc48a3a6063c6d68a949300e9ca",
+          "text": "D",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "roman-1000",
+          "sha256": "54e8d06766c1b95f8126f98bf20aab0336db7c4e69c6283ae52d9a8df391d312",
+          "text": "M",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-a",
+          "sha256": "c316035e91f9571c77c5087aea1847141ef49bfe326363da603c812d2899a62b",
+          "text": "A",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-b",
+          "sha256": "65f1fbde148a2a23e4c3351c2297659d57262b5c9035d0aaa431ef4345cbeba2",
+          "text": "B",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-c",
+          "sha256": "c74a895fb3d35e232ecb834a221e94d32da83947e6e1ea98649a0757d232b469",
+          "text": "C",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-d",
+          "sha256": "4f6c6b551e0adb6e864b023e58abc9d196510bc48a3a6063c6d68a949300e9ca",
+          "text": "D",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-e",
+          "sha256": "39499b29e122d512b44c2af28a7581c5061b350d4b72d713e93371bee15d2303",
+          "text": "E",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-f",
+          "sha256": "21470f855eeb3845714c90acfaba9dcbc93895e4617639b2557355d113f6d754",
+          "text": "F",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-g",
+          "sha256": "baae68558c9e9c6b59800377486681ac1d5423b44dc088553cbe6ffa2857bbfb",
+          "text": "G",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-h",
+          "sha256": "dba7bd3c01003c166da2c8b41cdfeddd5a072d9f2409d17c3ef96b6e8116b89c",
+          "text": "H",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-i",
+          "sha256": "432b7e225565f331d8eb2e9377bc11afe7e09b95685555747fb70c66e80fb139",
+          "text": "I",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-j",
+          "sha256": "20b07007b1320bf1ca2c17432f3c24fbed992bada91b53f1171d90a9ca041c6f",
+          "text": "J",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-k",
+          "sha256": "2d480b5fdeb0af942235d3b84e73245795a5dce72a4d2d4cc5c6190ddbabdfc9",
+          "text": "K",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-l",
+          "sha256": "b58eaf9ce6291efffff59da2a8532cc9979290ee145f4f7a6b8a52f3127cca2b",
+          "text": "L",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-m",
+          "sha256": "54e8d06766c1b95f8126f98bf20aab0336db7c4e69c6283ae52d9a8df391d312",
+          "text": "M",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-n",
+          "sha256": "2a4d0fb85970fb1157d75c2cf1c54b9a2387ae7c826dacd62a22d33b36ff91d4",
+          "text": "N",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-o",
+          "sha256": "4e9d0a801685f67ab32d5bf0b6ddf2d7ab8e543fbe4c74b82a0d224972cd531b",
+          "text": "O",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-p",
+          "sha256": "a9b99407343e2c18e846f1b1ee4cae02fd20db8138905a04fc4f4935de0035a8",
+          "text": "P",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-q",
+          "sha256": "be67d673198f236621bb489422f39215d9f08f69697fc1db92274ef044cf8f04",
+          "text": "Q",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-r",
+          "sha256": "53b8fb668beff458241df0ce265bf9663817115450c0e7354913174801abf984",
+          "text": "R",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-s",
+          "sha256": "216297a50183a8ba18f43f0f0622da8584e075ef94e0d324de0a9b8afb3c19f9",
+          "text": "S",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-t",
+          "sha256": "44243ce790d89ce220c9191f1e695ba0d99ef582410e1b3ed6e9380ec03e687f",
+          "text": "T",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-u",
+          "sha256": "d9d0349f3ae0539da7bae54f1608027dba76942989f7b55f101a31e07b5ece73",
+          "text": "U",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-v",
+          "sha256": "6532c31ceb575cc656eb1a6e9448ab0d567681fb0f3cf0ccad2cf65f9c5654ad",
+          "text": "V",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-w",
+          "sha256": "0b26afded28f9e411b96c70729dd0140a0a3b1c84d44b71a363fe3892e87a361",
+          "text": "W",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-x",
+          "sha256": "0a92aa2e24ffc6420cf61f16507713f687e3fd48efdd1dfb74e0198c735b1351",
+          "text": "X",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-y",
+          "sha256": "f02dda4bcc92638ee42e5623df15e990bb13738fc2d1ab1cbad15b860cb5933e",
+          "text": "Y",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-upper-z",
+          "sha256": "e570ab9ff6d3ef543080e8e043baefaff54633586933533135868f01f7831a14",
+          "text": "Z",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-a",
+          "sha256": "ecfba33c785a0e1fbd54e25fb7410834c090db6729c48df7a119a5663de9b8a3",
+          "text": "a",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-b",
+          "sha256": "79492ef9b2237aec87e593d2a6dcd4d211c3347f9c3e4b9e3d243a16f4dbdae1",
+          "text": "b",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-c",
+          "sha256": "e5a038f8634964cdc493323f6c93d6c20d0427027c30c661c91cba8487cd4215",
+          "text": "c",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-d",
+          "sha256": "37359b4627fc5df6b42ec6b03177f71b143b9599f6c47de0c0c9aad43a89f316",
+          "text": "d",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-e",
+          "sha256": "2a07a696d510307a64be7811b8dd300953844e00f29eb2db8b088205e2c47216",
+          "text": "e",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-f",
+          "sha256": "e09bb17ac83ac0ffe577b2441fecb408cbe1632ff950a81f400836a93662f895",
+          "text": "f",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-g",
+          "sha256": "52fd461b6e4f494de1881feadb460e6b90667fc518b0f643e1cd05b1de631272",
+          "text": "g",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-h",
+          "sha256": "61798bee83c30e8cc0b7e0553fa1bb09acf8399c131a74d2b5aa198753653108",
+          "text": "h",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-i",
+          "sha256": "f5210738fea0e254db63a97de74d23cab36a096469bff966de4539585f59730f",
+          "text": "i",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-j",
+          "sha256": "b13cfee3d7001d0e13f0922ac760bf984cf30cc83997c60fcbfd33bcfa9fb0c0",
+          "text": "j",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-k",
+          "sha256": "dea811970548ad087e32bb865ca42b0976371133f9606a17e47cb18f29c67af2",
+          "text": "k",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-l",
+          "sha256": "dc34317cfa9e5afac6b43c7152e48f15eac7bf0184bd958879ad41bcbefe2c8b",
+          "text": "l",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-m",
+          "sha256": "8f512e1668efbd919175b46e17aec4c35a1614badc3d99a69beb3b5bcf80daec",
+          "text": "m",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-n",
+          "sha256": "c10d6f194a1c34b7fadc3ceb49477bd2f6d21c0c314014a79cd7a3c981698c9b",
+          "text": "n",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-o",
+          "sha256": "616b100adf1095772f6ad21b3aa144d69ac4327d67e89c91a8a7086c730f4179",
+          "text": "o",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-p",
+          "sha256": "f5998975acd2d1fb1e43f923cc56ea401bb6bbce8f97985ff7af2c05b9221dfe",
+          "text": "p",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-q",
+          "sha256": "81da7d8fb9c5506e32da1e2f04ba3abfd19dbabd34b2e516352de944f1f112a1",
+          "text": "q",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-r",
+          "sha256": "666b40c0867da8653cb1191d5ba681287baa138ebc8c63612d06775b6cb37bf2",
+          "text": "r",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-s",
+          "sha256": "9d53e8a48e95c3c81727cd20e9a26e0dce05099ea0173aab5aaf623d9b821653",
+          "text": "s",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-t",
+          "sha256": "c5c8d7de1722850eaa6a23a769c5b4e03a93bc7c99894af069f8912ce0985a38",
+          "text": "t",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-u",
+          "sha256": "650bd5666b251a97a9093283d40a619bbf300f873105dfcdbf23fca2f7655ae7",
+          "text": "u",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-v",
+          "sha256": "f7cfa770752e487895a0119ef1c50d191606e445d7be50ccecc5befcbddde7c2",
+          "text": "v",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-w",
+          "sha256": "0eea4e7b72dfb7f622327843add917de1748067c9181313156f199be25a08508",
+          "text": "w",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-x",
+          "sha256": "cb48f56fe1ac9e65ee60e23cec1ebeddc84543d086235b64022309a36ade2353",
+          "text": "x",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-y",
+          "sha256": "ea1e63d837699ba7fe45a691fc907e9a10d1fb493c7a0233e35d85cc1ffa6b75",
+          "text": "y",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "latin-lower-z",
+          "sha256": "d5b3acbf8721223e6407f56ff4fe1f9c2503f0da2d730025c0950a9bad08880e",
+          "text": "z",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-alpha",
+          "sha256": "c316035e91f9571c77c5087aea1847141ef49bfe326363da603c812d2899a62b",
+          "text": "Α",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-beta",
+          "sha256": "65f1fbde148a2a23e4c3351c2297659d57262b5c9035d0aaa431ef4345cbeba2",
+          "text": "Β",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-gamma",
+          "sha256": "542c6c7ee40014d222bd8b3f9105f78995de9ce4d82766c4fd62641762f18a2f",
+          "text": "Γ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-delta",
+          "sha256": "a2dbcf952ed45f640082cfeca8cdc3092182c844dfba52ea15021c7ea6a87083",
+          "text": "Δ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-epsilon",
+          "sha256": "39499b29e122d512b44c2af28a7581c5061b350d4b72d713e93371bee15d2303",
+          "text": "Ε",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-zeta",
+          "sha256": "e570ab9ff6d3ef543080e8e043baefaff54633586933533135868f01f7831a14",
+          "text": "Ζ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-eta",
+          "sha256": "dba7bd3c01003c166da2c8b41cdfeddd5a072d9f2409d17c3ef96b6e8116b89c",
+          "text": "Η",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-theta",
+          "sha256": "1aa1ce17be77ff1341b88dc6bd92794bfb7d98cd32d39161dacfe9fc95bc2984",
+          "text": "Θ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-iota",
+          "sha256": "432b7e225565f331d8eb2e9377bc11afe7e09b95685555747fb70c66e80fb139",
+          "text": "Ι",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-kappa",
+          "sha256": "2d480b5fdeb0af942235d3b84e73245795a5dce72a4d2d4cc5c6190ddbabdfc9",
+          "text": "Κ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-lambda",
+          "sha256": "fa1db75c2b09c0cff4927dddf340295a84001ef2674c0bb5656c052e77350900",
+          "text": "Λ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-mu",
+          "sha256": "54e8d06766c1b95f8126f98bf20aab0336db7c4e69c6283ae52d9a8df391d312",
+          "text": "Μ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-nu",
+          "sha256": "2a4d0fb85970fb1157d75c2cf1c54b9a2387ae7c826dacd62a22d33b36ff91d4",
+          "text": "Ν",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-xi",
+          "sha256": "f553e41a66a1bc9b4accc57af761d08f7376fe1dae8b369334ce1ede2e75f41e",
+          "text": "Ξ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-omicron",
+          "sha256": "4e9d0a801685f67ab32d5bf0b6ddf2d7ab8e543fbe4c74b82a0d224972cd531b",
+          "text": "Ο",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-pi",
+          "sha256": "7042125d0c87629e949b78511d949140f52510f86d47fd7e28323791a7265af6",
+          "text": "Π",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-rho",
+          "sha256": "a9b99407343e2c18e846f1b1ee4cae02fd20db8138905a04fc4f4935de0035a8",
+          "text": "Ρ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-sigma",
+          "sha256": "b652647c7fed353b9841d62b3ff5e29345df84dfe8a973238537e5b22c968181",
+          "text": "Σ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-tau",
+          "sha256": "44243ce790d89ce220c9191f1e695ba0d99ef582410e1b3ed6e9380ec03e687f",
+          "text": "Τ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-upsilon",
+          "sha256": "f02dda4bcc92638ee42e5623df15e990bb13738fc2d1ab1cbad15b860cb5933e",
+          "text": "Υ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-phi",
+          "sha256": "594868eb68713bf835ce3c0f2e34c8a01152b5a5d4844d616c812015e205c6d3",
+          "text": "Φ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-chi",
+          "sha256": "0a92aa2e24ffc6420cf61f16507713f687e3fd48efdd1dfb74e0198c735b1351",
+          "text": "Χ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-psi",
+          "sha256": "aad8a91757d28b1b312ae7112aeeb82a080f7a79cb323ae3dcbc05dbf9b58980",
+          "text": "Ψ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-upper-omega",
+          "sha256": "10a284eb343845bcd19fa9697ad23b9a7c8a9e51dd141753e448654c2d6db123",
+          "text": "Ω",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-alpha",
+          "sha256": "83f00ed2e7ee0fddb42e42b7460d5b00733354a6a7a92f8ccf5a4930923713bf",
+          "text": "α",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-beta",
+          "sha256": "f0ad952bc3daf9b5ac72d032c01e2a05948031e1dfa06745e309ad41dace247d",
+          "text": "β",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-gamma",
+          "sha256": "5e1d97be4d7d957e3797a209bc37ff5e1a826d4b5474f70f4a0dd58cf78d1f61",
+          "text": "γ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-delta",
+          "sha256": "bdf244d16d58938fca27c923bbe4f9f391398a7ee8893682c18eee808f1dd304",
+          "text": "δ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-epsilon",
+          "sha256": "ab8201c070848ff2003c88db947a7371e29bf75052b689c3273f72e2643a1677",
+          "text": "ε",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-zeta",
+          "sha256": "a1845774f27c5a354b8bbebb5641ab8cfcb065ac2dc993e8ff42bab1a93ca65c",
+          "text": "ζ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-eta",
+          "sha256": "c10d6f194a1c34b7fadc3ceb49477bd2f6d21c0c314014a79cd7a3c981698c9b",
+          "text": "η",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-theta",
+          "sha256": "5daae6c8e87dd19a41c4fd907d60bcc37a197db88028f1c8804b5355cba56f3f",
+          "text": "θ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-iota",
+          "sha256": "849c87fdd32ca40787716c728573403ca3338a0275dfc54c2456a11875c61bd2",
+          "text": "ι",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-kappa",
+          "sha256": "07a307e6b211a820dbddcb3acc9e94d1d5120c009384c81c7ce326cd902192f0",
+          "text": "κ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-lambda",
+          "sha256": "510a857adf7d58f04acce9aa2266cae3ce70cc74b191766916f646b979a18629",
+          "text": "λ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-mu",
+          "sha256": "fd906ab3f2f18578244f45f564769548b00e006a8aff7edf041347fe94702198",
+          "text": "μ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-nu",
+          "sha256": "f7cfa770752e487895a0119ef1c50d191606e445d7be50ccecc5befcbddde7c2",
+          "text": "ν",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-xi",
+          "sha256": "fc902e2730a626800db02b05c6870cf0ce467ac605f101293afaf3b907c567a0",
+          "text": "ξ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-omicron",
+          "sha256": "616b100adf1095772f6ad21b3aa144d69ac4327d67e89c91a8a7086c730f4179",
+          "text": "ο",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-pi",
+          "sha256": "890b4f58ea53de8a7e94cc50535d98b474fbf7b50b3ceb5fdd2965f492b1ac40",
+          "text": "π",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-rho",
+          "sha256": "d90948972ae85dd34306e4b7e070fb2f2c666ba295099ccbfc00a60c8a41bcdb",
+          "text": "ρ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-sigma",
+          "sha256": "c2ba6b7c526f0073bf365a704d78556d582669df0c7db256742ca8c42e091618",
+          "text": "σ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-tau",
+          "sha256": "43cae5fe8d3b8897aa4ac4bb4b1e1d754cf45ffb9ef0b5a3deddf8f4299e57f1",
+          "text": "τ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-upsilon",
+          "sha256": "650bd5666b251a97a9093283d40a619bbf300f873105dfcdbf23fca2f7655ae7",
+          "text": "υ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-phi",
+          "sha256": "5208bc066db98c60f0927084cfe31b827d669df4fb56e1aeb52c5dfbf3bc1a4e",
+          "text": "φ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-chi",
+          "sha256": "cb48f56fe1ac9e65ee60e23cec1ebeddc84543d086235b64022309a36ade2353",
+          "text": "χ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-psi",
+          "sha256": "6a8b6b6c8db6c5cfe761f28cbf6c7892bd077003a22b0fe307326eb837d7a1d0",
+          "text": "ψ",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-omega",
+          "sha256": "7d7d4199d4edcaee533afd037e58f4532eb2893e9f397b9cb47279dda9b5f3e3",
+          "text": "ω",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        },
+        {
+          "id": "greek-lower-final-sigma",
+          "sha256": "225f6d1dff0d11dd03bfa3d826d22dffc6a2ec54c0ce2ca1df1faafd315ab324",
+          "text": "ς",
+          "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        }
+      ]
     }
   ],
   "customIcons": [
@@ -1582,6 +2358,22 @@
         -1.0909090909090908,
         -1.0909090909090908
       ]
+    },
+    {
+      "id": "monogram-ai",
+      "sha256": "e636eafa8a430a48eb7e757f972ccf6d0c60fd464762ae42f7ed913175fab11a",
+      "source": "src/main/resources/icons/contours/monogram-ai.svg",
+      "author": "Vlas",
+      "license": "MIT",
+      "modifications": "Original geometric letter monogram; filled vector paths, straight edges and transparent background."
+    },
+    {
+      "id": "monogram-ai-lower",
+      "sha256": "87577e50cc8af4b10d7e4032712e8dc7cc8d900629a53be3d3c3ff1b35d3addf",
+      "source": "src/main/resources/icons/contours/monogram-ai-lower.svg",
+      "author": "Vlas",
+      "license": "MIT",
+      "modifications": "Original geometric letter monogram; filled vector paths, straight edges and transparent background."
     }
   ],
   "research": {

@@ -19,7 +19,17 @@ import java.awt.RenderingHints
 import java.awt.geom.RoundRectangle2D
 import javax.swing.Icon
 import javax.swing.JPanel
-import javax.swing.SwingConstants
+
+internal typealias PreviewArtwork = Map<String, Map<TabIconSize, Icon>>
+
+private data class PreviewSample(val title: String, val path: String, val branch: String,
+                                 val contourId: String?, val color: Color, val selected: Boolean)
+
+private val PREVIEW_SAMPLES = listOf(
+    PreviewSample("Frontend", "~/web", "feature/improve-project-tabs", "globe-simple", Color(0x60A5FA), selected = false),
+    PreviewSample("Backend", "~/api", "feature/PROJ-1287-show-current-branch", null, Color(0xC084FC), selected = true),
+    PreviewSample("Tools", "~/tools", "main", "brackets-curly", Color(0x4ADE80), selected = false),
+)
 
 /** Постоянные примеры: никаких окон, файлов проекта или записей в настройки. */
 internal class WindowTabsPreview : JPanel(null) {
@@ -27,11 +37,9 @@ internal class WindowTabsPreview : JPanel(null) {
     private var theme = PreviewIdeTheme.CURRENT
     private var appearance = TabAppearanceState.defaults()
     private var palette = theme.palette()
-    private val sampleTabs = listOf(
-        PreviewTab("Frontend", "~/web", "feature/improve-project-tabs", "globe-simple", Color(0x60A5FA), selected = false),
-        PreviewTab("Backend", "~/api", "feature/PROJ-1287-show-current-branch", null, Color(0xC084FC), selected = true),
-        PreviewTab("Tools", "~/tools", "main", "brackets-curly", Color(0x4ADE80), selected = false),
-    )
+    private val sampleTabs = PREVIEW_SAMPLES.map { sample ->
+        PreviewTab(sample.title, sample.path, sample.branch, sample.contourId, sample.color, sample.selected)
+    }
 
     init {
         isOpaque = false
@@ -94,6 +102,11 @@ internal class WindowTabsPreview : JPanel(null) {
         showAppearance(appearance)
     }
 
+    fun showArtwork(artwork: PreviewArtwork) {
+        sampleTabs.forEach { it.showArtwork(artwork) }
+        showAppearance(appearance)
+    }
+
     fun showAppearance(appearance: TabAppearanceState) {
         this.appearance = appearance
         tabHeight = if (appearance.enabled) {
@@ -107,13 +120,25 @@ internal class WindowTabsPreview : JPanel(null) {
         doLayout()
         repaint()
     }
+
+    companion object {
+        /** Подготовка ресурсов выполняется фоновым загрузчиком настроек. */
+        fun loadArtwork(): PreviewArtwork = PREVIEW_SAMPLES.mapNotNull { sample ->
+            sample.contourId?.let { id ->
+                val svg = ContourCatalog.entries.first { it.id == id }.svg(sample.color)
+                id to TabIconSize.entries.associateWith { size ->
+                    RecentProjectIconHelper.createIcon(svg, true, size.pixels)
+                }
+            }
+        }.toMap()
+    }
 }
 
 private class PreviewTab(
     private val title: String,
     samplePath: String,
     private val sampleBranch: String,
-    contourId: String?,
+    private val contourId: String?,
     private val color: Color,
     private val selected: Boolean,
 ) : JPanel(BorderLayout()) {
@@ -132,13 +157,7 @@ private class PreviewTab(
         toolTipText = fullTitle
     }
     private val close = JBLabel().apply { border = JBUI.Borders.emptyLeft(6) }
-    private val artwork = contourId?.let { id ->
-        val contour = ContourCatalog.entries.first { it.id == id }
-        val svg = contour.svg(color)
-        TabIconSize.entries.associateWith { size ->
-            RecentProjectIconHelper.createIcon(svg, true, size.pixels)
-        }
-    }.orEmpty()
+    private var artwork = emptyMap<TabIconSize, Icon>()
 
     init {
         isOpaque = false
@@ -153,6 +172,10 @@ private class PreviewTab(
         maxOf(caption.getFontMetrics(caption.font).height,
             if (layout === previewLayout) previewLayout.projectIcon?.iconHeight ?: 0 else 0) +
             insets.top + insets.bottom + JBUI.scale(4))
+
+    fun showArtwork(icons: PreviewArtwork) {
+        artwork = contourId?.let(icons::get).orEmpty()
+    }
 
     fun showAppearance(appearance: TabAppearanceState, theme: PreviewThemePalette) {
         palette = theme

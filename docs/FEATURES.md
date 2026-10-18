@@ -29,6 +29,7 @@ the draft. The enable switch and project icon assignments are preserved by a res
 
 The bundled library has **100+ icons**, including language symbols, animals,
 tools and navigation icons. Search by name or keyword and filter by category.
+The library also includes digits, Roman numerals, Latin and Greek letters, and AI/Ai monograms.
 Use the native IDE color picker, a HEX value, or 14 swatches.
 
 Import a standalone SVG or browse the SVG icons used by open projects. Existing

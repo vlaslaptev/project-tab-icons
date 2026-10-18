@@ -205,8 +205,9 @@ internal class IconSelectionDialog(
     }
 
     private fun filterShapes() {
+        val terms = iconSearchTerms(search.text)
         val visible = ContourCatalog.entries.filter {
-            (category.selectedIndex == 0 || it.category == category.selectedItem) && it.matches(search.text.trim())
+            (category.selectedIndex == 0 || it.category == category.selectedItem) && it.matches(terms)
         }
         filtering = true
         try {
@@ -220,8 +221,11 @@ internal class IconSelectionDialog(
     }
 
     private fun filterCustom() {
-        val terms = customSearch.text.trim().lowercase(Locale.ROOT).split(Regex("\\s+"))
-        val visible = gallery.filter { choice -> terms.all { it in choice.asset.label.lowercase(Locale.ROOT) } }
+        val terms = iconSearchTerms(customSearch.text)
+        val visible = gallery.filter { choice ->
+            val label = choice.asset.label.lowercase(Locale.ROOT)
+            terms.all { it in label }
+        }
         filtering = true
         try {
             customGrid.replaceItems(visible, visible.firstOrNull { it.asset.digest == custom?.asset?.digest })

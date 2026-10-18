@@ -137,6 +137,7 @@ internal class IconSettingsPanel(
     private val fillInsetValue = JBLabel("0 px", SwingConstants.RIGHT)
     private val closeButtonPosition = ComboBox(TabCloseButtonPosition.entries.toTypedArray())
     private val closeButtonLabel = JBLabel("Close button:").apply { labelFor = closeButtonPosition }
+    private val fontSizeSelection = TabFontSizeSelection()
     private val tabFontSize = JSlider(minOf(MIN_TAB_FONT_SIZE, defaultTabFontSize()),
         maxOf(MAX_TAB_FONT_SIZE, defaultTabFontSize() + 2), defaultTabFontSize()).apply {
         minorTickSpacing = 1
@@ -236,6 +237,9 @@ internal class IconSettingsPanel(
     fun refreshPreviewTheme() {
         try {
             preview.showTheme(previewTheme.selectedItem as PreviewIdeTheme)
+            if (fontSizeSelection.storedSize == 0 && tabFontSize.value != defaultTabFontSize()) {
+                setAppearance(appearance())
+            }
             previewTheme.repaint()
         } catch (error: ProcessCanceledException) {
             throw error
@@ -378,7 +382,10 @@ internal class IconSettingsPanel(
         tabFontSize.accessibleContext.accessibleName = "Window tab font size in pixels"
         tabFontSize.accessibleContext.accessibleDescription = "Use arrow keys for one-pixel steps."
         tabFontSize.toolTipText = "Adjust tab title text. The default size follows the IDE font."
-        tabFontSize.addChangeListener { appearanceChanged() }
+        tabFontSize.addChangeListener {
+            if (!syncing) fontSizeSelection.select(tabFontSize.value, defaultTabFontSize())
+            appearanceChanged()
+        }
     }
 
     fun appearance(): TabAppearanceState = TabAppearanceState(
@@ -395,7 +402,7 @@ internal class IconSettingsPanel(
         closeButtonPosition = closeButtonPosition.selectedItem as TabCloseButtonPosition,
         tabHeight = tabHeight.value,
         preset = presetButtons.entries.firstOrNull { it.value.isSelected }?.key ?: TabAppearancePreset.CUSTOM,
-        tabFontSize = tabFontSize.value.takeUnless { it == defaultTabFontSize() } ?: 0,
+        tabFontSize = fontSizeSelection.storedSize,
         showProjectPath = moreInfoButtons.getValue(TabMoreInfo.PROJECT_PATH).isSelected,
         showGitBranch = moreInfoButtons.entries.any { it.key.isBranch && it.value.isSelected },
         gitBranchFormat = if (moreInfoButtons.getValue(TabMoreInfo.GIT_BRANCH_COMPACT).isSelected)
@@ -416,7 +423,7 @@ internal class IconSettingsPanel(
         try {
             pluginEnabled.isSelected = value.enabled
             presetButtons.forEach { (preset, button) -> button.isSelected = preset == value.preset }
-            val size = value.effectiveTabFontSize()
+            val size = fontSizeSelection.reset(value.tabFontSize, defaultTabFontSize())
             tabFontSize.maximum = maxOf(MAX_TAB_FONT_SIZE, defaultTabFontSize() + 2, size)
             tabFontSize.minimum = minOf(MIN_TAB_FONT_SIZE, defaultTabFontSize())
             tabFontSize.value = size
@@ -519,8 +526,9 @@ internal class IconSettingsPanel(
         status.toolTipText = status.text
     }
 
-    fun loaded(value: List<ProjectIconSettingsRow>) {
+    fun loaded(value: List<ProjectIconSettingsRow>, artwork: PreviewArtwork) {
         rows = value
+        preview.showArtwork(artwork)
         refreshRows()
     }
 

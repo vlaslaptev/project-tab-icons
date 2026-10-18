@@ -4,9 +4,11 @@ import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import java.awt.Color
 import java.awt.Component
+import java.awt.Font
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.RenderingHints
+import java.awt.font.FontRenderContext
 import java.awt.font.TextLayout
 import java.text.BreakIterator
 import java.util.Locale
@@ -22,6 +24,8 @@ internal class ProjectInitialsIcon(
     private val weight: TabIconLetterWeight,
     private val projectName: String = shortName,
 ) : Icon {
+    private val painter = ProjectInitialsPainter()
+
     override fun getIconWidth(): Int = JBUI.scale(unscaledSize)
     override fun getIconHeight(): Int = JBUI.scale(unscaledSize)
 
@@ -30,32 +34,48 @@ internal class ProjectInitialsIcon(
         val g = graphics.create() as Graphics2D
         try {
             g.translate(x, y)
-            paintProjectInitials(g, shortName, color, unscaledSize, initials, weight, projectName)
+            painter.paint(g, shortName, color, unscaledSize, initials, weight, projectName)
         } finally { g.dispose() }
     }
 }
 
-internal fun paintProjectInitials(
-    g: Graphics2D, shortName: String, color: Color, unscaledSize: Int,
-    initials: TabIconInitials, weight: TabIconLetterWeight, projectName: String = shortName,
-) {
-    val text = projectIconLetters(shortName, projectName, initials)
-    if (text.isEmpty()) return
-    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
-    // Прежние размеры букв сохранены: 16/20/24 px для слотов Small/Medium/Large.
-    val textSize = JBUI.scale((unscaledSize - 4).coerceAtLeast(1)).toFloat()
-    val font = UIUtil.getLabelFont().deriveFont(weight.fontStyle, textSize)
-    val reference = TextLayout(text, font, g.fontRenderContext).bounds
-    if (reference.isEmpty) return
-    val available = textSize * 0.84f
-    val ratio = min(available / reference.width, available / reference.height).toFloat()
-    val layout = TextLayout(text, font.deriveFont(font.size2D * ratio), g.fontRenderContext)
-    val bounds = layout.bounds
-    val size = JBUI.scale(unscaledSize).toFloat()
-    g.color = color
-    layout.draw(g, ((size - bounds.width) / 2 - bounds.x).toFloat(),
-        ((size - bounds.height) / 2 - bounds.y).toFloat())
+/** Один последний layout на иконку; цвет меняется без повторного расчёта глифов. */
+internal class ProjectInitialsPainter {
+    private data class LayoutKey(val shortName: String, val projectName: String, val initials: TabIconInitials,
+                                 val font: Font, val context: FontRenderContext, val size: Float)
+    private data class PositionedLayout(val layout: TextLayout, val x: Float, val y: Float)
+    private var cachedKey: LayoutKey? = null
+    private var cachedLayout: PositionedLayout? = null
+
+    fun paint(g: Graphics2D, shortName: String, color: Color, unscaledSize: Int,
+              initials: TabIconInitials, weight: TabIconLetterWeight, projectName: String = shortName) {
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
+        // Прежние размеры букв сохранены: 16/20/24 px для слотов Small/Medium/Large.
+        val textSize = JBUI.scale((unscaledSize - 4).coerceAtLeast(1)).toFloat()
+        val font = UIUtil.getLabelFont().deriveFont(weight.fontStyle, textSize)
+        val key = LayoutKey(shortName, projectName, initials, font, g.fontRenderContext, JBUI.scale(unscaledSize).toFloat())
+        if (key != cachedKey) {
+            cachedLayout = createLayout(key)
+            cachedKey = key
+        }
+        val positioned = cachedLayout ?: return
+        g.color = color
+        positioned.layout.draw(g, positioned.x, positioned.y)
+    }
+
+    private fun createLayout(key: LayoutKey): PositionedLayout? {
+        val text = projectIconLetters(key.shortName, key.projectName, key.initials)
+        if (text.isEmpty()) return null
+        val reference = TextLayout(text, key.font, key.context).bounds
+        if (reference.isEmpty) return null
+        val available = key.font.size2D * 0.84f
+        val ratio = min(available / reference.width, available / reference.height).toFloat()
+        val layout = TextLayout(text, key.font.deriveFont(key.font.size2D * ratio), key.context)
+        val bounds = layout.bounds
+        return PositionedLayout(layout, ((key.size - bounds.width) / 2 - bounds.x).toFloat(),
+            ((key.size - bounds.height) / 2 - bounds.y).toFloat())
+    }
 }
 
 /** Два регистра используют одинаковые инициалы и одинаковый fallback для простого имени. */

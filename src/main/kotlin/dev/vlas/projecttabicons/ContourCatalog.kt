@@ -10,6 +10,7 @@ import kotlin.math.pow
 internal enum class ContourLicense(val resourcePath: String) {
     PHOSPHOR("/META-INF/Phosphor-LICENSE.txt"),
     DEVICON("/META-INF/Devicon-LICENSE.txt"),
+    JETBRAINS_MONO("/META-INF/JetBrains-Mono-OFL-1.1.txt"),
     CC0("/META-INF/CC0-1.0.txt"),
     OWN("/META-INF/LICENSE.txt"),
 }
@@ -22,10 +23,9 @@ internal data class Contour(
     val category: String,
     private val keywords: String,
 ) {
-    fun matches(query: String): Boolean {
-        val searchable = "$title $id $category $keywords".lowercase(Locale.ROOT)
-        return query.lowercase(Locale.ROOT).split(Regex("\\s+")).all { it in searchable }
-    }
+    private val searchable = "$title $id $category $keywords".lowercase(Locale.ROOT)
+
+    fun matches(terms: List<String>): Boolean = terms.all { it in searchable }
 
     fun svg(color: Color): ByteArray {
         val hex = color.hex()
@@ -100,4 +100,10 @@ private fun Color.luminance(): Double {
 }
 
 internal fun parseIconColor(text: String): Color? =
-    text.trim().takeIf { it.matches(Regex("#[0-9a-fA-F]{6}")) }?.let(Color::decode)
+    text.trim().takeIf { it.matches(ICON_COLOR_PATTERN) }?.let(Color::decode)
+
+internal fun iconSearchTerms(query: String): List<String> =
+    query.trim().lowercase(Locale.ROOT).split(SEARCH_WHITESPACE)
+
+private val ICON_COLOR_PATTERN = Regex("#[0-9a-fA-F]{6}")
+private val SEARCH_WHITESPACE = Regex("\\s+")

@@ -4,6 +4,8 @@ import com.intellij.openapi.wm.impl.IdeFrameImpl
 import java.awt.Container
 import java.awt.event.ContainerAdapter
 import java.awt.event.ContainerEvent
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 import java.beans.PropertyChangeListener
 import java.util.Collections
 import java.util.IdentityHashMap
@@ -21,6 +23,10 @@ internal class FrameObservation(
     private val containers = identitySet<Container>()
     private val titleListener = PropertyChangeListener { titleChanged() }
     private val tabsListener = PropertyChangeListener { changed() }
+    private val activationListener = object : WindowAdapter() {
+        override fun windowActivated(event: WindowEvent) = changed()
+        override fun windowDeactivated(event: WindowEvent) = changed()
+    }
     private val childListener = object : ContainerAdapter() {
         override fun componentAdded(event: ContainerEvent) = changed()
         override fun componentRemoved(event: ContainerEvent) = changed()
@@ -28,6 +34,7 @@ internal class FrameObservation(
 
     init {
         frame.addPropertyChangeListener("title", titleListener)
+        frame.addWindowListener(activationListener)
         rootPane.addPropertyChangeListener(WINDOW_TABS_CONTAINER_KEY, tabsListener)
     }
 
@@ -47,6 +54,7 @@ internal class FrameObservation(
 
     override fun close() {
         frame.removePropertyChangeListener("title", titleListener)
+        frame.removeWindowListener(activationListener)
         rootPane.removePropertyChangeListener(WINDOW_TABS_CONTAINER_KEY, tabsListener)
         containers.forEach { it.removeContainerListener(childListener) }
         containers.clear()

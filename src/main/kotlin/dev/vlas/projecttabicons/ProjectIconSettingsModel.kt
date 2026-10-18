@@ -106,10 +106,7 @@ internal class ProjectIconSettingsRow(loaded: LoadedProjectIcon, overrides: Proj
         if (modified && (snapshot?.fingerprint != loaded.snapshot?.fingerprint || snapshot?.directory != loaded.snapshot?.directory)) {
             conflicted = true
         }
-        if (svgModified) {
-            conflicted = conflicted || snapshot?.fingerprint != loaded.snapshot?.fingerprint ||
-                snapshot?.directory != loaded.snapshot?.directory
-        } else {
+        if (!svgModified) {
             snapshot = loaded.snapshot
             current = loaded.choice
             currentColor = loaded.color

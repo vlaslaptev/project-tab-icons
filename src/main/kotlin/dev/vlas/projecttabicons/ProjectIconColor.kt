@@ -18,7 +18,7 @@ internal data class IconColorRead(val color: Color? = null, val avatar: AvatarIc
 /** Вызывать в IO-потоке: getData может читать файл с диска. Цвет avatar читается отдельно на EDT. */
 internal fun projectIconColor(delegate: Icon, unscaledSize: Int): IconColorRead {
     val resolved = if (delegate is DeferredIconImpl<*>) {
-        // Загрузку запускает штатный paintIcon; retrieveIcon не выполняет async evaluator.
+        // Загрузку запускает loadProjectIconWithoutPainting; retrieveIcon не выполняет async evaluator.
         if (!delegate.isDone) throw IconColorNotReady()
         delegate.currentlyPaintedIcon()
     } else delegate
@@ -34,15 +34,16 @@ internal fun projectIconColor(delegate: Icon, unscaledSize: Int): IconColorRead 
     val data = (custom.iconData as? ImageIconData)?.getData() ?: return IconColorRead()
     if (data.size > MAX_ICON_BYTES) return IconColorRead()
     val svg = !data.take(8).toByteArray().contentEquals(PNG_SIGNATURE)
-    var artwork: Icon? = null
     if (svg) {
         val asset = SvgAsset.validate(data, "Project icon")
-        asset.tabArtwork()?.let {
-            artwork = RecentProjectIconHelper.createIcon(it, true, unscaledSize)
-        }
-        asset.builder?.colorHex?.let(::parseIconColor)?.let { return IconColorRead(color = it, artwork = artwork) }
+        // Даже SVG без старого фона рисуем только из проверенной копии байтов.
+        // Исходный ProjectFileIcon не используется в paint и больше не обходит очистку.
+        val artwork = RecentProjectIconHelper.createIcon(asset.tabArtwork() ?: asset.bytes, true, unscaledSize)
+        val color = asset.builder?.colorHex?.let(::parseIconColor) ?: sampleIconColor(data, true)
+        return IconColorRead(color = color, artwork = artwork)
     }
-    return IconColorRead(color = sampleIconColor(data, svg), artwork = artwork)
+    return IconColorRead(color = sampleIconColor(data, false),
+        artwork = RecentProjectIconHelper.createIcon(data, false, unscaledSize))
 }
 
 /** IO-поток; используется также для цвета в таблице и предпросмотра выбранного SVG. */

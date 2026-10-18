@@ -10,7 +10,7 @@
 
 ## Install in a minute
 
-### [↓ Download ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.46/project-tab-icons-0.3.46.zip)
+### [↓ Download ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.49/project-tab-icons-0.3.49.zip)
 
 1. Open **Settings → Plugins → ⚙ → Install Plugin from Disk…** and select the ZIP.
 2. Open several projects in separate windows, then use **Window → Merge All Project Windows**.
@@ -45,7 +45,7 @@ Give each project a visual identity and keep the information you need beside its
 
 - **Platform:** macOS
 - **IDE:** IntelliJ IDEA **2026.2.3** / build **262**
-- **Version:** **0.3.46**
+- **Version:** **0.3.49**
 - **License:** MIT
 
 > **Updates & future IDE support**

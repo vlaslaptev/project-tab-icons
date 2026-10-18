@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.security.MessageDigest
+import java.util.HexFormat
 import javax.xml.XMLConstants
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
@@ -54,6 +55,8 @@ internal data class SvgAsset(val bytes: ByteArray, val label: String, val builde
     }
 
     companion object {
+        private val URL_PATTERN = Regex("url\\s*\\(([^)]*)\\)", RegexOption.IGNORE_CASE)
+
         fun read(path: Path, label: String): SvgAsset = validate(readIconBytes(path), label)
 
         fun validate(bytes: ByteArray, label: String): SvgAsset {
@@ -92,7 +95,7 @@ internal data class SvgAsset(val bytes: ByteArray, val label: String, val builde
         }
 
         private fun checkUrls(value: String) {
-            Regex("url\\s*\\(([^)]*)\\)", RegexOption.IGNORE_CASE).findAll(value).forEach {
+            URL_PATTERN.findAll(value).forEach {
                 require(it.groupValues[1].trim().trim('\'', '"').startsWith('#')) {
                     "SVG must be self-contained; external resources are not supported."
                 }
@@ -120,5 +123,4 @@ internal fun readIconBytes(path: Path): ByteArray = Files.newInputStream(path).u
     }
 }
 
-internal fun sha256(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256")
-    .digest(bytes).joinToString("") { "%02x".format(it.toInt() and 0xFF) }
+internal fun sha256(bytes: ByteArray): String = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes))

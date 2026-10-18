@@ -26,7 +26,6 @@ import com.intellij.openapi.wm.impl.ProjectFrameHelper
 import com.intellij.ui.mac.WindowTabsComponent
 import com.intellij.ui.IconDeferrer
 import com.intellij.ui.DeferredIconImpl
-import com.intellij.util.ui.EmptyIcon
 import com.intellij.ui.tabs.TabInfo
 import com.intellij.util.messages.MessageBusConnection
 import kotlinx.coroutines.CancellationException
@@ -38,15 +37,12 @@ import kotlinx.coroutines.withContext
 import java.awt.Component
 import java.awt.Container
 import java.awt.Color
-import java.awt.image.BufferedImage
-import java.awt.LayoutManager
 import java.awt.LayoutManager2
 import java.util.IdentityHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.Icon
 import javax.swing.JComponent
 import javax.swing.SwingUtilities
-import javax.swing.border.Border
 
 @Service(Service.Level.APP)
 class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Disposable {
@@ -60,7 +56,6 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
     private val observations = IdentityHashMap<IdeFrameImpl, FrameObservation>()
     private val tabOwners = IdentityHashMap<TabInfo, WindowTabsComponent>()
     private val originalIcons = IdentityHashMap<TabInfo, Icon?>()
-    private val appliedIcons = IdentityHashMap<TabInfo, Icon?>()
     private val originalTabTitles = IdentityHashMap<TabInfo, String>()
     private val appliedTabTitles = IdentityHashMap<TabInfo, String>()
     private val originalBranchTooltips = IdentityHashMap<TabInfo, HtmlChunk?>()
@@ -69,17 +64,19 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
     private data class GitWatch(val provider: ProjectTabBranchProvider, val includeStatus: Boolean, val lifetime: Disposable)
     private val branchWatches = IdentityHashMap<Project, GitWatch>()
     private val iconWrappers = IdentityHashMap<Icon, CenteredProjectIcon>()
-    private val originalLabelBorders = IdentityHashMap<JComponent, Border?>()
     private val appliedLabelBorders = IdentityHashMap<JComponent, ProjectTabBorder>()
-    private val originalLabelLayouts = IdentityHashMap<JComponent, LayoutManager?>()
     private val appliedLabelLayouts = IdentityHashMap<JComponent, ProjectTabIconLayout>()
     private val appliedLabelFonts = IdentityHashMap<JComponent, ProjectTabFont>()
     private val appliedContainerLayouts = IdentityHashMap<JComponent, ProjectTabsContainerLayout>()
     private val projectNames = IdentityHashMap<Project, String>()
     private val iconReads = IdentityHashMap<Icon, IconColorRead?>()
+    // Только очищенные изображения, независимо от смены DeferredIcon и сброса его кеша.
+    private val lastPreparedArtwork = IdentityHashMap<Project, MutableMap<Int, Icon>>()
     private val loadingColors = identitySet<Icon>()
     private var colorGeneration = 0L
     private var previousAppearance: TabAppearanceState? = null
+
+    private data class TabPresentation(val icon: CenteredProjectIcon?, val outline: Color?, val background: Color?)
 
     init {
         ProjectTabBranchProvider.EP_NAME.addChangeListener(coroutineScope, Runnable { requestRefresh() })
@@ -156,6 +153,7 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
             if (previousName != null && previousName != project.name) invalidateIcons.set(true)
         }
         projectNames.keys.retainAll(frames.values.toSet())
+        lastPreparedArtwork.keys.retainAll(frames.values.toSet())
 
         observations.keys.filter { it !in frames }.forEach { frame -> observations.remove(frame)?.close() }
         frames.keys.forEach { frame ->
@@ -199,6 +197,32 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         val activeDelegates = identitySet<Icon>()
         val activeLabels = identitySet<JComponent>()
         val activeContainers = identitySet<JComponent>()
+        val presentations = IdentityHashMap<Project, TabPresentation>()
+        fun presentationFor(project: Project, label: JComponent?): TabPresentation? {
+            presentations[project]?.let { return it }
+            val path = recentProjects.getProjectPath(project) ?: return null
+            // Каждое окно содержит копию всей полосы; данные проекта вычисляем один раз за проход.
+            // Поля провайдера по 2px: запрос 24/28/32px даёт изображение 20/24/28px.
+            val delegate = recentProjects.getProjectIcon(path, true, appearance.iconSize.pixels + 4, project.name)
+            activeDelegates.add(delegate)
+            val read = if (appearance.showOutline || appearance.showIcons || appearance.showTabBackground) {
+                readIcon(delegate, label, appearance.iconSize.pixels)
+            } else null
+            val overrides = projectColors.overrides(path)
+            // Ручной цвет буквенного аватара не перекрашивает сторонние SVG/PNG.
+            val iconColor = if (read?.avatar != null) overrides.icon ?: read.color else read?.color
+            val icon = if (appearance.showIcons) iconWrappers.getOrPut(delegate) {
+                CenteredProjectIcon(delegate, appearance.iconSize.pixels,
+                    artwork = { preparedArtwork(delegate, project, appearance.iconSize.pixels) },
+                    avatarColor = { projectColors.iconColor(path) },
+                    initials = appearance.iconInitials, letterWeight = appearance.iconLetterWeight,
+                    projectName = { project.name })
+            } else null
+            return TabPresentation(icon,
+                if (appearance.showOutline) overrides.outline ?: iconColor else null,
+                if (appearance.showTabBackground) overrides.tab ?: iconColor else null,
+            ).also { presentations[project] = it }
+        }
         frames.keys.forEach { frame ->
             val container = frame.rootPane.getClientProperty(WINDOW_TABS_CONTAINER_KEY) as? Component
             val tabs = findWindowTabs(container) ?: return@forEach
@@ -212,40 +236,21 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
                 // а не к проекту окна, внутри которого сейчас рисуется полоса.
                 val targetFrame = info.`object` as? IdeFrameImpl ?: return@tab
                 val project = frames[targetFrame] ?: return@tab
-                val path = recentProjects.getProjectPath(project) ?: return@tab
+                val label = tabs.getTabLabel(info)
+                val presentation = presentationFor(project, label) ?: return@tab
                 tabOwners[info] = tabs
                 decorateTabTitle(info, project.name, appearance.showProjectPath)
                 val branch = branches[project]
                 decorateBranchTooltip(info, project.name, branch)
-                // Поля провайдера по 2px: запрос 24/28/32px даёт изображение 20/24/28px.
-                val delegate = recentProjects.getProjectIcon(path, true, appearance.iconSize.pixels + 4, project.name)
-                activeDelegates.add(delegate)
-                val label = tabs.getTabLabel(info)
-                val read = if (appearance.showOutline || appearance.showIcons || appearance.showTabBackground) {
-                    readIcon(delegate, label, appearance.iconSize.pixels)
-                } else null
-                val overrides = projectColors.overrides(path)
-                // Ручной цвет буквенного аватара не перекрашивает сторонние SVG/PNG.
-                val iconColor = if (read?.avatar != null) overrides.icon ?: read.color else read?.color
-                val color = if (appearance.showOutline) overrides.outline ?: iconColor else null
-                val tabColor = if (appearance.showTabBackground) overrides.tab ?: iconColor else null
-                val icon = if (appearance.showIcons) iconWrappers.getOrPut(delegate) {
-                    CenteredProjectIcon(delegate, appearance.iconSize.pixels,
-                        artwork = { iconReads[delegate]?.artwork },
-                        avatarColor = { projectColors.iconColor(path) },
-                        initials = appearance.iconInitials, letterWeight = appearance.iconLetterWeight,
-                        projectName = { project.name })
-                } else null
                 if (label != null) {
                     activeLabels.add(label)
-                    decorateTabLabel(label, tabs, appearance, icon, color, tabColor)
+                    decorateTabLabel(label, tabs, appearance, presentation.icon, presentation.outline, presentation.background)
                     decorateBranchCaption(label, project.name, branch, appearance.branchPosition)
                 }
                 activeTabs.add(info)
                 if (!originalIcons.containsKey(info)) originalIcons[info] = info.icon
                 // Штатная раскладка центрирует icon + title. Border закрепляет значок на выбранной стороне.
                 if (info.icon != null) info.setIcon(null)
-                appliedIcons[info] = null
             }
         }
         appliedContainerLayouts.keys.filter { it !in activeContainers }.forEach(::restoreTabsContainer)
@@ -253,7 +258,6 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         appliedBranchTooltips.keys.filter { it !in activeTabs }.forEach(::restoreBranchTooltip)
         tabOwners.keys.retainAll(activeTabs)
         originalIcons.keys.retainAll(activeTabs)
-        appliedIcons.keys.retainAll(activeTabs)
         iconWrappers.keys.retainAll(activeDelegates)
         iconReads.keys.retainAll(activeDelegates)
         branchCaptions.keys.filter { it !in activeLabels }.toList().forEach { branchCaptions.remove(it)?.restore() }
@@ -370,8 +374,7 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
             return
         }
         // Тема может заменить border при updateUI: в этом случае её border становится новой базой.
-        if (applied == null || label.border !== applied) originalLabelBorders[label] = label.border
-        val border = ProjectTabBorder(originalLabelBorders[label], icon, color,
+        val border = ProjectTabBorder(label.border, icon, color,
             appearance.outlineThickness, appearance.outlineStyle, tabColor, appearance.tabFillInset)
         label.border = border
         appliedLabelBorders[label] = border
@@ -405,7 +408,6 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         }
         applied?.restoreCloseInsets()
         val original = label.layout as? LayoutManager2 ?: return
-        originalLabelLayouts[label] = original
         label.layout = ProjectTabIconLayout(original, icon, appearance.iconPosition,
             appearance.closeButtonPosition, centerProjectName).also { appliedLabelLayouts[label] = it }
         label.revalidate()
@@ -439,41 +441,39 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
     private fun restoreTabFont(label: JComponent): Boolean = appliedLabelFonts.remove(label)?.restore() ?: false
 
     private fun restoreTabLabelLayout(label: JComponent) {
-        val applied = appliedLabelLayouts.remove(label)
-        applied?.restoreCloseInsets()
-        val original = originalLabelLayouts.remove(label)
-        if (applied != null && label.layout === applied) {
-            label.layout = original
+        val applied = appliedLabelLayouts.remove(label) ?: return
+        applied.restoreCloseInsets()
+        if (label.layout === applied) {
+            label.layout = applied.original
             label.revalidate()
             label.repaint()
         }
     }
 
+    private fun preparedArtwork(delegate: Icon, project: Project, size: Int): Icon? {
+        val current = iconReads[delegate]
+        if (current?.avatar != null) {
+            lastPreparedArtwork[project]?.remove(size)
+            return null
+        }
+        current?.artwork?.let { image ->
+            lastPreparedArtwork.getOrPut(project) { mutableMapOf() }[size] = image
+            return image
+        }
+        return lastPreparedArtwork[project]?.get(size)
+    }
+
     private fun readIcon(delegate: Icon, label: JComponent?, unscaledSize: Int): IconColorRead? {
         if (iconReads.containsKey(delegate)) return iconReads[delegate]
         if (!loadingColors.add(delegate)) return null
-        var source = delegate
         if (delegate is DeferredIconImpl<*> && !delegate.isDone) {
-            // В режиме «только линия» у иконки нет видимого paintIcon. Запускаем
-            // загрузку штатным способом, не рисуя placeholder на экран.
-            // Загруженные file-иконки здесь не рисуем, чтобы не менять их HiDPI-кеш.
-            if (delegate.currentlyPaintedIcon() is EmptyIcon) {
-                val graphics = BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics()
-                try {
-                    delegate.paintIcon(label, graphics, 0, 0)
-                } finally {
-                    graphics.dispose()
-                }
-            } else {
-                // У провайдера уже есть готовая база: она безопасна для чтения в IO.
-                source = delegate.currentlyPaintedIcon()
-            }
+            loadProjectIconWithoutPainting(delegate, label)
         }
         val generation = colorGeneration
         coroutineScope.launch(Dispatchers.IO) {
             var pending = false
             val result = try {
-                projectIconColor(source, unscaledSize)
+                projectIconColor(delegate, unscaledSize)
             } catch (_: IconColorNotReady) {
                 pending = true
                 null
@@ -502,11 +502,10 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
     }
 
     private fun restoreTabLabelBorder(label: JComponent) {
-        val applied = appliedLabelBorders.remove(label)
-        val original = originalLabelBorders.remove(label)
+        val applied = appliedLabelBorders.remove(label) ?: return
         // Не заменяем border, если после нас его установила тема или другое расширение.
-        if (applied != null && label.border === applied) {
-            label.border = original
+        if (label.border === applied) {
+            label.border = applied.original
             label.revalidate()
             label.repaint()
         }
@@ -529,9 +528,9 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         connection = null
         observations.values.forEach(FrameObservation::close)
         observations.clear()
-        appliedIcons.forEach { (info, applied) ->
+        originalIcons.forEach { (info, original) ->
             // Не затираем значок, если после нас его изменило другое расширение.
-            if (canUpdateTabInfo(info) && info.icon === applied) info.setIcon(originalIcons[info])
+            if (canUpdateTabInfo(info) && info.icon == null) info.setIcon(original)
         }
         branchWatches.values.forEach { Disposer.dispose(it.lifetime) }
         branchWatches.clear()
@@ -542,19 +541,17 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         appliedTabTitles.keys.toList().forEach(::restoreTabTitle)
         originalTabTitles.clear()
         tabOwners.clear()
-        appliedIcons.clear()
         originalIcons.clear()
         iconWrappers.clear()
         appliedLabelFonts.keys.toList().forEach { restoreTabFont(it) }
         appliedLabelBorders.keys.toList().forEach(::restoreTabLabelBorder)
         appliedLabelLayouts.keys.toList().forEach(::restoreTabLabelLayout)
-        originalLabelBorders.clear()
-        originalLabelLayouts.clear()
         appliedContainerLayouts.keys.toList().forEach(::restoreTabsContainer)
         projectNames.clear()
         colorGeneration++
         iconReads.clear()
         loadingColors.clear()
+        lastPreparedArtwork.clear()
         previousAppearance = null
     }
 

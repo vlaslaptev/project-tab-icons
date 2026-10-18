@@ -1,3 +1,5 @@
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+
 plugins {
     kotlin("jvm") version "2.4.0"
     id("org.jetbrains.intellij.platform") version "2.19.0"
@@ -14,6 +16,8 @@ repositories {
 }
 
 dependencies {
+    testImplementation("junit:junit:4.13.2")
+
     intellijPlatform {
         val localPlatformPath = providers.gradleProperty("localPlatformPath")
         if (localPlatformPath.isPresent) {
@@ -24,6 +28,7 @@ dependencies {
         bundledPlugin("Git4Idea")
         bundledModule("intellij.platform.vcs.dvcs")
         bundledModule("intellij.platform.vcs.dvcs.impl")
+        testFramework(TestFrameworkType.Platform)
     }
 }
 
