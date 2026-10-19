@@ -8,9 +8,9 @@ built-in demonstration data from the plugin's preview.
 | Asset | Size | Purpose |
 | --- | --- | --- |
 | `hero-dark.png` / `hero-light.png` | 1600 × 900 | README cover, selected by preferred color scheme |
-| `appearance-presets.png` | 1600 × 1000 | Real Settings preview from 0.3.52: Filled preset, Color controls and Fill intensity |
+| `appearance-presets.png` | 1600 × 1000 | Real Settings preview from 0.3.56: Filled preset, Color controls, Fill intensity and the User presets row |
 | `icon-library.png` | 1600 × 1000 | A selection from 100+ bundled SVG icons |
-| `git-context.png` | 1600 × 1000 | Real Settings preview: Git preset, compact branches, line counts and Tab layout controls |
+| `git-context.png` | 1600 × 1000 | Real Settings preview from 0.3.56: Git preset, compact branches, line counts, Tab layout and the User presets row |
 | `social-preview.png` | 1280 × 640 | Repository social preview |
 | `logo-512.png` | 512 × 512 | Transparent export of the existing plugin logo |
 
@@ -19,10 +19,12 @@ the original PNG crops, preserving the UI pixels and text. `manifest.json` recor
 dimensions, asset types and the source plugin version. `preview.html` displays the full gallery locally.
 The logo concept is preserved: overlapping colored project windows and a shark.
 
-The appearance capture was updated on 18 October 2026 using Project Tab Icons
-0.3.52. It shows the Filled preset with 12% fill intensity and a 3 px inset,
-including the blue markers for pending changes. The Git capture remains from
-0.3.46, taken on 16 October 2026. Both use the **Current · Islands Darcula**
+Both captures were updated on 19 October 2026 using Project Tab Icons 0.3.56.
+The appearance capture shows Filled with 12% fill intensity and a 3 px inset,
+including the blue markers for pending changes. The Git capture shows compact
+branches and line counts. Both include a separate **User presets** row with
+standard text colors, no star and one shared selection across all presets.
+Both use the **Current · Islands Darcula**
 preview theme. [Capture provenance](captures/provenance.json) records each version, date, hash,
 dimensions and selected controls. [Appearance crop](captures/appearance-settings.png)
 and [Git crop](captures/git-settings.png) contain only Preview, presets and appearance

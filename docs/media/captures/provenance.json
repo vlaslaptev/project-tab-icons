@@ -3,30 +3,32 @@
   "application": "IntelliJ IDEA 2026.2.3",
   "previewTheme": "Current · Islands Darcula",
   "source": "Native screenshot of the installed plugin Settings page, captured through the app UI.",
-  "crop": "Preview, preset row and appearance controls only. Settings navigation, window title and the open-project table are excluded.",
-  "demoData": "Frontend, Backend, Tools, example editor text, branch names and line counts are built-in preview fixtures.",
+  "crop": "Preview, built-in and user preset rows, and appearance controls only. Settings navigation, window title and the open-project table are excluded.",
+  "demoData": "Frontend, Backend, Tools, example editor text, branch names and line counts are built-in preview fixtures. The user-preset row shows a generic Git-with-icons style name.",
   "processing": "Rectangular crop and lossless PNG encoding; UI pixels and labels were not redrawn or retouched.",
-  "settings": "Presets were selected only in pending Settings drafts and discarded with Cancel. Saved appearance, Custom memory and theme were unchanged after the 0.3.52 capture.",
+  "settings": "Built-in and user presets were selected only in pending Settings drafts and discarded with Cancel. Saved appearance, Custom memory, named presets and theme were preserved after the 0.3.56 capture.",
   "files": [
     {
       "file": "appearance-settings.png",
-      "sha256": "85daba9287d41501101034c6c513b53e8aedd19a8a75c880e8f622a79b95bb78",
+      "sha256": "b7157d6eabff5ec85352b318ea99f9168d16ac692dac81300e7fd7ead91b35fc",
       "width": 2816,
-      "height": 1296,
+      "height": 1382,
       "preset": "Filled",
       "section": "Color",
-      "pluginVersion": "0.3.52",
-      "capturedOn": "2026-10-18"
+      "pluginVersion": "0.3.56",
+      "capturedOn": "2026-10-19",
+      "userPresetRow": true
     },
     {
       "file": "git-settings.png",
-      "sha256": "7e0aa2a168ab043f1a1883841b14a9ee5313ee2ab16fa28e6dd807f693ec3f12",
+      "sha256": "4bfcfe2936ef9e0d39a8dd497b886866d78a4403577af51178c0eb7a767dc0a6",
       "width": 2816,
-      "height": 1280,
+      "height": 1382,
       "preset": "Git",
       "section": "Tab layout",
-      "pluginVersion": "0.3.46",
-      "capturedOn": "2026-10-16"
+      "pluginVersion": "0.3.56",
+      "capturedOn": "2026-10-19",
+      "userPresetRow": true
     }
   ],
   "pixelScale": 2

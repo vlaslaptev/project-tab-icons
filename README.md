@@ -1,6 +1,6 @@
 # Project Tab Icons
 
-![Real Settings preview with compact Git branches, changed-line counts and Tab layout controls](docs/media/git-context.png)
+![Real Settings preview with Git context, Tab layout controls and a separate User presets row](docs/media/git-context.png)
 
 ## Local by design
 
@@ -22,7 +22,7 @@ The [installation guide](docs/INSTALLATION.md) covers missing tabs, updates and 
 
 
 ## Main features
-![Real Settings preview with the Filled preset and Color controls](docs/media/appearance-presets.png)
+![Real Settings preview with the Filled preset, Color controls and a separate User presets row](docs/media/appearance-presets.png)
 ### You can change tab height, text size and the close button’s position
 ### You can give each project its own outline and translucent fill colors
 ### You can adjust fill intensity and return to your last Custom appearance
@@ -84,6 +84,9 @@ light and dark variants; keep a copy if you want to restore custom artwork later
 The appearance and Git slides show **real captures of the plugin’s Settings
 preview**, with built-in demo projects and Git values. The icon-library slide is
 an illustration made from the plugin’s actual SVG resources.
+The captures use local build **0.3.56** and show the separate **User presets** row
+with standard text colors and one shared selection across both preset rows.
+The download link points to the latest published release, **0.3.55**.
 Media sources and capture provenance are in [docs/media](docs/media/README.md).
 
 This project is independent of JetBrains and is not an official JetBrains product.

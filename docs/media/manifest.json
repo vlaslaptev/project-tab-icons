@@ -1,5 +1,5 @@
 {
-  "version": "0.3.52",
+  "version": "0.3.56",
   "kind": "illustrations and compositions of real Settings screenshots",
   "files": [
     {
@@ -22,8 +22,8 @@
       "width": 1600,
       "height": 1000,
       "kind": "screenshot composition",
-      "pluginVersion": "0.3.52",
-      "description": "Real screenshot of Project Tab Icons 0.3.52 Settings in IntelliJ IDEA. Filled preset, Color controls, built-in Preview demo data. Cropped without redrawing UI pixels; presented on an illustrated frame.",
+      "pluginVersion": "0.3.56",
+      "description": "Real screenshot of Project Tab Icons 0.3.56 Settings in IntelliJ IDEA. Filled preset, Color controls, built-in Preview demo data. Cropped without redrawing UI pixels; presented on an illustrated frame.",
       "capture": "captures/appearance-settings.png",
       "provenance": "captures/provenance.json"
     },
@@ -41,7 +41,8 @@
       "width": 1600,
       "height": 1000,
       "kind": "screenshot composition",
-      "description": "Real screenshot of Project Tab Icons 0.3.46 Settings in IntelliJ IDEA. Git preset, Tab layout controls, built-in Preview demo data. Cropped without redrawing UI pixels; presented on an illustrated frame.",
+      "pluginVersion": "0.3.56",
+      "description": "Real screenshot of Project Tab Icons 0.3.56 Settings in IntelliJ IDEA. Git preset, Tab layout controls, built-in Preview demo data. Cropped without redrawing UI pixels; presented on an illustrated frame.",
       "capture": "captures/git-settings.png",
       "provenance": "captures/provenance.json"
     },
