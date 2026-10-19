@@ -30,6 +30,9 @@ import java.awt.event.FocusAdapter
 import java.awt.event.FocusEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.awt.event.ActionEvent
+import java.util.UUID
+import javax.swing.AbstractAction
 import javax.swing.DefaultListCellRenderer
 import javax.swing.ButtonGroup
 import javax.swing.JButton
@@ -37,6 +40,9 @@ import javax.swing.JList
 import javax.swing.JSeparator
 import javax.swing.JComponent
 import javax.swing.JPanel
+import javax.swing.JMenuItem
+import javax.swing.JPopupMenu
+import javax.swing.KeyStroke
 import javax.swing.JSlider
 import javax.swing.Scrollable
 import javax.swing.ScrollPaneConstants
@@ -89,6 +95,11 @@ internal class IconSettingsPanel(
     }
     private val presetTitle = JBLabel("Presets").apply { font = font.deriveFont(Font.BOLD) }
     private val presetButtons = TabAppearancePreset.entries.associateWith { JBRadioButton(it.title) }
+    private val presetGroup = ButtonGroup()
+    private val userPresetButtons = linkedMapOf<String, JBRadioButton>()
+    private val userPresetMarkers = linkedMapOf<String, SettingsPendingChange>()
+    private val presetRow = JPanel(BorderLayout()).apply { isOpaque = false }
+    private val savePreset = JButton("Save as new preset").apply { isVisible = false }
     private val showIcons = JBCheckBox("Show icons", true)
     private val showOutline = JBCheckBox("Show outline", true)
     private val showTabBackground = JBCheckBox("Fill tab", false)
@@ -170,16 +181,22 @@ internal class IconSettingsPanel(
     private var appearanceBaseline = TabAppearanceState.defaults()
     private var lastCustomAppearance = TabAppearanceState.defaults().asCustomAppearance()
     private var customAppearanceBaseline = lastCustomAppearance
+    private var userPresetDraft = emptyList<UserAppearancePreset>()
+    private var userPresetBaseline = emptyList<UserAppearancePreset>()
+    private var canSaveAsPreset = false
+    private var presetNameDialog: UserPresetNameDialog? = null
+    private var disposed = false
+    private var importedCategoryCount = 0
     private val pendingMarkers = mutableListOf<Pair<SettingsPendingChange, (TabAppearanceState) -> Boolean>>()
     var rows: List<ProjectIconSettingsRow> = emptyList()
         private set
 
     val modified: Boolean get() = appearance() != appearanceBaseline ||
-        lastCustomAppearance != customAppearanceBaseline || rows.any { it.modified }
+        lastCustomAppearance != customAppearanceBaseline || userPresetDraft != userPresetBaseline || rows.any { it.modified }
     val preferredFocus: JComponent get() = pluginEnabled
 
     init {
-        ButtonGroup().apply { presetButtons.values.forEach(::add) }
+        presetButtons.values.forEach(presetGroup::add)
         ButtonGroup().apply { moreInfoButtons.values.forEach(::add) }
         (listOf(showIcons, showOutline, showTabBackground) + moreInfoButtons.values).forEach { it.isOpaque = false }
         appearanceTabs.background = component.background
@@ -238,8 +255,10 @@ internal class IconSettingsPanel(
         }, BorderLayout.SOUTH)
         previewTheme.addActionListener { refreshPreviewTheme() }
         pluginEnabled.addActionListener { appearanceChanged(manualEdit = false) }
+        savePreset.addActionListener { saveUserPreset() }
         restoreDefaults.addActionListener {
             rememberCurrentCustom()
+            canSaveAsPreset = false
             setAppearance(TabAppearanceState.defaults().copy(enabled = pluginEnabled.isSelected))
             updateStatus()
         }
@@ -265,7 +284,8 @@ internal class IconSettingsPanel(
     private fun pageWidth(): Int = pageScroll.viewport.extentSize.width.takeIf { it > 0 } ?: JBUI.scale(760)
 
     private fun appearancePanel(): JPanel = JPanel(BorderLayout(0, JBUI.scale(12))).apply {
-        add(SettingsRadioRow(presetTitle, presetButtons.values.toList(), availableWidth = ::pageWidth), BorderLayout.NORTH)
+        rebuildPresetRow()
+        add(presetRow, BorderLayout.NORTH)
         val rowHeight = maxOf(iconSize.preferredSize.height, outlineThickness.preferredSize.height, JBUI.scale(30))
         val gitInfoControl = JPanel(BorderLayout(JBUI.scale(12), 0)).apply {
             isOpaque = false
@@ -273,10 +293,12 @@ internal class IconSettingsPanel(
             add(branchStatus, BorderLayout.EAST)
         }
         val controls = listOf(iconSize, iconPosition, iconInitials, iconLetterWeight, outlineStyle, closeButtonPosition, gitInfoControl)
-        val controlWidth = maxOf(controls.maxOf { it.preferredSize.width }, JBUI.scale(240))
-        val labelWidth = listOf(sizeLabel, positionLabel, initialsLabel, letterWeightLabel, styleLabel,
+        val controlWidth = maxOf(controls.maxOf {
+            it.preferredSize.width + if (it === gitInfoControl) SettingsPendingChange.reservedWidth else 0
+        }, JBUI.scale(240))
+        val labelWidth = { listOf(sizeLabel, positionLabel, initialsLabel, letterWeightLabel, styleLabel,
             thicknessLabel, fillInsetLabel, fillIntensityLabel, closeButtonLabel, fontSizeLabel, tabHeightLabel, branchPositionLabel)
-            .maxOf { it.preferredSize.width } + JBUI.scale(12)
+            .maxOf { it.preferredSize.width } + JBUI.scale(12) }
         controls.forEach { it.preferredSize = Dimension(controlWidth, rowHeight) }
         fun sliderControl(slider: JSlider, value: JBLabel, maxValue: Int, unit: String = "px") = JPanel(BorderLayout(JBUI.scale(6), 0)).apply {
             isOpaque = false
@@ -333,6 +355,7 @@ internal class IconSettingsPanel(
             button.addActionListener {
                 if (!syncing) {
                     rememberCurrentCustom()
+                    canSaveAsPreset = preset == TabAppearancePreset.CUSTOM
                     val next = if (preset == TabAppearancePreset.CUSTOM) lastCustomAppearance.copy(enabled = pluginEnabled.isSelected)
                         else TabAppearanceState.forPreset(preset, pluginEnabled.isSelected)
                     setAppearance(next)
@@ -409,12 +432,124 @@ internal class IconSettingsPanel(
         installAppearanceMarkers()
     }
 
+    private fun rebuildPresetRow() {
+        presetRow.removeAll()
+        val choices = presetButtons.values.toList() + userPresetButtons.values +
+            listOf(savePreset).filter { it.isVisible }
+        presetRow.add(SettingsRadioRow(presetTitle, choices, wrapChoices = true, availableWidth = ::pageWidth))
+        presetRow.revalidate()
+        presetRow.repaint()
+        page.revalidate()
+    }
+
+    private fun refreshSavePresetAction() {
+        val current = appearance()
+        val visible = canSaveAsPreset && current.preset == TabAppearancePreset.CUSTOM && current.userPresetId == null
+        val visibilityChanged = visible != savePreset.isVisible
+        savePreset.isVisible = visible
+        savePreset.isEnabled = pluginEnabled.isSelected && userPresetDraft.size < MAX_USER_APPEARANCE_PRESETS
+        savePreset.toolTipText = if (userPresetDraft.size >= MAX_USER_APPEARANCE_PRESETS)
+            "All $MAX_USER_APPEARANCE_PRESETS user preset slots are used. Right-click a user preset to delete it, then save a new one."
+        else "Save Icon, Color and Tab layout as a named preset · ${userPresetDraft.size} of $MAX_USER_APPEARANCE_PRESETS slots used · Apply to keep it"
+        if (visibilityChanged) rebuildPresetRow()
+    }
+
+    private fun rebuildUserPresetButtons() {
+        userPresetButtons.values.forEach(presetGroup::remove)
+        userPresetButtons.clear()
+        userPresetMarkers.clear()
+        userPresetDraft.forEach { preset ->
+            val button = JBRadioButton("★ ${preset.name}").apply {
+                isOpaque = false
+                foreground = JBColor.namedColor("Link.activeForeground", JBColor(0x3574F0, 0x6B9BFA))
+                accessibleContext.accessibleName = "User appearance preset: ${preset.name}"
+                toolTipText = "User preset · ${settingsLiteral(preset.name)} · Right-click or Shift+F10 to rename or delete · Apply to save changes"
+                addActionListener {
+                    if (!syncing) {
+                        rememberCurrentCustom()
+                        canSaveAsPreset = false
+                        setAppearance(preset.appearance.copy(enabled = pluginEnabled.isSelected, userPresetId = preset.id))
+                        updateStatus()
+                    }
+                }
+            }
+            val menu = JPopupMenu().apply {
+                add(JMenuItem("Rename preset…").apply { addActionListener { renameUserPreset(preset.id) } })
+                add(JMenuItem("Delete preset").apply { addActionListener { deleteUserPreset(preset.id) } })
+            }
+            button.componentPopupMenu = menu
+            button.inputMap.put(KeyStroke.getKeyStroke("shift F10"), "userPresetMenu")
+            button.actionMap.put("userPresetMenu", object : AbstractAction() {
+                override fun actionPerformed(event: ActionEvent) {
+                    if (button.isEnabled && button.isShowing) menu.show(button, 0, button.height)
+                }
+            })
+            presetGroup.add(button)
+            userPresetButtons[preset.id] = button
+            userPresetMarkers[preset.id] = SettingsPendingChange(button)
+        }
+        rebuildPresetRow()
+    }
+
+    private fun saveUserPreset() {
+        if (!savePreset.isEnabled || !savePreset.isVisible || userPresetDraft.size >= MAX_USER_APPEARANCE_PRESETS) return
+        val name = askPresetName() ?: return
+        val current = appearance()
+        val preset = UserAppearancePreset(UUID.randomUUID().toString(), name, current.asCustomAppearance())
+        userPresetDraft = userPresetDraft + preset
+        canSaveAsPreset = false
+        rebuildUserPresetButtons()
+        setAppearance(current.copy(preset = TabAppearancePreset.CUSTOM, userPresetId = preset.id))
+        updateStatus()
+    }
+
+    private fun renameUserPreset(id: String) {
+        val preset = userPresetDraft.firstOrNull { it.id == id } ?: return
+        val name = askPresetName(preset) ?: return
+        val current = appearance()
+        userPresetDraft = userPresetDraft.map { if (it.id == id) it.copy(name = name) else it }
+        rebuildUserPresetButtons()
+        setAppearance(current)
+        updateStatus()
+    }
+
+    private fun deleteUserPreset(id: String) {
+        val current = appearance()
+        userPresetDraft = userPresetDraft.filterNot { it.id == id }
+        val next = if (current.userPresetId == id) {
+            lastCustomAppearance = current.asCustomAppearance()
+            canSaveAsPreset = true
+            lastCustomAppearance.copy(enabled = current.enabled)
+        } else current
+        rebuildUserPresetButtons()
+        setAppearance(next)
+        updateStatus()
+    }
+
+    private fun askPresetName(existing: UserAppearancePreset? = null): String? {
+        if (disposed) return null
+        val dialog = UserPresetNameDialog(component, userPresetDraft, existing)
+        presetNameDialog = dialog
+        return try {
+            if (dialog.showAndGet() && !disposed) dialog.presetName() else null
+        } finally { presetNameDialog = null }
+    }
+
+    fun disposeDialogs() {
+        disposed = true
+        presetNameDialog?.close(com.intellij.openapi.ui.DialogWrapper.CANCEL_EXIT_CODE)
+        presetNameDialog = null
+    }
+
     private fun installAppearanceMarkers() {
         fun watch(component: JComponent, value: (TabAppearanceState) -> Any?) {
             pendingMarkers += SettingsPendingChange(component) to { current: TabAppearanceState -> value(current) != value(appearanceBaseline) }
         }
         watch(pluginEnabled) { it.enabled }
-        watch(presetTitle) { it.preset }
+        pendingMarkers += SettingsPendingChange(presetTitle) to { current: TabAppearanceState ->
+            current.preset != appearanceBaseline.preset || current.userPresetId != appearanceBaseline.userPresetId ||
+                userPresetDraft != userPresetBaseline
+        }
         watch(showIcons) { it.showIcons }
         watch(sizeLabel) { it.iconSize }
         watch(positionLabel) { it.iconPosition }
@@ -439,12 +574,17 @@ internal class IconSettingsPanel(
 
     private fun rememberCurrentCustom() {
         // При клике радиокнопка уже переключена; прежний пресет берём из отображённого состояния.
-        if (displayedAppearance.preset == TabAppearancePreset.CUSTOM) {
+        if (displayedAppearance.preset == TabAppearancePreset.CUSTOM && displayedAppearance.userPresetId == null) {
             lastCustomAppearance = displayedAppearance.asCustomAppearance()
         }
     }
 
     fun customAppearance(): TabAppearanceState = lastCustomAppearance
+    fun userPresets(): List<UserAppearancePreset> = userPresetDraft.toList()
+    fun showImportedCategories(count: Int) {
+        importedCategoryCount = count
+        updateStatus()
+    }
 
     fun appearance(): TabAppearanceState = TabAppearanceState(
         showIcons = showIcons.isSelected,
@@ -461,6 +601,7 @@ internal class IconSettingsPanel(
         closeButtonPosition = closeButtonPosition.selectedItem as TabCloseButtonPosition,
         tabHeight = tabHeight.value,
         preset = presetButtons.entries.firstOrNull { it.value.isSelected }?.key ?: TabAppearancePreset.CUSTOM,
+        userPresetId = userPresetButtons.entries.firstOrNull { it.value.isSelected }?.key,
         tabFontSize = fontSizeSelection.storedSize,
         showProjectPath = moreInfoButtons.getValue(TabMoreInfo.PROJECT_PATH).isSelected,
         showGitBranch = moreInfoButtons.entries.any { it.key.isBranch && it.value.isSelected },
@@ -474,12 +615,18 @@ internal class IconSettingsPanel(
 
     fun resetAppearance() {
         val app = ApplicationManager.getApplication()
-        appearanceBaseline = app.getService(TabAppearanceSettings::class.java).state
-        lastCustomAppearance = if (appearanceBaseline.preset == TabAppearancePreset.CUSTOM) {
+        userPresetDraft = app.getService(UserAppearancePresets::class.java).state.presets.toList()
+        userPresetBaseline = userPresetDraft
+        rebuildUserPresetButtons()
+        val saved = app.getService(TabAppearanceSettings::class.java).state
+        appearanceBaseline = if (saved.userPresetId != null && userPresetDraft.none { it.id == saved.userPresetId })
+            saved.copy(preset = TabAppearancePreset.CUSTOM, userPresetId = null) else saved
+        lastCustomAppearance = if (appearanceBaseline.preset == TabAppearancePreset.CUSTOM && appearanceBaseline.userPresetId == null) {
             appearanceBaseline.asCustomAppearance()
         } else app.getService(LastCustomAppearanceSettings::class.java).state.appearance
             ?: appearanceBaseline.asCustomAppearance()
         customAppearanceBaseline = lastCustomAppearance
+        canSaveAsPreset = false
         setAppearance(appearanceBaseline)
     }
 
@@ -487,7 +634,8 @@ internal class IconSettingsPanel(
         syncing = true
         try {
             pluginEnabled.isSelected = value.enabled
-            presetButtons.forEach { (preset, button) -> button.isSelected = preset == value.preset }
+            presetButtons.forEach { (preset, button) -> button.isSelected = value.userPresetId == null && preset == value.preset }
+            userPresetButtons.forEach { (id, button) -> button.isSelected = id == value.userPresetId }
             val size = fontSizeSelection.reset(value.tabFontSize, defaultTabFontSize())
             tabFontSize.maximum = maxOf(MAX_TAB_FONT_SIZE, defaultTabFontSize() + 2, size)
             tabFontSize.minimum = minOf(MIN_TAB_FONT_SIZE, defaultTabFontSize())
@@ -520,6 +668,8 @@ internal class IconSettingsPanel(
         val enabled = pluginEnabled.isSelected
         presetTitle.isEnabled = enabled
         presetButtons.values.forEach { it.isEnabled = enabled }
+        userPresetButtons.values.forEach { it.isEnabled = enabled }
+        refreshSavePresetAction()
         listOf(showIcons, showOutline, showTabBackground, closeButtonPosition, closeButtonLabel,
             tabHeight, tabHeightLabel, tabHeightValue, tabFontSize, fontSizeLabel, fontSizeValue, moreInfoLabel)
             .forEach { it.isEnabled = enabled }
@@ -583,6 +733,7 @@ internal class IconSettingsPanel(
         if (manualEdit && appearance() != displayedAppearance) {
             presetButtons.getValue(TabAppearancePreset.CUSTOM).isSelected = true
             lastCustomAppearance = appearance().asCustomAppearance()
+            canSaveAsPreset = true
         }
         updateAppearanceEnabled()
         refreshAppearancePreview()
@@ -646,7 +797,8 @@ internal class IconSettingsPanel(
                 button.addActionListener { if (pluginEnabled.isSelected) run() }
                 line.add(button)
             }
-            val iconName = row.builder?.contourId?.let { id -> ContourCatalog.entries.firstOrNull { it.id == id }?.title }
+            val iconName = row.textIcon?.let { "Text: ${it.text}" }
+                ?: row.builder?.contourId?.let { id -> ContourCatalog.entries.firstOrNull { it.id == id }?.title }
                 ?: if (row.activeChoice != null) "Custom SVG" else if (row.snapshot?.currentFile(!JBColor.isBright()) != null) "Custom icon" else "Default"
             val artwork = row.activeChoice?.let {
                 RecentProjectIconHelper.createIcon(it.asset.tabArtwork() ?: it.asset.bytes, true, 24)
@@ -716,7 +868,9 @@ internal class IconSettingsPanel(
         status.text = when {
             conflict -> "Reload the affected projects before applying changes."
             changed > 0 -> "$changed project${if (changed == 1) "" else "s"} edited · Save with Apply"
+            importedCategoryCount > 0 -> "$importedCategoryCount icon categor${if (importedCategoryCount == 1) "y" else "ies"} imported · Save with Apply"
             appearance() != appearanceBaseline -> "Window tabs edited · Save with Apply"
+            userPresetDraft != userPresetBaseline -> "User presets edited · Save with Apply"
             lastCustomAppearance != customAppearanceBaseline -> "Custom appearance edited · Save with Apply"
             !pluginEnabled.isSelected -> "Tab customization is disabled."
             else -> "Click an icon or color to change it."
@@ -728,6 +882,7 @@ internal class IconSettingsPanel(
     fun saved() {
         appearanceBaseline = appearance()
         customAppearanceBaseline = lastCustomAppearance
+        userPresetBaseline = userPresetDraft.toList()
         refreshRows()
         status.foreground = UIUtil.getContextHelpForeground()
         status.text = "Changes saved."
@@ -737,6 +892,9 @@ internal class IconSettingsPanel(
     private fun refreshPendingChanges() {
         val current = appearance()
         pendingMarkers.forEach { (marker, changed) -> marker.update(changed(current)) }
+        userPresetMarkers.forEach { (id, marker) ->
+            marker.update(userPresetDraft.firstOrNull { it.id == id } != userPresetBaseline.firstOrNull { it.id == id })
+        }
     }
 
     fun failed(message: String) {
@@ -749,8 +907,10 @@ internal class IconSettingsPanel(
 /** Одинаковые ширины и оси для каждой строки и закреплённой шапки. */
 private class ProjectColumns {
     private val metrics = JBLabel().let { it.getFontMetrics(it.font) }
-    private val iconWidth = maxOf(JBUI.scale(132), metrics.stringWidth("Custom SVG") + JBUI.scale(52))
-    private val colorWidth = maxOf(JBUI.scale(140), metrics.stringWidth("Dark purple") + JBUI.scale(44))
+    private val iconWidth = maxOf(JBUI.scale(132), metrics.stringWidth("Custom SVG") + JBUI.scale(52)) +
+        SettingsPendingChange.reservedWidth
+    private val colorWidth = maxOf(JBUI.scale(140), metrics.stringWidth("Dark purple") + JBUI.scale(44)) +
+        SettingsPendingChange.reservedWidth
     private val actionWidth = JBUI.scale(32)
     private val gap = JBUI.scale(8)
     private val inset = JBUI.scale(12)
@@ -782,7 +942,7 @@ private class ProjectColumns {
                 parent.components.getOrNull(index)?.let { view ->
                     if (view is SettingsValueButton) {
                         val targetBorder = if (compact) compactButtonBorder else normalButtonBorder
-                        if (view.border !== targetBorder) view.border = targetBorder
+                        SettingsPendingChange.setContentBorder(view, targetBorder)
                     }
                     val height = minOf(view.preferredSize.height, parent.height)
                     val padding = if (header && index in 1..4) JBUI.scale(if (compact) 4 else 8) else 0

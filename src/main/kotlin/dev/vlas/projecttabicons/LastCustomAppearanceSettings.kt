@@ -27,4 +27,4 @@ internal class LastCustomAppearanceSettings :
 
 // Общий переключатель не является частью запоминаемого оформления.
 internal fun TabAppearanceState.asCustomAppearance(): TabAppearanceState =
-    normalized().copy(preset = TabAppearancePreset.CUSTOM, enabled = true)
+    normalized().copy(preset = TabAppearancePreset.CUSTOM, userPresetId = null, enabled = true)

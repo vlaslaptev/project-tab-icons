@@ -1,22 +1,22 @@
 {
-  "capturedOn": "2026-10-16",
   "plugin": "Project Tab Icons",
-  "pluginVersion": "0.3.46",
   "application": "IntelliJ IDEA 2026.2.3",
   "previewTheme": "Current · Islands Darcula",
   "source": "Native screenshot of the installed plugin Settings page, captured through the app UI.",
   "crop": "Preview, preset row and appearance controls only. Settings navigation, window title and the open-project table are excluded.",
   "demoData": "Frontend, Backend, Tools, example editor text, branch names and line counts are built-in preview fixtures.",
   "processing": "Rectangular crop and lossless PNG encoding; UI pixels and labels were not redrawn or retouched.",
-  "settings": "Presets were selected only in the pending Settings draft. Cancel discarded both draft changes; Apply was disabled after reopening.",
+  "settings": "Presets were selected only in pending Settings drafts and discarded with Cancel. Saved appearance, Custom memory and theme were unchanged after the 0.3.52 capture.",
   "files": [
     {
       "file": "appearance-settings.png",
-      "sha256": "30bcf0a10c6e62e1462eb248c09018636614cde7f17daaff57c3d6fe5bbff2cd",
+      "sha256": "85daba9287d41501101034c6c513b53e8aedd19a8a75c880e8f622a79b95bb78",
       "width": 2816,
-      "height": 1280,
+      "height": 1296,
       "preset": "Filled",
-      "section": "Color"
+      "section": "Color",
+      "pluginVersion": "0.3.52",
+      "capturedOn": "2026-10-18"
     },
     {
       "file": "git-settings.png",
@@ -24,7 +24,9 @@
       "width": 2816,
       "height": 1280,
       "preset": "Git",
-      "section": "Tab layout"
+      "section": "Tab layout",
+      "pluginVersion": "0.3.46",
+      "capturedOn": "2026-10-16"
     }
   ],
   "pixelScale": 2

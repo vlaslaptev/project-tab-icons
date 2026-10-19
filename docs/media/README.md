@@ -1,14 +1,14 @@
 # GitHub media
 
 The gallery combines original illustrations and **real Settings preview captures**
-from Project Tab Icons 0.3.46 running in IntelliJ IDEA 2026.2.3 on macOS.
+from Project Tab Icons running in IntelliJ IDEA 2026.2.3 on macOS.
 Frontend, Backend, Tools, example editor text, branch names and line counts are
 built-in demonstration data from the plugin's preview.
 
 | Asset | Size | Purpose |
 | --- | --- | --- |
 | `hero-dark.png` / `hero-light.png` | 1600 × 900 | README cover, selected by preferred color scheme |
-| `appearance-presets.png` | 1600 × 1000 | Real Settings preview: Filled preset and Color controls |
+| `appearance-presets.png` | 1600 × 1000 | Real Settings preview from 0.3.52: Filled preset, Color controls and Fill intensity |
 | `icon-library.png` | 1600 × 1000 | A selection from 100+ bundled SVG icons |
 | `git-context.png` | 1600 × 1000 | Real Settings preview: Git preset, compact branches, line counts and Tab layout controls |
 | `social-preview.png` | 1280 × 640 | Repository social preview |
@@ -19,8 +19,11 @@ the original PNG crops, preserving the UI pixels and text. `manifest.json` recor
 dimensions, asset types and the source plugin version. `preview.html` displays the full gallery locally.
 The logo concept is preserved: overlapping colored project windows and a shark.
 
-The captures were taken on 16 October 2026 using the **Current · Islands Darcula**
-preview theme. [Capture provenance](captures/provenance.json) records their hashes,
+The appearance capture was updated on 18 October 2026 using Project Tab Icons
+0.3.52. It shows the Filled preset with 12% fill intensity and a 3 px inset,
+including the blue markers for pending changes. The Git capture remains from
+0.3.46, taken on 16 October 2026. Both use the **Current · Islands Darcula**
+preview theme. [Capture provenance](captures/provenance.json) records each version, date, hash,
 dimensions and selected controls. [Appearance crop](captures/appearance-settings.png)
 and [Git crop](captures/git-settings.png) contain only Preview, presets and appearance
 controls. Settings navigation, window title and the real open-project table are

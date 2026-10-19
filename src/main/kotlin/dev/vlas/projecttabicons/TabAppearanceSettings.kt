@@ -122,8 +122,11 @@ internal data class TabAppearanceState(
     // Пропущенное поле тоже использует текущий дефолт Ab; явный выбор XML сохраняется.
     @field:OptionTag @JvmField val iconInitials: TabIconInitials = DEFAULT_ICON_INITIALS,
     @field:OptionTag @JvmField val iconLetterWeight: TabIconLetterWeight = TabIconLetterWeight.BOLD,
+    // Пользовательский пресет использует стабильный ID, не расширяя сохранённый enum.
+    @field:OptionTag @JvmField val userPresetId: String? = null,
 ) {
     fun normalized(): TabAppearanceState = copy(
+        userPresetId = userPresetId?.trim()?.takeIf { it.isNotEmpty() && it.length <= 64 },
         outlineThickness = outlineThickness.coerceIn(MIN_OUTLINE_THICKNESS, MAX_OUTLINE_THICKNESS),
         tabHeight = tabHeight.coerceIn(DEFAULT_TAB_HEIGHT, MAX_TAB_HEIGHT),
         tabFillInset = tabFillInset.coerceIn(MIN_TAB_FILL_INSET, MAX_TAB_FILL_INSET),

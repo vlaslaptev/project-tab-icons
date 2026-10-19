@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.3.55 — 2026-10-19
+
+- Import an SVG folder and its subfolders as a shared, searchable icon category, preserving original colors.
+- Keep independent copies in the icon library; skip invalid files with an explanation and merge identical SVGs within each set.
+- Create 1–6-character text icons such as DB, QA, API or αβ, with four styles, three font families and custom colors.
+- Save text as transparent SVG paths with editable metadata; preserve text, font and style when recoloring from the project row.
+- Keep imports and icon assignments in the Settings draft until Apply; Cancel leaves saved state unchanged.
+
+## 0.3.54 — 2026-10-18
+
+- Place smaller unsaved-change dots consistently after visible captions, including checkbox/radio controls and shortened project-row buttons.
+- Reserve marker space during layout and respect UI scale, disabled controls and right-to-left layouts.
+
+## 0.3.53 — 2026-10-18
+
+- Save up to 10 named presets for Icon, Color and Tab layout in the existing radio-button list.
+- Mark user presets with a star and accent color; offer Rename and Delete from their context menu.
+- Preserve the named original when editing its values, and save preset changes only with Apply.
+
 ## 0.3.52 — 2026-10-18
 
 - Return to the last manual appearance with Custom, including after restarting IDEA.

@@ -46,11 +46,12 @@ internal class ProjectIconSettingsRow(loaded: LoadedProjectIcon, overrides: Proj
     val modified: Boolean get() = svgModified || colorModified
     fun colorModified(target: ProjectColorTarget): Boolean =
         colorOverrides.value(target) != colorBaseline.value(target) ||
-            (target == ProjectColorTarget.ICON && builder != null && choiceDraft != null && choiceDraft?.color != current?.color)
+            (target == ProjectColorTarget.ICON && (builder != null || textIcon != null) && choiceDraft != null && choiceDraft?.color != current?.color)
     val activeChoice: IconChoice? get() = choiceDraft ?: current
     val builder: BuilderSelection? get() = activeChoice?.asset?.builder
+    val textIcon: TextIconSpec? get() = activeChoice?.asset?.textIcon
     val automaticIcon: Boolean get() = activeChoice == null && snapshot?.files?.isEmpty() == true
-    val editableIconColor: Boolean get() = builder != null || automaticIcon
+    val editableIconColor: Boolean get() = builder != null || textIcon != null || automaticIcon
     val sourceColor: Color? get() = if (choiceDraft != null) choiceDraft?.color else current?.color ?: currentColor
     val color: Color? get() = if (automaticIcon) colorOverrides.icon ?: sourceColor else sourceColor
     val outlineColor: Color? get() = colorOverrides.outline ?: color
@@ -78,7 +79,10 @@ internal class ProjectIconSettingsRow(loaded: LoadedProjectIcon, overrides: Proj
     }
 
     fun changeColor(target: ProjectColorTarget, value: Color?) {
-        if (target == ProjectColorTarget.ICON && builder != null) {
+        if (target == ProjectColorTarget.ICON && textIcon != null) {
+            val selected = requireNotNull(value) { "Choose an icon color." }
+            choose(IconChoice(requireNotNull(textIcon).copy(colorHex = selected.hex()).asset(), selected))
+        } else if (target == ProjectColorTarget.ICON && builder != null) {
             val generated = requireNotNull(builder)
             val selected = requireNotNull(value) { "Choose an icon color." }
             val contour = ContourCatalog.entries.first { it.id == generated.contourId }

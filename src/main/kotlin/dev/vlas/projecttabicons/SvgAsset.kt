@@ -21,7 +21,8 @@ internal val PROJECT_ICON_FILES = listOf("icon.svg", "icon.png", "icon_dark.svg"
 
 internal data class BuilderSelection(val contourId: String, val colorHex: String, val background: Boolean)
 
-internal data class SvgAsset(val bytes: ByteArray, val label: String, val builder: BuilderSelection? = null) {
+internal data class SvgAsset(val bytes: ByteArray, val label: String, val builder: BuilderSelection? = null,
+                             val textIcon: TextIconSpec? = null) {
     val digest: String = sha256(bytes)
 
     /** Убирает только старую подложку конструктора из отображения, не меняя сохранённый SVG. */
@@ -76,7 +77,7 @@ internal data class SvgAsset(val bytes: ByteArray, val label: String, val builde
             val builder = if (color != null && ContourCatalog.entries.any { it.id == id }) {
                 BuilderSelection(id, color.hex(), root.getAttribute("data-project-tab-icons-background") == "auto")
             } else null
-            return SvgAsset(bytes.copyOf(), label, builder)
+            return SvgAsset(bytes.copyOf(), label, builder, readTextIconSpec(root, color))
         }
 
         private fun validateElement(element: Element) {

@@ -39,7 +39,7 @@ internal fun projectIconColor(delegate: Icon, unscaledSize: Int): IconColorRead 
         // Даже SVG без старого фона рисуем только из проверенной копии байтов.
         // Исходный ProjectFileIcon не используется в paint и больше не обходит очистку.
         val artwork = RecentProjectIconHelper.createIcon(asset.tabArtwork() ?: asset.bytes, true, unscaledSize)
-        val color = asset.builder?.colorHex?.let(::parseIconColor) ?: sampleIconColor(data, true)
+        val color = (asset.textIcon?.colorHex ?: asset.builder?.colorHex)?.let(::parseIconColor) ?: sampleIconColor(data, true)
         return IconColorRead(color = color, artwork = artwork)
     }
     return IconColorRead(color = sampleIconColor(data, false),
@@ -48,7 +48,7 @@ internal fun projectIconColor(delegate: Icon, unscaledSize: Int): IconColorRead 
 
 /** IO-поток; используется также для цвета в таблице и предпросмотра выбранного SVG. */
 internal fun svgIconColor(asset: SvgAsset): Color? =
-    asset.builder?.colorHex?.let(::parseIconColor) ?: sampleIconColor(asset.bytes, true)
+    (asset.textIcon?.colorHex ?: asset.builder?.colorHex)?.let(::parseIconColor) ?: sampleIconColor(asset.bytes, true)
 
 internal fun sampleIconColor(data: ByteArray, svg: Boolean): Color? {
     // Отдельный экземпляр: offscreen-выбор цвета не сбрасывает HiDPI-кеш иконки вкладки.

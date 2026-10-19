@@ -50,7 +50,7 @@ internal data class AppearanceField(val label: JBLabel?, val control: JComponent
 internal class SettingsAppearanceForm(
     private val master: JComponent,
     private val fields: List<AppearanceField>,
-    private val labelWidth: Int,
+    private val labelWidthProvider: () -> Int,
     private val controlWidth: Int,
     private val rowHeight: Int,
     private val availableWidth: () -> Int,
@@ -60,6 +60,7 @@ internal class SettingsAppearanceForm(
     private val fieldGap = JBUI.scale(12)
     private val columnGap = JBUI.scale(28)
     private val rowGap = JBUI.scale(10)
+    private val labelWidth get() = labelWidthProvider()
     private val fieldWidth get() = labelWidth + fieldGap + controlWidth
 
     init {

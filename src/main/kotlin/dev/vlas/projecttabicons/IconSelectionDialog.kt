@@ -45,7 +45,7 @@ import javax.swing.ScrollPaneConstants
 import javax.swing.SwingUtilities
 import javax.swing.SwingConstants
 
-/** Диалог редактирует только черновик иконки; цвет остаётся отдельным действием строки. */
+/** Выбор иконки и импорт библиотеки остаются черновиком до Apply страницы Settings. */
 internal class IconSelectionDialog(
     parent: JComponent,
     private val project: Project,
@@ -53,6 +53,7 @@ internal class IconSelectionDialog(
     private val color: Color,
     initial: IconChoice?,
     available: List<IconChoice>,
+    sets: List<ImportedIconSet>,
 ) : DialogWrapper(parent, true) {
     private val body = JPanel(BorderLayout(0, JBUI.scale(16)))
     private val preview = IconPreviewWell()
@@ -72,14 +73,14 @@ internal class IconSelectionDialog(
     private val tabs = JTabbedPane()
     private val search = SearchTextField(false)
     private val customSearch = SearchTextField(false)
-    private val category = ComboBox((listOf("All categories") + ContourCatalog.entries.map { it.category }.distinct().sorted()).toTypedArray())
+    private val category = ComboBox<LibraryCategory>()
     private val resultCount = settingsHint("")
     private val customCount = settingsHint("")
     private val shapeIcons = mutableMapOf<String, Icon>()
     private val customIcons = mutableMapOf<String, Icon>()
-    private val shapes = IconChoiceGrid<Contour>({ it.title }) { shape ->
-        shapeIcons.getOrPut(shape.id) {
-            RecentProjectIconHelper.createIcon(shape.svg(color), true, 28)
+    private val shapes = IconChoiceGrid<LibraryIcon>({ it.title }) { item ->
+        shapeIcons.getOrPut(item.id) {
+            RecentProjectIconHelper.createIcon(item.choice(color).asset.let { it.tabArtwork() ?: it.bytes }, true, 28)
         }
     }
     private val customGrid = IconChoiceGrid<IconChoice>(
@@ -88,14 +89,46 @@ internal class IconSelectionDialog(
         customIcons.getOrPut(choice.asset.digest) { RecentProjectIconHelper.createIcon(choice.asset.tabArtwork() ?: choice.asset.bytes, true, 28) }
     }
     private val importButton = JButton("Import SVG…")
+    private val importFolderButton = JButton("Import folder…")
+    private var iconSets = sets
+    private val addedSets = mutableListOf<ImportedIconSet>()
+    private var library = libraryItems()
+    private val textEditor = TextIconEditor(project, initial?.asset?.textIcon, color) { showSelection() }
     private var gallery = (listOfNotNull(initial) + available).distinctBy { it.asset.digest }
     private var custom = initial
-    private var shapeId = initial?.asset?.builder?.contourId
-    private var useShape = shapeId != null || initial == null
+    private var shapeId = initial?.asset?.builder?.contourId?.let { "builtin:$it" }
+        ?: library.firstOrNull { it.imported?.asset?.digest == initial?.asset?.digest }?.id
     private var filtering = false
     private var worker: Future<*>? = null
     private var importGeneration = 0
     private var closed = false
+    private var busy = false
+
+    private fun libraryItems(): List<LibraryIcon> = ContourCatalog.entries.map {
+        LibraryIcon("builtin:${it.id}", it.title, "builtin:${it.category}", it)
+    } + iconSets.flatMap { set -> set.icons.map { choice ->
+        LibraryIcon("${set.id}:${choice.asset.digest}", choice.asset.label.substringBeforeLast(" · "), set.id, imported = choice)
+    } }
+
+    private fun rebuildCategories(selectedKey: String? = null) {
+        val values = listOf(LibraryCategory(null, "All categories")) +
+            ContourCatalog.entries.map { it.category }.distinct().sorted().map { LibraryCategory("builtin:$it", it) } +
+            iconSets.map { LibraryCategory(it.id, "★ ${it.name}") }
+        category.removeAllItems()
+        values.forEach(category::addItem)
+        category.selectedItem = values.firstOrNull { it.key == selectedKey } ?: values.first()
+        category.maximumSize = JBUI.size(220, 40)
+        category.preferredSize = Dimension(JBUI.scale(190), category.preferredSize.height)
+    }
+
+    fun importedSets(): List<ImportedIconSet> = addedSets.toList()
+
+    private fun setLoading(value: Boolean) {
+        busy = value
+        importButton.isEnabled = !value
+        importFolderButton.isEnabled = !value
+        if (value) setOKActionEnabled(false)
+    }
 
     init {
         title = "Choose icon · $projectName"
@@ -119,27 +152,31 @@ internal class IconSelectionDialog(
             add(samples, BorderLayout.EAST)
         }, BorderLayout.NORTH)
 
-        search.textEditor.emptyText.text = "Search ${ContourCatalog.entries.size} icons…"
-        search.textEditor.accessibleContext.accessibleName = "Search built-in icons"
+        search.textEditor.emptyText.text = "Search icons…"
+        search.textEditor.accessibleContext.accessibleName = "Search icon library"
         customSearch.textEditor.emptyText.text = "Search project SVGs"
         customSearch.textEditor.accessibleContext.accessibleName = "Search project SVGs"
         category.accessibleContext.accessibleName = "Icon category"
-        shapes.accessibleContext.accessibleName = "Built-in icons"
+        shapes.accessibleContext.accessibleName = "Icon library"
         customGrid.accessibleContext.accessibleName = "Project SVGs"
         val toolbarHeight = maxOf(search.preferredSize.height, category.preferredSize.height,
-            importButton.preferredSize.height, JBUI.scale(30))
-        listOf(search, customSearch, category, importButton).forEach {
+            importButton.preferredSize.height, importFolderButton.preferredSize.height, JBUI.scale(30))
+        listOf(search, customSearch, category, importButton, importFolderButton).forEach {
             it.preferredSize = Dimension(it.preferredSize.width, toolbarHeight)
         }
         customGrid.fixedCellWidth = JBUI.scale(162)
         customGrid.fixedCellHeight = JBUI.scale(100)
         val filterBar = JPanel(BorderLayout(JBUI.scale(8), 0)).apply {
-            add(search, BorderLayout.CENTER); add(category, BorderLayout.EAST)
+            add(search, BorderLayout.CENTER)
+            add(JPanel(BorderLayout(JBUI.scale(8), 0)).apply {
+                add(category, BorderLayout.CENTER); add(importFolderButton, BorderLayout.EAST)
+            }, BorderLayout.EAST)
         }
-        tabs.addTab("Built-in icons", catalogPanel(filterBar, shapes, resultCount))
+        tabs.addTab("Icon library", catalogPanel(filterBar, shapes, resultCount))
         tabs.addTab("Project SVGs", catalogPanel(JPanel(BorderLayout(JBUI.scale(8), 0)).apply {
             add(customSearch, BorderLayout.CENTER); add(importButton, BorderLayout.EAST)
         }, customGrid, customCount))
+        tabs.addTab("Text icon", textEditor)
         body.add(tabs, BorderLayout.CENTER)
         body.add(status, BorderLayout.SOUTH)
         search.addDocumentListener(onTextChanged { filterShapes() })
@@ -148,23 +185,26 @@ internal class IconSelectionDialog(
         shapes.addListSelectionListener { event ->
             if (!filtering && !event.valueIsAdjusting) shapes.selectedValue?.let {
                 shapeId = it.id
-                useShape = true
                 showSelection()
             }
         }
         customGrid.addListSelectionListener { event ->
             if (!filtering && !event.valueIsAdjusting) customGrid.selectedValue?.let {
                 custom = it
-                useShape = false
                 showSelection()
             }
         }
         importButton.addActionListener { importSvg() }
+        importFolderButton.addActionListener { importFolder() }
+        rebuildCategories()
         filterShapes()
         filterCustom()
-        tabs.selectedIndex = if (useShape) 0 else 1
+        tabs.selectedIndex = when {
+            initial?.asset?.textIcon != null -> 2
+            shapeId != null || initial == null -> 0
+            else -> 1
+        }
         tabs.addChangeListener {
-            useShape = tabs.selectedIndex == 0
             showSelection()
         }
         focusGridOnDown(search, shapes)
@@ -173,7 +213,11 @@ internal class IconSelectionDialog(
             KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().menuShortcutKeyMaskEx), "searchIcons")
         body.actionMap.put("searchIcons", object : AbstractAction() {
             override fun actionPerformed(event: ActionEvent) {
-                (if (tabs.selectedIndex == 0) search else customSearch).textEditor.requestFocusInWindow()
+                when (tabs.selectedIndex) {
+                    0 -> search.textEditor.requestFocusInWindow()
+                    1 -> customSearch.textEditor.requestFocusInWindow()
+                    else -> textEditor.textField.requestFocusInWindow()
+                }
             }
         })
         init()
@@ -216,8 +260,9 @@ internal class IconSelectionDialog(
 
     private fun filterShapes() {
         val terms = iconSearchTerms(search.text)
-        val visible = ContourCatalog.entries.filter {
-            (category.selectedIndex == 0 || it.category == category.selectedItem) && it.matches(terms)
+        val selectedCategory = category.selectedItem as? LibraryCategory
+        val visible = library.filter {
+            (selectedCategory?.key == null || it.categoryKey == selectedCategory.key) && it.matches(terms)
         }
         filtering = true
         try {
@@ -226,7 +271,7 @@ internal class IconSelectionDialog(
             filtering = false
         }
         shapes.emptyText.text = "No icons found. Try another name or category."
-        resultCount.text = "${visible.size} of ${ContourCatalog.entries.size} icons · Arrow keys to navigate"
+        resultCount.text = "${visible.size} of ${library.size} icons · Arrow keys to navigate"
         revealSelection(shapes)
     }
 
@@ -275,8 +320,7 @@ internal class IconSelectionDialog(
         worker?.cancel(true)
         status.foreground = UIUtil.getContextHelpForeground()
         status.text = "Loading SVG…"
-        importButton.isEnabled = false
-        setOKActionEnabled(false)
+        setLoading(true)
         worker = ApplicationManager.getApplication().executeOnPooledThread {
             val result = try {
                 val asset = SvgAsset.read(path, "Imported · ${path.fileName}")
@@ -288,11 +332,10 @@ internal class IconSelectionDialog(
             }
             ApplicationManager.getApplication().invokeLater({
                 if (closed || token != importGeneration) return@invokeLater
-                importButton.isEnabled = true
+                setLoading(false)
                 result.fold(onSuccess = { choice ->
                     gallery = (gallery + choice).distinctBy { it.asset.digest }
                     custom = choice
-                    useShape = false
                     customSearch.text = ""
                     filterCustom()
                     tabs.selectedIndex = 1
@@ -309,16 +352,63 @@ internal class IconSelectionDialog(
         }
     }
 
+    private fun importFolder() {
+        val descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor().apply {
+            title = "Import icon folder"
+            description = "SVG files in this folder and its subfolders become a shared icon category."
+            isForcedToUseIdeaFileChooser = true
+        }
+        val folder = FileChooser.chooseFile(descriptor, body, project, null)?.toNioPath() ?: return
+        val token = ++importGeneration
+        worker?.cancel(true)
+        val names = iconSets.map { it.name }.toSet() + ContourCatalog.entries.map { it.category }
+        status.foreground = UIUtil.getContextHelpForeground()
+        status.text = "Importing icon folder…"
+        setLoading(true)
+        worker = ApplicationManager.getApplication().executeOnPooledThread {
+            val result = try { Result.success(importIconSet(folder, names)) }
+            catch (error: ProcessCanceledException) { throw error }
+            catch (error: Exception) { Result.failure(error) }
+            ApplicationManager.getApplication().invokeLater({
+                if (closed || token != importGeneration) return@invokeLater
+                setLoading(false)
+                result.fold(onSuccess = { imported ->
+                    iconSets = iconSets + imported.set
+                    addedSets += imported.set
+                    library = libraryItems()
+                    shapeId = "${imported.set.id}:${imported.set.icons.first().asset.digest}"
+                    search.text = ""
+                    rebuildCategories(imported.set.id)
+                    filterShapes()
+                    tabs.selectedIndex = 0
+                    status.foreground = UIUtil.getContextHelpForeground()
+                    status.text = "Imported ${imported.set.icons.size} icons into ${imported.set.name}. " +
+                        "Skipped invalid files: ${imported.skipped.size}; duplicates: ${imported.duplicates}. Saved with Apply."
+                    status.toolTipText = imported.skipped.take(8).joinToString("\n").ifEmpty { null }
+                    showSelection(clearImportError = false)
+                }, onFailure = { error ->
+                    status.foreground = JBColor.RED
+                    status.text = when (error) {
+                        is IllegalArgumentException -> settingsMessage(error.message ?: "Choose a folder containing SVG icons.")
+                        else -> "The folder could not be read. Check its permissions and try again."
+                    }
+                    status.toolTipText = status.text
+                    showSelection(clearImportError = false)
+                })
+            }, ModalityState.any())
+        }
+    }
+
     fun selection(): IconChoice? {
-        if (!useShape) return custom
-        val shape = ContourCatalog.entries.firstOrNull { it.id == shapeId } ?: return null
-        val asset = SvgAsset(shape.svg(color), shape.title,
-            BuilderSelection(shape.id, color.hex(), background = false))
-        return IconChoice(asset, color)
+        return when (tabs.selectedIndex) {
+            0 -> library.firstOrNull { it.id == shapeId }?.choice(color)
+            1 -> custom
+            else -> textEditor.selection()
+        }
     }
 
     private fun showSelection(clearImportError: Boolean = true) {
-        if (clearImportError && importButton.isEnabled) {
+        if (clearImportError && !busy) {
             status.foreground = UIUtil.getContextHelpForeground()
             status.text = "Saved with Apply · Replaces light and dark icon variants"
             status.toolTipText = null
@@ -329,7 +419,8 @@ internal class IconSelectionDialog(
         selectionLabel.toolTipText = selected?.asset?.label?.let(::settingsLiteral)
         selectionDetail.text = when {
             selected == null -> "Select a result to preview it at tab sizes."
-            useShape -> "Built-in icon · ${colorName(color)}"
+            selected.asset.textIcon != null -> "${selected.asset.textIcon.font.title} · ${selected.asset.textIcon.style.title} · ${selected.color?.hex()}"
+            tabs.selectedIndex == 0 && selected.asset.builder != null -> "Built-in icon · ${colorName(color)}"
             else -> selected.asset.label.substringAfter(" · ", "SVG") + " · Original colors"
         }
         samples.removeAll()
@@ -345,17 +436,35 @@ internal class IconSelectionDialog(
         }
         samples.revalidate()
         samples.repaint()
-        setOKActionEnabled(selected != null && importButton.isEnabled)
+        setOKActionEnabled(selected != null && !busy)
     }
 
     override fun doValidate(): ValidationInfo? = when {
-        !importButton.isEnabled -> ValidationInfo("Wait for the imported SVG to load.")
+        busy -> ValidationInfo("Wait for the icons to load.")
+        tabs.selectedIndex == 2 && textEditor.validationError != null -> ValidationInfo(textEditor.validationError!!, textEditor.textField)
         selection() != null -> null
-        else -> ValidationInfo("Choose a built-in icon or a project SVG.", tabs)
+        else -> ValidationInfo("Choose an icon or enter a text icon.", tabs)
     }
 
     override fun createCenterPanel(): JComponent = body
-    override fun getPreferredFocusedComponent(): JComponent =
-        if (useShape) search.textEditor else customSearch.textEditor
+    override fun getPreferredFocusedComponent(): JComponent = when (tabs.selectedIndex) {
+        0 -> search.textEditor
+        1 -> customSearch.textEditor
+        else -> textEditor.textField
+    }
     override fun getDimensionServiceKey(): String = "ProjectTabIcons.IconSelection.Refined"
+}
+
+private data class LibraryCategory(val key: String?, val title: String) {
+    override fun toString(): String = title
+}
+
+private data class LibraryIcon(val id: String, val title: String, val categoryKey: String,
+                               val contour: Contour? = null, val imported: IconChoice? = null) {
+    fun choice(color: Color): IconChoice = imported ?: requireNotNull(contour).let {
+        IconChoice(SvgAsset(it.svg(color), it.title, BuilderSelection(it.id, color.hex(), background = false)), color)
+    }
+    fun matches(terms: List<String>): Boolean = contour?.matches(terms) ?: terms.all {
+        it in (title + " " + imported?.asset?.label.orEmpty()).lowercase(Locale.ROOT)
+    }
 }

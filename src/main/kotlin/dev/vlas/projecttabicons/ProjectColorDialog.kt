@@ -180,7 +180,9 @@ internal class ProjectColorDialog(
             if (target == ProjectColorTarget.ICON) "Follows the IDE project color" else "Follows the icon color"
         } else value?.hex() ?: "Enter six HEX digits"
         val choice = row.activeChoice
-        val image = if (target == ProjectColorTarget.ICON && value != null && choice?.asset?.builder != null) {
+        val image = if (target == ProjectColorTarget.ICON && value != null && choice?.asset?.textIcon != null) {
+            RecentProjectIconHelper.createIcon(choice.asset.textIcon.copy(colorHex = value.hex()).asset().bytes, true, 24)
+        } else if (target == ProjectColorTarget.ICON && value != null && choice?.asset?.builder != null) {
             val builder = choice.asset.builder
             ContourCatalog.entries.firstOrNull { it.id == builder.contourId }?.let {
                 RecentProjectIconHelper.createIcon(it.svg(value), true, 24)

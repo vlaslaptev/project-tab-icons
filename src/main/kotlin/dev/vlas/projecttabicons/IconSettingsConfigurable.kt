@@ -43,6 +43,8 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
     private val reloadQueued = AtomicBoolean()
     private val models = linkedMapOf<String, ProjectIconSettingsRow>()
     private var gallery = emptyList<IconChoice>()
+    private var iconSets = emptyList<ImportedIconSet>()
+    private var pendingIconSets = emptyList<ImportedIconSet>()
     private val dialogs = linkedMapOf<DialogWrapper, String>()
 
     override fun getDisplayName(): String = "Project Tab Icons"
@@ -91,7 +93,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
     }
 
     override fun getPreferredFocusedComponent(): JComponent? = panel?.preferredFocus
-    override fun isModified(): Boolean = panel?.modified == true
+    override fun isModified(): Boolean = panel?.modified == true || pendingIconSets.isNotEmpty()
 
     private fun refreshSettingsState() {
         val view = panel ?: return
@@ -102,6 +104,8 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
     }
 
     override fun reset() {
+        pendingIconSets = emptyList()
+        panel?.showImportedCategories(0)
         panel?.resetAppearance()
         reload(keepDraft = false)
     }
@@ -148,7 +152,8 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
                     }
                     IconChoice(asset, color)
                 }
-                Result.success(LoadedOpenProjects(loaded, assets, previewArtwork))
+                val sets = ApplicationManager.getApplication().getService(IconSetLibrary::class.java).readSets()
+                Result.success(LoadedOpenProjects(loaded, assets, previewArtwork, sets))
             } catch (error: ProcessCanceledException) {
                 throw error
             } catch (error: Exception) {
@@ -176,6 +181,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
                     }
                     iconDirectories = active.mapNotNull { it.snapshot?.directory?.toString()?.replace('\\', '/') }.toSet()
                     gallery = loaded.gallery
+                    iconSets = loaded.iconSets
                     view.loaded(active.mapNotNull { models[it.target.key] }, loaded.previewArtwork)
                 }, onFailure = { error ->
                     view.failed(error.message ?: "Cannot load open project icons.")
@@ -234,11 +240,13 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
         val initialColor = row.builder?.colorHex?.let(::parseIconColor) ?: row.color ?: COLOR_PRESETS.first().bright
         val expected = row.snapshot
         val dialog = IconSelectionDialog(view.component, project, row.target.name, initialColor,
-            row.activeChoice, gallery + models.values.mapNotNull { it.activeChoice })
+            row.activeChoice, gallery + models.values.mapNotNull { it.activeChoice }, iconSets + pendingIconSets)
         dialogs[dialog] = row.key
         try {
             if (dialog.showAndGet() && stillOpen(row)) {
                 dialog.selection()?.let(row::choose)
+                pendingIconSets = pendingIconSets + dialog.importedSets()
+                view.showImportedCategories(pendingIconSets.size)
                 if (row.snapshot?.fingerprint != expected?.fingerprint || row.snapshot?.directory != expected?.directory) {
                     row.markConflict()
                 }
@@ -277,7 +285,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
 
     override fun apply() {
         val view = panel ?: return
-        if (!view.modified) return
+        if (!isModified()) return
         val pending = view.rows.filter { it.modified }
         pending.forEach { row ->
             if (!stillOpen(row)) throw ConfigurationException("${row.target.name} has been closed.")
@@ -299,8 +307,11 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
         try {
             var installed: Map<Path, IconSnapshot> = emptyMap()
             var failure: Exception? = null
-            if (writes.isNotEmpty()) ProgressManager.getInstance().runProcessWithProgressSynchronously(Runnable {
+            var preparedLibrary: IconSetLibraryState? = null
+            if (writes.isNotEmpty() || pendingIconSets.isNotEmpty()) ProgressManager.getInstance().runProcessWithProgressSynchronously(Runnable {
                 try {
+                    if (pendingIconSets.isNotEmpty()) preparedLibrary = ApplicationManager.getApplication()
+                        .getService(IconSetLibrary::class.java).prepare(pendingIconSets)
                     installed = ProjectIconStore.installAll(writes)
                 } catch (error: Exception) {
                     failure = error
@@ -317,6 +328,11 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
             app.getService(ProjectOutlineColors::class.java).apply(colors)
             app.getService(TabAppearanceSettings::class.java).apply(view.appearance())
             app.getService(LastCustomAppearanceSettings::class.java).remember(view.customAppearance())
+            app.getService(UserAppearancePresets::class.java).apply(view.userPresets())
+            preparedLibrary?.let { app.getService(IconSetLibrary::class.java).apply(it) }
+            iconSets = iconSets + pendingIconSets
+            pendingIconSets = emptyList()
+            view.showImportedCategories(0)
             pending.forEach { row -> row.saved(row.target.path?.let(installed::get)) }
             writes.forEach { write -> installed[write.path]?.let { ProjectIconStore.refreshUi(write.project, write.path, it) } }
             app.getService(ProjectTabIconsService::class.java).requestRefresh()
@@ -334,6 +350,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
         worker?.cancel(true)
         dialogs.keys.toList().forEach { it.close(DialogWrapper.CANCEL_EXIT_CODE) }
         dialogs.clear()
+        panel?.disposeDialogs()
         lifetime?.let(Disposer::dispose)
         lifetime = null
         panel = null
@@ -341,6 +358,8 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
         models.clear()
         iconDirectories = emptySet()
         gallery = emptyList()
+        iconSets = emptyList()
+        pendingIconSets = emptyList()
     }
 
     companion object {
@@ -349,4 +368,4 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
 }
 
 private data class LoadedOpenProjects(val rows: List<LoadedProjectIcon>, val gallery: List<IconChoice>,
-                                      val previewArtwork: PreviewArtwork)
+                                      val previewArtwork: PreviewArtwork, val iconSets: List<ImportedIconSet>)

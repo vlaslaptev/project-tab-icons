@@ -10,7 +10,7 @@
 
 ## Install in a minute
 
-### [↓ Download ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.52/project-tab-icons-0.3.52.zip)
+### [↓ Download ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.55/project-tab-icons-0.3.55.zip)
 
 1. Open **Settings → Plugins → ⚙ → Install Plugin from Disk…** and select the ZIP.
 2. Open several projects in separate windows, then use **Window → Merge All Project Windows**.
@@ -27,12 +27,14 @@ The [installation guide](docs/INSTALLATION.md) covers missing tabs, updates and 
 ### You can give each project its own outline and translucent fill colors
 ### You can adjust fill intensity and return to your last Custom appearance
 ### You can start with a preset, adjust it and see the result before Apply
+### You can save up to 10 named presets for your own tab styles
 ### You can preview your tabs in different IDE themes
 
 ---
 ![A selection from 100+ bundled icons, rendered from the plugin's actual SVG resources](docs/media/icon-library.png)
 ### You can assign an icon to each project tab and place it on the left or right
 ### You can pick from 100+ icons, import your own SVG or use your project’s initials
+### You can import SVG folders as categories and create text icons such as DB, QA or API
 ### You can adjust the icon’s color and size to make each project easy to recognize
 
 ## About the plugin
@@ -46,7 +48,7 @@ Give each project a visual identity and keep the information you need beside its
 
 - **Platform:** macOS
 - **IDE:** IntelliJ IDEA **2026.2.3** / build **262**
-- **Version:** **0.3.52**
+- **Version:** **0.3.55**
 - **License:** MIT
 
 > **Updates & future IDE support**
@@ -60,6 +62,12 @@ Give each project a visual identity and keep the information you need beside its
 Search by name or keyword, filter by category, and choose a color with the native
 IDE picker, a HEX value, or one of 14 swatches. Icon sizes are **20, 24 and 28 px**.
 Your existing SVG/PNG artwork keeps its own colors.
+
+Import a folder and its SVG subfolders as a shared category, with search and original
+colors. Copies remain available after moving the source folder. Or open **Text icon**
+to create a 1–6-character label with four styles, three font families and a custom color.
+Text icons save as transparent SVG paths and can be edited later. Apply saves library
+imports and project assignments; Cancel discards the draft.
 
 Selected SVG icons are saved in the IDE's native project icon storage. They remain
 project icons after the plugin is removed. Replacing an icon updates that project's
