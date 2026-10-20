@@ -1,42 +1,32 @@
 # GitHub media
 
-The gallery combines original illustrations and **real Settings preview captures**
-from Project Tab Icons running in IntelliJ IDEA 2026.2.3 on macOS.
-Frontend, Backend, Tools, example editor text, branch names and line counts are
-built-in demonstration data from the plugin's preview.
+The gallery combines illustrations and real Settings crops from installed
+**Project Tab Icons 0.3.62**, captured in IntelliJ IDEA 2026.2.3 on **20 October 2026**.
+Frontend, Backend, Tools, editor text, branches and line counts are built-in fixtures.
 
-| Asset | Size | Purpose |
-| --- | --- | --- |
-| `hero-dark.png` / `hero-light.png` | 1600 × 900 | README cover, selected by preferred color scheme |
-| `appearance-presets.png` | 1600 × 1000 | Real Settings preview from 0.3.56: Filled preset, Color controls, Fill intensity and the User presets row |
-| `icon-library.png` | 1600 × 1000 | A selection from 100+ bundled SVG icons |
-| `git-context.png` | 1600 × 1000 | Real Settings preview from 0.3.56: Git preset, compact branches, line counts, Tab layout and the User presets row |
-| `social-preview.png` | 1280 × 640 | Repository social preview |
-| `logo-512.png` | 512 × 512 | Transparent export of the existing plugin logo |
+| Asset | Purpose |
+| --- | --- |
+| `appearance-presets.png` | Real Settings crop: Custom appearance, Icon controls and separate User presets |
+| `git-context.png` | A second crop from the same capture, focusing on Preview, Git context and presets |
+| `captures/groups-settings.png` | Projects / Project groups switcher, group columns and Add group row |
+| `icon-library.png` | Unchanged approved illustration with a fixed selection of 100+ bundled SVGs |
+| `hero-dark.png` / `hero-light.png` | Illustrated covers |
+| `social-preview.png` | Repository social preview |
+| `logo-512.png` | Transparent export of the existing logo |
 
-Corresponding SVG files are editable slide sources. The two screenshot slides embed
-the original PNG crops, preserving the UI pixels and text. `manifest.json` records
-dimensions, asset types and the source plugin version. `preview.html` displays the full gallery locally.
-The logo concept is preserved: overlapping colored project windows and a shark.
+The crops come from the installation-verification session for the installed 0.3.62
+artifact. The appearance crop includes the Custom radio button, generic Git-with-icons
+user preset, Manage button, icon sizes and initials controls. The Git crop focuses
+on the demo project captions. The group crop deliberately ends after the Add group
+row; it does not imply that the user's saved group list is empty.
 
-Both captures were updated on 19 October 2026 using Project Tab Icons 0.3.56.
-The appearance capture shows Filled with 12% fill intensity and a 3 px inset,
-including the blue markers for pending changes. The Git capture shows compact
-branches and line counts. Both include a separate **User presets** row with
-standard text colors, no star and one shared selection across all presets.
-Both use the **Current · Islands Darcula**
-preview theme. [Capture provenance](captures/provenance.json) records each version, date, hash,
-dimensions and selected controls. [Appearance crop](captures/appearance-settings.png)
-and [Git crop](captures/git-settings.png) contain only Preview, presets and appearance
-controls. Settings navigation, window title and the real open-project table are
-excluded. UI labels and values were not redrawn or retouched. The slides add a
-background, frame, headline and caption outside the captures.
+Window titles, Settings navigation, saved group rows, real project names and paths
+are excluded. UI pixels and labels were not redrawn, renamed, blurred or retouched.
+Only rectangular cropping and lossless PNG encoding were used. The screenshot slides
+add an illustrated background, frame and captions outside the original UI pixels.
+[Capture provenance](captures/provenance.json) records the version, date, SHA-256,
+dimensions and crop scope. The screenshots do not change saved settings.
 
-The Filled and Git presets were selected in a temporary Settings draft and discarded
-with Cancel after capture. The IDE's saved appearance was restored. The two slides
-show those specific settings; other themes and combinations can look different.
-The covers, icon-library slide and social preview remain illustrations. The icon
-library shows a fixed selection of bundled SVG resources under the 100+ label.
-Adding icons to the plugin does not require rebuilding this slide or updating its count.
-Code and library attribution are in
-[third-party notices](../../THIRD_PARTY_NOTICES.md).
+SVG files are the slide sources. `manifest.json` describes the generated gallery;
+`preview.html` displays it locally. The icon-library composition remains fixed when
+the catalog grows. Attribution is in [third-party notices](../../THIRD_PARTY_NOTICES.md).

@@ -1,8 +1,6 @@
 package dev.vlas.projecttabicons
 
 import com.intellij.ide.DataManager
-import com.intellij.ide.RecentProjectIconHelper
-import com.intellij.ide.RecentProjectsManagerBase
 import com.intellij.ide.ProjectColorChangeListener
 import com.intellij.ide.ProjectWindowCustomizerService
 import com.intellij.ide.ui.LafManagerListener
@@ -23,9 +21,7 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
-import com.intellij.ui.DeferredIconImpl
 import com.intellij.ui.JBColor
-import com.intellij.util.ui.AvatarIcon
 import java.nio.file.Path
 import java.util.concurrent.Future
 import java.util.concurrent.atomic.AtomicBoolean
@@ -54,7 +50,8 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
         disposed = false
         val scope = Disposer.newDisposable("Project Tab Icons settings")
         lifetime = scope
-        val view = IconSettingsPanel(::chooseIcon, ::chooseColor, ::reloadRow, ::refreshSettingsState)
+        val view = IconSettingsPanel(::chooseIcon, ::chooseColor, ::reloadRow, ::refreshSettingsState,
+            ::importStyles, ::exportStyles, ::chooseGroupIcon, ::chooseGroupColor)
         panel = view
         Disposer.register(scope, Disposable { worker?.cancel(true) })
         val bus = ApplicationManager.getApplication().messageBus.connect(scope)
@@ -110,34 +107,26 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
         reload(keepDraft = false)
     }
 
-    private fun openTargets(): List<OpenProjectIconTarget> {
-        val recent = RecentProjectsManagerBase.getInstanceEx()
-        return ProjectManager.getInstance().openProjects.filterNot { it.isDisposed || it.isDefault }.map { target ->
-            val path = recent.getProjectPath(target)
-            val delegate = path?.let { recent.getProjectIcon(it, true, 28, target.name) }
-            val resolved = if (delegate is DeferredIconImpl<*>) delegate.currentlyPaintedIcon() else delegate
-            OpenProjectIconTarget(target, path, delegate?.let { CenteredProjectIcon(it, 24, projectName = { target.name }) },
-                (resolved as? AvatarIcon)?.presentation?.color1)
-        }
-    }
-
     private fun reload(keepDraft: Boolean) {
         val view = panel ?: return
         if (applying) return
         val scope = lifetime ?: return
-        val targets = openTargets()
+        val targets = openProjectIconTargets()
         val keys = targets.map { it.key }.toSet()
-        dialogs.filterValues { it !in keys }.keys.toList().forEach { it.close(DialogWrapper.CANCEL_EXIT_CODE) }
+        val groupKeys = view.projectGroups().groups.map { "group:${it.id}" }.toSet()
+        dialogs.filterValues { it != "styles" && it !in keys && it !in groupKeys }.keys.toList().forEach { it.close(DialogWrapper.CANCEL_EXIT_CODE) }
         val dark = !JBColor.isBright()
         val token = ++generation
+        val groupDraft = view.projectGroups()
         worker?.cancel(true)
         if (!keepDraft || models.isEmpty()) view.loading()
         worker = ApplicationManager.getApplication().executeOnPooledThread {
             val result = try {
                 ContourCatalog.entries
                 ContourCatalog.licenses
+                GroupAppearanceIcons.prepare(groupDraft)
                 val previewArtwork = WindowTabsPreview.loadArtwork()
-                val loaded = targets.map { loadProject(it, dark) }
+                val loaded = targets.map { loadProjectIcon(it, dark) }
                 val sources = loaded.mapNotNull { row ->
                     row.target.path?.let { ProjectIconSource(it, row.target.name, row.snapshot) }
                 }
@@ -190,60 +179,20 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
         }
     }
 
-    private fun loadProject(target: OpenProjectIconTarget, dark: Boolean): LoadedProjectIcon {
-        val path = target.path ?: return LoadedProjectIcon(target, null, null, null,
-            "A local project directory is required to save an icon.")
-        return try {
-            val snapshot = ProjectIconStore.snapshot(path)
-            val svg = try {
-                snapshot.currentSvg(dark)
-            } catch (error: ProcessCanceledException) {
-                throw error
-            } catch (_: IllegalArgumentException) {
-                null
-            } catch (_: org.xml.sax.SAXException) {
-                null
-            }
-            val file = snapshot.currentFile(dark)
-            val color = try {
-                when {
-                    svg != null -> svgIconColor(svg)
-                    file?.endsWith(".png") == true -> sampleIconColor(snapshot.files.getValue(file), false)
-                    file == null -> target.automaticColor
-                    else -> null
-                }
-            } catch (error: ProcessCanceledException) {
-                throw error
-            } catch (_: Exception) {
-                null
-            }
-            // PNG тоже получает подготовленную копию: renderer больше не рисует delegate.
-            val prepared = if (svg == null && file?.endsWith(".png") == true) {
-                val image = RecentProjectIconHelper.createIcon(snapshot.files.getValue(file), false, 24)
-                target.copy(preview = (target.preview as? CenteredProjectIcon)?.withArtwork(image) ?: image)
-            } else target
-            LoadedProjectIcon(prepared, snapshot, svg?.let { IconChoice(it, color) }, color)
-        } catch (error: ProcessCanceledException) {
-            throw error
-        } catch (error: Exception) {
-            LoadedProjectIcon(target, null, null, null, error.message ?: "Cannot read this project's icon.")
-        }
-    }
-
     private fun stillOpen(row: ProjectIconSettingsRow): Boolean =
         !disposed && !row.target.project.isDisposed && models[row.key] === row &&
             ProjectManager.getInstance().openProjects.any { it === row.target.project }
 
     private fun chooseIcon(row: ProjectIconSettingsRow) {
         val view = panel ?: return
-        if (!stillOpen(row) || !row.ready || row.conflicted) return
+        if (!stillOpen(row) || row.inheritedGroup != null || !row.ready || row.conflicted) return
         val initialColor = row.builder?.colorHex?.let(::parseIconColor) ?: row.color ?: COLOR_PRESETS.first().bright
         val expected = row.snapshot
         val dialog = IconSelectionDialog(view.component, project, row.target.name, initialColor,
-            row.activeChoice, gallery + models.values.mapNotNull { it.activeChoice }, iconSets + pendingIconSets)
+            row.activeChoice, gallery + models.values.mapNotNull { it.activeChoice }, effectiveIconSets())
         dialogs[dialog] = row.key
         try {
-            if (dialog.showAndGet() && stillOpen(row)) {
+            if (dialog.showAndGet() && stillOpen(row) && row.inheritedGroup == null) {
                 dialog.selection()?.let(row::choose)
                 pendingIconSets = pendingIconSets + dialog.importedSets()
                 view.showImportedCategories(pendingIconSets.size)
@@ -259,13 +208,13 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
 
     private fun chooseColor(row: ProjectIconSettingsRow, target: ProjectColorTarget) {
         val view = panel ?: return
-        if (!stillOpen(row) || !row.ready || row.conflicted) return
+        if (!stillOpen(row) || row.inheritedGroup != null || !row.ready || row.conflicted) return
         val expected = row.snapshot
         if (target == ProjectColorTarget.ICON && !row.editableIconColor) return
         val dialog = ProjectColorDialog(view.component, project, row, target, view.appearance())
         dialogs[dialog] = row.key
         try {
-            if (dialog.showAndGet() && stillOpen(row)) {
+            if (dialog.showAndGet() && stillOpen(row) && row.inheritedGroup == null) {
                 if (row.snapshot?.fingerprint != expected?.fingerprint || row.snapshot?.directory != expected?.directory) {
                     row.markConflict()
                 } else row.changeColor(target, dialog.selection())
@@ -274,6 +223,136 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
         } finally {
             dialogs.remove(dialog)
         }
+    }
+
+    private fun transferWork(title: String, action: () -> Unit): Boolean {
+        val view = panel ?: return false
+        var failure: Exception? = null
+        ProgressManager.getInstance().runProcessWithProgressSynchronously(Runnable {
+            try { action() } catch (error: Exception) { failure = error }
+        }, title, false, project, view.component)
+        failure?.let {
+            LOG.warn(title, it)
+            com.intellij.openapi.ui.Messages.showErrorDialog(view.component, it.message ?: "Cannot transfer styles.", title)
+            return false
+        }
+        return !disposed && !project.isDisposed
+    }
+
+    private fun importStyles() {
+        val view = panel ?: return
+        val descriptor = com.intellij.openapi.fileChooser.FileChooserDescriptorFactory.createSingleFileDescriptor("json")
+            .withTitle("Import Project Tab Icons styles")
+        val file = com.intellij.openapi.fileChooser.FileChooser.chooseFile(descriptor, view.component, project, null) ?: return
+        var bundle: StyleBundle? = null
+        if (!transferWork("Reading style bundle") { bundle = readStyleBundle(file.toNioPath()) }) return
+        val dialog = StyleBundleDialog(view.component, bundle ?: return, true)
+        dialogs[dialog] = "styles"
+        try {
+            if (!dialog.showAndGet() || disposed) return
+            val selected = dialog.selected()
+            val conflict = dialog.conflict()
+            var merged: StyleBundle? = null
+            val current = StyleBundle(view.userPresets(), effectiveIconSets())
+            if (!transferWork("Preparing imported styles") {
+                val result = mergeStyleBundle(current, selected, conflict)
+                ApplicationManager.getApplication().getService(IconSetLibrary::class.java).prepare(result.categories)
+                merged = result
+            }) return
+            val result = merged ?: return
+            // Обе коллекции меняются вместе только после полной проверки размеров и SVG.
+            pendingIconSets = result.categories.filter { incoming -> iconSets.none { it === incoming } }
+            view.replaceUserPresets(result.presets)
+            view.showImportedCategories(pendingIconSets.size)
+        } finally { dialogs.remove(dialog) }
+    }
+
+    private fun exportStyles() {
+        val view = panel ?: return
+        val sets = effectiveIconSets().toMutableList()
+        val textIcons = models.values.mapNotNull { it.activeChoice }.filter { it.asset.textIcon != null }
+            .distinctBy { it.asset.digest }.filter { icon -> sets.none { set -> set.icons.any { it.asset.digest == icon.asset.digest } } }
+        if (textIcons.isNotEmpty()) {
+            var name = "Text icons"
+            var suffix = 2
+            while (sets.any { it.name.equals(name, true) }) name = "Text icons (${suffix++})"
+            sets += ImportedIconSet(java.util.UUID.randomUUID().toString(), name, textIcons.map { icon ->
+                icon.copy(asset = icon.asset.copy(label = "Text ${icon.asset.textIcon?.text.orEmpty()} · $name"))
+            })
+        }
+        val bundle = StyleBundle(view.userPresets(), sets)
+        if (bundle.empty) {
+            com.intellij.openapi.ui.Messages.showInfoMessage(view.component,
+                "Save a user preset, import an SVG category or create a text icon first.", "Export styles")
+            return
+        }
+        val dialog = StyleBundleDialog(view.component, bundle, false)
+        dialogs[dialog] = "styles"
+        try {
+            if (!dialog.showAndGet() || disposed) return
+            val descriptor = com.intellij.openapi.fileChooser.FileSaverDescriptor("Export Project Tab Icons styles",
+                "Choose a location for the portable style bundle.", "json")
+            val file = com.intellij.openapi.fileChooser.FileChooserFactory.getInstance()
+                .createSaveFileDialog(descriptor, project).save(null as com.intellij.openapi.vfs.VirtualFile?, "project-tab-styles.json")?.file ?: return
+            if (file.exists() && com.intellij.openapi.ui.Messages.showYesNoDialog(view.component,
+                    "Replace ${file.name}?", "Export styles", com.intellij.openapi.ui.Messages.getQuestionIcon()) != com.intellij.openapi.ui.Messages.YES) return
+            val selected = dialog.selected()
+            transferWork("Exporting style bundle") { writeStyleBundle(file.toPath(), selected) }
+        } finally { dialogs.remove(dialog) }
+    }
+
+    private fun effectiveIconSets(): List<ImportedIconSet> = (iconSets + pendingIconSets).associateBy { it.id }.values.toList()
+
+    private fun chooseGroupIcon(id: String) {
+        val view = panel ?: return
+        val group = view.projectGroups().groups.firstOrNull { it.id == id } ?: return
+        val choice = GroupAppearanceIcons.choice(group.icon) ?: return
+        val dialog = IconSelectionDialog(view.component, project, "Group: ${group.name}",
+            choice.color ?: COLOR_PRESETS.first().bright, choice,
+            gallery + models.values.mapNotNull { it.activeChoice }, effectiveIconSets())
+        dialogs[dialog] = "group:$id"
+        try {
+            if (!dialog.showAndGet() || disposed || project.isDisposed) return
+            val selected = dialog.selection() ?: return
+            try {
+                val stored = GroupAppearanceIcons.store(selected)
+                view.updateGroup(id) { it.copy(icon = stored) }
+                pendingIconSets += dialog.importedSets()
+                view.showImportedCategories(pendingIconSets.size)
+            } catch (error: IllegalArgumentException) {
+                com.intellij.openapi.ui.Messages.showErrorDialog(view.component, error.message ?: "Cannot save the group icon.", "Project Tab Icons")
+            }
+        } finally { dialogs.remove(dialog) }
+    }
+
+    private fun chooseGroupColor(id: String, target: ProjectColorTarget) {
+        val view = panel ?: return
+        val group = view.projectGroups().groups.firstOrNull { it.id == id } ?: return
+        val choice = GroupAppearanceIcons.choice(group.icon) ?: return
+        // Редактор цвета получает самостоятельную модель группы, а не первый проект.
+        val row = ProjectIconSettingsRow(LoadedProjectIcon(
+            OpenProjectIconTarget(project, null, null, displayName = group.name), null, choice, choice.color), group.colors(choice))
+        if (target == ProjectColorTarget.ICON && !row.editableIconColor) return
+        val dialog = ProjectColorDialog(view.component, project, row, target, view.appearance(),
+            label = "${target.title} · Group: ${group.name}", allowAutomatic = target != ProjectColorTarget.ICON)
+        dialogs[dialog] = "group:$id"
+        try {
+            if (!dialog.showAndGet() || disposed || project.isDisposed) return
+            val color = dialog.selection()
+            try {
+                val storedIcon = if (target == ProjectColorTarget.ICON) {
+                    row.changeColor(target, color)
+                    GroupAppearanceIcons.store(requireNotNull(row.ownChoice))
+                } else null
+                view.updateGroup(id) { current -> when (target) {
+                    ProjectColorTarget.ICON -> current.copy(icon = requireNotNull(storedIcon))
+                    ProjectColorTarget.OUTLINE -> current.copy(outlineColor = color?.hex().orEmpty())
+                    ProjectColorTarget.TAB -> current.copy(tabColor = color?.hex().orEmpty())
+                } }
+            } catch (error: IllegalArgumentException) {
+                com.intellij.openapi.ui.Messages.showErrorDialog(view.component, error.message ?: "Cannot save the group color.", "Project Tab Icons")
+            }
+        } finally { dialogs.remove(dialog) }
     }
 
     private fun reloadRow(row: ProjectIconSettingsRow) {
@@ -296,7 +375,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
             ProjectIconWrite(row.target.project,
                 row.target.path ?: throw ConfigurationException("A local project directory is required."),
                 row.snapshot ?: throw ConfigurationException("Wait for the project icons to load."),
-                row.activeChoice?.asset ?: throw ConfigurationException("Choose a project icon."))
+                row.ownChoice?.asset ?: throw ConfigurationException("Choose a project icon."))
         }
         val colors = pending.filter { it.colorModified }.associate { row ->
             (row.target.path ?: throw ConfigurationException("A local project directory is required.")) to row.colorOverrides
@@ -329,8 +408,9 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
             app.getService(TabAppearanceSettings::class.java).apply(view.appearance())
             app.getService(LastCustomAppearanceSettings::class.java).remember(view.customAppearance())
             app.getService(UserAppearancePresets::class.java).apply(view.userPresets())
+            app.getService(ProjectGroups::class.java).apply(view.projectGroups())
             preparedLibrary?.let { app.getService(IconSetLibrary::class.java).apply(it) }
-            iconSets = iconSets + pendingIconSets
+            iconSets = effectiveIconSets()
             pendingIconSets = emptyList()
             view.showImportedCategories(0)
             pending.forEach { row -> row.saved(row.target.path?.let(installed::get)) }

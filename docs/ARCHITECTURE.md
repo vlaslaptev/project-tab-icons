@@ -71,3 +71,26 @@ cancellation and a timeout. No fetch is performed.
 Window-tab decoration, project frame lookup, icon wrappers and project icon storage
 depend on internal APIs in the target platform. The strict IDE build range is an
 intentional part of the implementation. See [compatibility](COMPATIBILITY.md).
+
+## Group appearance and window ordering
+
+`ProjectGroups` persists group icons, independent colors, memberships, grouping flags
+and member positions in local application state. The settings page holds a draft;
+Apply saves it. `GroupAppearanceIcons` prepares inherited SVGs off the UI thread
+with bounded validation and caching. Effective group appearance overlays personal
+project styling, so ungrouping does not need to rewrite project icon files.
+
+`ProjectTabGroupOrdering` observes merged strip membership. A changed order alone
+never triggers sorting. New merges are coalesced, groups follow their table order,
+fixed positions reserve slots and Auto members retain relative order. Restore Group
+Tab Order reads the current live strip and latest persisted group state.
+
+On the AppKit main thread, the implementation validates the native window set,
+reorders it within its tab group and preserves the selected window. It then updates
+each live Swing strip through the internal SDK 262 `reorderTabs(Map)` method,
+including indexes used by the IDE's drag-and-drop support. Disposal cancels pending
+work and restores the original context-menu groups. These internal APIs are part of
+the narrow compatibility scope, rather than a promise of cross-version stability.
+
+The table block follows the Settings viewport height. The member list retains a
+minimum height so layout cannot collapse it in a short window; long content scrolls.

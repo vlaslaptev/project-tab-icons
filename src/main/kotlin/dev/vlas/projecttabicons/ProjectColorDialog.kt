@@ -38,8 +38,11 @@ internal class ProjectColorDialog(
     private val row: ProjectIconSettingsRow,
     private val target: ProjectColorTarget,
     private val appearance: TabAppearanceState,
+    label: String = "${target.title} · ${row.target.name}",
+    immediate: Boolean = false,
+    allowAutomatic: Boolean = target != ProjectColorTarget.ICON || row.automaticIcon,
 ) : DialogWrapper(parent, true) {
-    private val automaticAllowed = target != ProjectColorTarget.ICON || row.automaticIcon
+    private val automaticAllowed = allowAutomatic
     private val body = JPanel(BorderLayout(0, JBUI.scale(20)))
     private val hex = JBTextField((row.color(target) ?: COLOR_PRESETS.first().bright).hex(), 9)
     private val nativePicker = JButton("More colors…")
@@ -53,8 +56,8 @@ internal class ProjectColorDialog(
     private val colorDetail = settingsHint("")
 
     init {
-        title = "${target.title} · ${row.target.name}"
-        setOKButtonText("Choose color")
+        title = label
+        setOKButtonText(if (immediate) "Apply color" else "Choose color")
         body.border = JBUI.Borders.empty(8)
         body.add(JPanel(BorderLayout(JBUI.scale(12), 0)).apply {
             add(preview, BorderLayout.WEST)

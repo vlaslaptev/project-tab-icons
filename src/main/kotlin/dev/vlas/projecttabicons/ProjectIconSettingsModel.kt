@@ -6,9 +6,9 @@ import java.nio.file.Path
 import javax.swing.Icon
 
 internal data class OpenProjectIconTarget(val project: Project, val path: Path?, val preview: Icon?,
-                                          val automaticColor: Color? = null) {
+                                          val automaticColor: Color? = null, val displayName: String? = null) {
     val key: String = path?.let(::projectIconPathKey) ?: "unavailable:${System.identityHashCode(project)}"
-    val name: String get() = project.name
+    val name: String get() = displayName ?: project.name
 }
 
 internal data class IconChoice(val asset: SvgAsset, val color: Color?)
@@ -36,6 +36,11 @@ internal class ProjectIconSettingsRow(loaded: LoadedProjectIcon, overrides: Proj
     var colorOverrides = overrides
         private set
     private var choiceDraft: IconChoice? = null
+    var inheritedGroup: ProjectTabGroup? = null
+        private set
+    private var inheritedChoice: IconChoice? = null
+    var inheritedModified = false
+        private set
     var conflicted = false
         private set
 
@@ -47,15 +52,23 @@ internal class ProjectIconSettingsRow(loaded: LoadedProjectIcon, overrides: Proj
     fun colorModified(target: ProjectColorTarget): Boolean =
         colorOverrides.value(target) != colorBaseline.value(target) ||
             (target == ProjectColorTarget.ICON && (builder != null || textIcon != null) && choiceDraft != null && choiceDraft?.color != current?.color)
-    val activeChoice: IconChoice? get() = choiceDraft ?: current
+    val ownChoice: IconChoice? get() = choiceDraft ?: current
+    val activeChoice: IconChoice? get() = inheritedChoice ?: ownChoice
     val builder: BuilderSelection? get() = activeChoice?.asset?.builder
     val textIcon: TextIconSpec? get() = activeChoice?.asset?.textIcon
     val automaticIcon: Boolean get() = activeChoice == null && snapshot?.files?.isEmpty() == true
     val editableIconColor: Boolean get() = builder != null || textIcon != null || automaticIcon
-    val sourceColor: Color? get() = if (choiceDraft != null) choiceDraft?.color else current?.color ?: currentColor
+    val sourceColor: Color? get() = if (inheritedChoice != null) inheritedChoice?.color else
+        if (choiceDraft != null) choiceDraft?.color else current?.color ?: currentColor
     val color: Color? get() = if (automaticIcon) colorOverrides.icon ?: sourceColor else sourceColor
-    val outlineColor: Color? get() = colorOverrides.outline ?: color
-    val tabColor: Color? get() = colorOverrides.tab ?: color
+    val outlineColor: Color? get() = if (inheritedGroup != null) parseIconColor(inheritedGroup!!.outlineColor) ?: color else colorOverrides.outline ?: color
+    val tabColor: Color? get() = if (inheritedGroup != null) parseIconColor(inheritedGroup!!.tabColor) ?: color else colorOverrides.tab ?: color
+
+    fun inherit(group: ProjectTabGroup?, changed: Boolean = false) {
+        inheritedGroup = group
+        inheritedChoice = group?.let { GroupAppearanceIcons.choice(it.icon) }
+        inheritedModified = changed
+    }
 
     fun color(target: ProjectColorTarget): Color? = when (target) {
         ProjectColorTarget.ICON -> color
@@ -71,6 +84,7 @@ internal class ProjectIconSettingsRow(loaded: LoadedProjectIcon, overrides: Proj
         else target.preview
 
     fun choose(value: IconChoice) {
+        check(inheritedGroup == null) { "Edit this project's group appearance instead." }
         // Явное назначение также объединяет light/dark варианты в один SVG.
         val variants = snapshot?.files?.keys.orEmpty().any { it != "icon.svg" }
         choiceDraft = value.takeIf { it.asset.digest != current?.asset?.digest || variants }
@@ -79,6 +93,7 @@ internal class ProjectIconSettingsRow(loaded: LoadedProjectIcon, overrides: Proj
     }
 
     fun changeColor(target: ProjectColorTarget, value: Color?) {
+        check(inheritedGroup == null) { "Edit this project's group appearance instead." }
         if (target == ProjectColorTarget.ICON && textIcon != null) {
             val selected = requireNotNull(value) { "Choose an icon color." }
             choose(IconChoice(requireNotNull(textIcon).copy(colorHex = selected.hex()).asset(), selected))

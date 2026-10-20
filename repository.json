@@ -12,9 +12,9 @@
   ],
   "socialPreview": "docs/media/social-preview.png",
   "license": "MIT",
-  "version": "0.3.55",
+  "version": "0.3.62",
   "githubUrl": "https://github.com/vlaslaptev/project-tab-icons",
-  "status": "Published GitHub release 0.3.55 with shared SVG categories, text icons, user presets and refined pending-change markers",
+  "status": "Prepared 0.3.62 release: shared group appearance, inline group editing, merge-time ordering and refreshed screenshots",
   "releaseUrl": "https://github.com/vlaslaptev/project-tab-icons/releases/tag/v0.3.55",
   "publishedRelease": "0.3.55",
   "releasePublishedOn": "2026-10-19"

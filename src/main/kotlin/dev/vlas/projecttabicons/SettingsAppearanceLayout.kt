@@ -118,6 +118,7 @@ internal class SettingsRadioRow(
     private val title: JComponent,
     private val choices: List<JComponent>,
     private val wrapChoices: Boolean = false,
+    private val titleWidth: () -> Int = { title.preferredSize.width },
     private val availableWidth: () -> Int,
 ) : JPanel(null) {
     private val gap = JBUI.scale(12)
@@ -126,7 +127,7 @@ internal class SettingsRadioRow(
     private val choicesWidth get() = choices.sumOf { it.preferredSize.width } + (choices.size - 1) * gap
     init { isOpaque = false; add(title); choices.forEach(::add) }
     private fun wrappedBounds(available: Int): List<Rectangle> {
-        val indent = (title.preferredSize.width + titleGap).takeIf {
+        val indent = (titleWidth() + titleGap).takeIf {
             available >= it + choices.maxOf { choice -> choice.preferredSize.width }
         } ?: 0
         var x = indent
@@ -143,21 +144,21 @@ internal class SettingsRadioRow(
         }
     }
 
-    override fun getPreferredSize(): Dimension = Dimension(title.preferredSize.width + titleGap + choicesWidth,
+    override fun getPreferredSize(): Dimension = Dimension(titleWidth() + titleGap + choicesWidth,
         if (wrapChoices) wrappedBounds(availableWidth()).lastOrNull()?.let { it.y + it.height } ?: rowHeight
         else when {
-            availableWidth() >= title.preferredSize.width + titleGap + choicesWidth -> rowHeight
+            availableWidth() >= titleWidth() + titleGap + choicesWidth -> rowHeight
             availableWidth() >= choicesWidth -> rowHeight * 2 + JBUI.scale(4)
             else -> rowHeight * (choices.size + 1) + JBUI.scale(4)
         })
     override fun doLayout() {
-        title.setBounds(0, 0, title.preferredSize.width, rowHeight)
+        title.setBounds(0, 0, titleWidth(), rowHeight)
         if (wrapChoices) {
             choices.zip(wrappedBounds(width)).forEach { (choice, bounds) -> choice.bounds = bounds }
             return
         }
-        val sameRow = width >= title.preferredSize.width + titleGap + choicesWidth
-        var x = if (sameRow) title.preferredSize.width + titleGap else 0
+        val sameRow = width >= titleWidth() + titleGap + choicesWidth
+        var x = if (sameRow) titleWidth() + titleGap else 0
         var y = if (sameRow) 0 else rowHeight + JBUI.scale(4)
         choices.forEach { choice ->
             choice.setBounds(x, y, choice.preferredSize.width, rowHeight)
@@ -205,7 +206,7 @@ internal class SettingsPreviewHeader(
 }
 
 /** Штатные состояния IDEA, просторные сегменты и общая граница переключаемой формы. */
-internal class SettingsGroupSwitcher : JPanel(BorderLayout(0, JBUI.scale(8))) {
+internal class SettingsGroupSwitcher(selectorName: String = "Appearance settings group") : JPanel(BorderLayout(0, JBUI.scale(8))) {
     private val cardLayout = CardLayout()
     private val cards = JPanel(cardLayout).apply { isOpaque = false }
     private val titles = mutableListOf<String>()
@@ -218,7 +219,7 @@ internal class SettingsGroupSwitcher : JPanel(BorderLayout(0, JBUI.scale(8))) {
             override val segmentedButtonHorizontalGap: Int = 20
             override val segmentedButtonVerticalGap: Int = 6
         }
-        accessibleContext.accessibleName = "Appearance settings group"
+        accessibleContext.accessibleName = selectorName
     }
 
     init {
@@ -289,6 +290,10 @@ internal class SettingsGroupSwitcher : JPanel(BorderLayout(0, JBUI.scale(8))) {
 
     fun addChangeListener(listener: ChangeListener) {
         listeners += listener
+    }
+
+    fun selectTab(title: String) {
+        if (title in titles) selector.selectedItem = title
     }
 }
 

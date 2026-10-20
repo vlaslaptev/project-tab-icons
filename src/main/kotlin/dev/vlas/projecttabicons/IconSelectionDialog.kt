@@ -54,13 +54,15 @@ internal class IconSelectionDialog(
     initial: IconChoice?,
     available: List<IconChoice>,
     sets: List<ImportedIconSet>,
+    private val immediate: Boolean = false,
 ) : DialogWrapper(parent, true) {
+    private val saveHint = if (immediate) "Applies immediately · Replaces light and dark icon variants" else "Saved with Apply · Replaces light and dark icon variants"
     private val body = JPanel(BorderLayout(0, JBUI.scale(16)))
     private val preview = IconPreviewWell()
     private val selectionLabel = JBLabel("Choose an icon").apply { font = font.deriveFont(Font.BOLD) }
     private val selectionDetail = settingsHint("Preview at actual tab sizes")
     private val samples = JPanel(FlowLayout(FlowLayout.LEADING, JBUI.scale(12), 0))
-    private val status = JTextArea("Saved with Apply · Replaces light and dark icon variants", 3, 0).apply {
+    private val status = JTextArea(saveHint, 3, 0).apply {
         isEditable = false
         isFocusable = false
         isOpaque = false
@@ -132,7 +134,7 @@ internal class IconSelectionDialog(
 
     init {
         title = "Choose icon · $projectName"
-        setOKButtonText("Choose icon")
+        setOKButtonText(if (immediate) "Apply icon" else "Choose icon")
         body.border = JBUI.Borders.empty(8)
         body.preferredSize = JBUI.size(680, 600)
         body.minimumSize = JBUI.size(560, 460)
@@ -340,7 +342,7 @@ internal class IconSelectionDialog(
                     filterCustom()
                     tabs.selectedIndex = 1
                     status.foreground = UIUtil.getContextHelpForeground()
-                    status.text = "Saved with Apply · Replaces light and dark icon variants"
+                    status.text = saveHint
                     showSelection()
                 }, onFailure = { error ->
                     status.foreground = JBColor.RED
@@ -383,7 +385,7 @@ internal class IconSelectionDialog(
                     tabs.selectedIndex = 0
                     status.foreground = UIUtil.getContextHelpForeground()
                     status.text = "Imported ${imported.set.icons.size} icons into ${imported.set.name}. " +
-                        "Skipped invalid files: ${imported.skipped.size}; duplicates: ${imported.duplicates}. Saved with Apply."
+                        "Skipped invalid files: ${imported.skipped.size}; duplicates: ${imported.duplicates}. " + if (immediate) "Saved with Apply icon." else "Saved with Apply."
                     status.toolTipText = imported.skipped.take(8).joinToString("\n").ifEmpty { null }
                     showSelection(clearImportError = false)
                 }, onFailure = { error ->
@@ -410,7 +412,7 @@ internal class IconSelectionDialog(
     private fun showSelection(clearImportError: Boolean = true) {
         if (clearImportError && !busy) {
             status.foreground = UIUtil.getContextHelpForeground()
-            status.text = "Saved with Apply · Replaces light and dark icon variants"
+            status.text = saveHint
             status.toolTipText = null
         }
         val selected = selection()

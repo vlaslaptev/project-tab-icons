@@ -50,4 +50,24 @@
         implementation="dev.vlas.projecttabicons.ProjectTabIconsStartupActivity"
         os="mac"/>
   </extensions>
+  <actions>
+    <group id="ProjectTabIcons.Actions" text="Project Tab Icons" popup="true">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+      <action id="ProjectTabIcons.ChangeIcon" class="dev.vlas.projecttabicons.ChangeProjectTabIconAction" text="Change Project Tab Icon…">
+        <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift I"/>
+      </action>
+      <action id="ProjectTabIcons.IconColor" class="dev.vlas.projecttabicons.ChangeProjectTabIconColorAction" text="Change Project Tab Icon Color…"/>
+      <action id="ProjectTabIcons.OutlineColor" class="dev.vlas.projecttabicons.ChangeProjectTabOutlineColorAction" text="Change Project Tab Outline Color…"/>
+      <action id="ProjectTabIcons.FillColor" class="dev.vlas.projecttabicons.ChangeProjectTabFillColorAction" text="Change Project Tab Fill Color…"/>
+      <separator/>
+      <action id="ProjectTabIcons.ChoosePreset" class="dev.vlas.projecttabicons.ChooseProjectTabPresetAction" text="Choose Project Tab Appearance Preset…">
+        <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift P"/>
+      </action>
+      <action id="ProjectTabIcons.NextPreset" class="dev.vlas.projecttabicons.NextProjectTabPresetAction" text="Next Project Tab Appearance Preset">
+        <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift N"/>
+      </action>
+      <separator/>
+      <action id="ProjectTabIcons.Settings" class="dev.vlas.projecttabicons.OpenProjectTabSettingsAction" text="Project Tab Icons Settings…"/>
+    </group>
+  </actions>
 </idea-plugin>

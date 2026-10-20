@@ -28,7 +28,8 @@ Existing settings default to 50% intensity; other presets and Restore defaults u
 Changing the preview theme or a project's icon assignment does not change the preset.
 After a manual appearance edit, **Save as new preset** lets you name the current
 Icon, Color and Tab layout settings. Names must be unique and at most 32 characters.
-User presets appear in the same radio-button list with a star and accent color.
+User presets appear in a separate **User presets** row with the standard text color.
+Both rows share one radio-button group, so only one preset can be selected at a time.
 Right-click one, or press **Shift+F10** while focused, to rename or delete it.
 At 10 user presets, delete one to make room for another. Apply saves preset
 creation, renaming, deletion and selection; Cancel discards the draft.
@@ -36,6 +37,44 @@ Editing a user preset switches to Custom without overwriting the named original.
 The enable switch, preview theme and individual project assignments are excluded.
 **Restore defaults** changes the draft and takes effect after Apply; Cancel abandons
 the draft. The enable switch and project icon assignments are preserved by a reset.
+
+**Manage…** can update a named preset from the current appearance, duplicate it
+or move it in the user-preset row. **Import styles… / Export styles…** transfers
+selected presets, SVG categories and editable text icons in portable JSON bundles.
+Import resolves matching names explicitly; project memberships and paths are not exported.
+
+## Project groups
+
+Switch between **Projects** and **Project groups** above a single visible table.
+Both use matching icon and color columns. The Projects table shows the path below
+each project name and its group in a separate column (**—** when ungrouped).
+Select projects to **Assign** them to a group or **Ungroup** them. Appearance is
+edited in project rows or shared through the group; bulk appearance controls are removed.
+
+The first group row is **+ Add group**. Add or edit a name, member checkboxes,
+**Group tabs** and optional positions directly in the table, then use **Add / Save**.
+Paths appear under member names; long lists scroll within the form. **Cancel**
+closes the inline draft. Group changes are persisted with Settings **Apply**.
+Groups have their own icon and three colors. Members inherit them dynamically,
+including newly assigned and reopened projects. Removing a member or deleting its
+group restores that project's personal appearance. Group styling does not overwrite
+its personal icon files. Inherited values are edited in Project groups.
+
+Enable **Group tabs** to keep a group's open members together when project windows
+are merged. **↑ / ↓** sets group order. Each member can use **Auto** or a distinct
+fixed position within the group. For Tools = 1, Tools comes before Auto members;
+Auto members retain their relative order. Closed members remain editable and do not
+leave gaps while absent. Existing groups default to Group tabs off; new groups start on.
+
+Order is applied on merge. Later manual rearrangements remain available.
+**Restore Group Tab Order** in a window tab's context menu reapplies the saved order.
+
+## Quick actions
+
+**Tools → Project Tab Icons** and **Find Action** expose icon, icon color, outline
+color, tab color, preset switching and Settings. Configure shortcuts in **Keymap**.
+Quick editors apply their own changes immediately; inherited member styling is
+edited through its group.
 
 ## Icons and colors
 
@@ -62,7 +101,7 @@ SVG paths, with metadata for editing it later. The project's Icon color action
 also recolors text icons. **Choose icon → Apply** saves imported sets and icon
 assignments; Cancel discards the draft.
 
-The open-project table separates **Icon**, **Icon color**, **Outline color** and
+The open-project table separates **Project**, **Group**, **Icon**, **Icon color**, **Outline color** and
 **Tab color**. Keep colors matched to the icon or choose them independently.
 Pending project changes are saved together with Apply. An icon changed outside
 the settings is checked before replacement; reload the row when requested.
@@ -101,6 +140,7 @@ with cancellation, a delay and a timeout. This does not fetch or contact remotes
 The preview theme is temporary and does not change the IDE's theme. Appearance
 settings persist in `projectTabIcons.xml`; last Custom memory is saved in
 `projectTabIconsCustom.xml`, and named user presets in `projectTabIconsPresets.xml`.
+Groups and memberships persist locally in `projectTabIconsGroups.xml`.
 Project SVG icons use IDEA's native
 project icon storage. Turning customization off restores the native tab presentation
 while keeping selected settings and saved project icons.

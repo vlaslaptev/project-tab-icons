@@ -13,9 +13,9 @@ import java.util.Base64
 import java.util.Locale
 import java.util.UUID
 
-private const val MAX_SET_ICONS = 500
-private const val MAX_LIBRARY_BYTES = 16 * 1024 * 1024
-private const val MAX_LIBRARY_SETS = 50
+internal const val MAX_SET_ICONS = 500
+internal const val MAX_LIBRARY_BYTES = 16 * 1024 * 1024
+internal const val MAX_LIBRARY_SETS = 50
 
 internal data class ImportedIconSet(val id: String, val name: String, val icons: List<IconChoice>)
 internal data class IconSetImport(val set: ImportedIconSet, val skipped: List<String>, val duplicates: Int)
@@ -53,7 +53,8 @@ internal class IconSetLibrary : SerializablePersistentStateComponent<IconSetLibr
     }
 
     fun prepare(additions: List<ImportedIconSet>): IconSetLibraryState {
-        val existing = state.sets
+        require(additions.all { it.icons.size <= MAX_SET_ICONS }) { "Too many icons in a category." }
+        val existing = state.sets.filterNot { stored -> additions.any { it.id == stored.id } }
         require(existing.size + additions.size <= MAX_LIBRARY_SETS) { "The icon library can contain up to $MAX_LIBRARY_SETS imported categories." }
         val encoded = additions.map { set -> StoredIconSet(set.id, set.name, set.icons.map {
             StoredSetIcon(it.asset.label.substringBeforeLast(" · "), Base64.getEncoder().encodeToString(it.asset.bytes))

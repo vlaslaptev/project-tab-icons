@@ -1,6 +1,7 @@
 {
-  "version": "0.3.56",
+  "version": "0.3.62",
   "kind": "illustrations and compositions of real Settings screenshots",
+  "iconCountLabel": "100+",
   "files": [
     {
       "name": "hero-dark",
@@ -22,8 +23,8 @@
       "width": 1600,
       "height": 1000,
       "kind": "screenshot composition",
-      "pluginVersion": "0.3.56",
-      "description": "Real screenshot of Project Tab Icons 0.3.56 Settings in IntelliJ IDEA. Filled preset, Color controls, built-in Preview demo data. Cropped without redrawing UI pixels; presented on an illustrated frame.",
+      "pluginVersion": "0.3.62",
+      "description": "Real screenshot of Project Tab Icons 0.3.62 Settings in IntelliJ IDEA. Custom preset, Icon controls, built-in Preview demo data. Cropped without redrawing UI pixels; presented on an illustrated frame.",
       "capture": "captures/appearance-settings.png",
       "provenance": "captures/provenance.json"
     },
@@ -41,8 +42,8 @@
       "width": 1600,
       "height": 1000,
       "kind": "screenshot composition",
-      "pluginVersion": "0.3.56",
-      "description": "Real screenshot of Project Tab Icons 0.3.56 Settings in IntelliJ IDEA. Git preset, Tab layout controls, built-in Preview demo data. Cropped without redrawing UI pixels; presented on an illustrated frame.",
+      "pluginVersion": "0.3.62",
+      "description": "Real screenshot of Project Tab Icons 0.3.62 Settings in IntelliJ IDEA. Custom preset, Preview and presets controls, built-in Preview demo data. Cropped without redrawing UI pixels; presented on an illustrated frame.",
       "capture": "captures/git-settings.png",
       "provenance": "captures/provenance.json"
     },
@@ -53,6 +54,5 @@
       "height": 640,
       "kind": "illustration"
     }
-  ],
-  "iconCountLabel": "100+"
+  ]
 }
