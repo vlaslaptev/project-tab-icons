@@ -65,7 +65,7 @@
     "licenses/Gradle-Wrapper-Apache-2.0.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
     "licenses/JetBrains-Mono-OFL-1.1.txt": "30f0c136e3c88e422d0791acd97238870f9054a9729bc34cf2ff0d4ed8cac4ad",
     "licenses/Phosphor-MIT.txt": "b5b1f1da112d18ea2147decfd48ddc1bf2b5aeb6c265381579340e95b15a2bb2",
-    "repository.json": "8e5e7e722dd06c610f7439843f0c957cdf75ed0b362cdb984eea36cca1ceff1d",
+    "repository.json": "b0840511bb4f160875ee89b0b1632686bb1e83748dd62ac5035fe595539fa52f",
     "settings.gradle.kts": "c3b88464238fec3884189e003d13691aa86df86ac136565991ad4d83113fd26c",
     "src/main/kotlin/dev/vlas/projecttabicons/CenteredProjectIcon.kt": "4dabfab970caaf31f322bbef802762ba1f399f14cfe4cb17021c0c55cea0c38b",
     "src/main/kotlin/dev/vlas/projecttabicons/ContourCatalog.kt": "1fa2948469da2ead87f7e5c1f9e542cb38dcf8d56466a474c830de4cd27b9c28",
