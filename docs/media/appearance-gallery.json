@@ -9,8 +9,8 @@
   "selectedCount": 10,
   "layout": "one column",
   "canvasSize": [
-    1722,
-    2684
+    1598,
+    2481
   ],
   "windowSize": [
     1594,
@@ -27,7 +27,7 @@
     "High Contrast"
   ],
   "normalization": "Three recaptured windows were resized horizontally from 1658 to 1594 px; height remained 179 px. Other windows were cropped without resizing.",
-  "sha256": "5f2e5bed84d9d041596fac0be259113fc2f5c6be2939ad5f93d0f2f7211b2468",
+  "sha256": "b914f0f8fb431af30b13a09df937c14662c8af229d775a937772c495c8ea8678",
   "frames": [
     {
       "theme": "Islands Dark",
@@ -69,5 +69,6 @@
       "theme": "Islands Darcula",
       "captureSha256": "a1cf19946f6c0fadaefb81820700e2ad9b2375b9f760f9b897cd7ad748dc9b8f"
     }
-  ]
+  ],
+  "outerPaddingPx": 2
 }

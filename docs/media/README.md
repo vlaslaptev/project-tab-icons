@@ -2,8 +2,8 @@
 
 The README's main gallery, `appearance-gallery.png`, contains **ten real Preview
 frames** from installed **0.3.84/0.3.85**, captured on **21 October 2026**. All eight
-IDE themes are represented. Each window is 1594 × 179 px; the slide is 1722 × 2684 px
-in one column. Captions contain only theme names. The header describes hundreds of
+IDE themes are represented. Each window is 1594 × 179 px; the slide is 1598 × 2481 px
+in one column, with 2 px outer margins and no Project Tab Icons title. Captions contain only theme names. The header describes hundreds of
 possible combinations; ten screenshots illustrate a selection. The first frame uses
 the current custom appearance, High Contrast uses larger text and right-side icons,
 and Light includes the corrected tab palette. Three recaptures were normalized in
