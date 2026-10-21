@@ -46,6 +46,33 @@ internal class SettingsPageBody : JPanel(BorderLayout(0, JBUI.scale(20))), Scrol
 
 internal data class AppearanceField(val label: JBLabel?, val control: JComponent)
 
+/** Иконка/обводка рядом с разделителями; в узком Settings блоки идут друг под другом. */
+internal class SettingsAppearanceColumns(
+    private val availableWidth: () -> Int,
+    private val minimumColumnWidth: () -> Int,
+) : JPanel(null) {
+    private val gap = JBUI.scale(20)
+    init { isOpaque = false; border = JBUI.Borders.empty(12, 0, 0, 0) }
+    private fun twoColumns(): Boolean = availableWidth() >= minimumColumnWidth() * 2 + gap
+    fun columnWidth(): Int = if (twoColumns()) (availableWidth() - gap) / 2 else availableWidth()
+    override fun getPreferredSize(): Dimension {
+        val heights = components.map { it.preferredSize.height }
+        val height = if (twoColumns()) heights.maxOrNull() ?: 0 else heights.sum() + gap * (heights.size - 1).coerceAtLeast(0)
+        return Dimension(availableWidth(), height + insets.top + insets.bottom)
+    }
+    override fun doLayout() {
+        var y = insets.top
+        components.forEachIndexed { index, child ->
+            val childHeight = child.preferredSize.height
+            if (twoColumns()) child.setBounds(index * (columnWidth() + gap), y, columnWidth(), childHeight)
+            else {
+                child.setBounds(0, y, width, childHeight)
+                y += childHeight + gap
+            }
+        }
+    }
+}
+
 /** Два поля в строке только когда оба помещаются полностью; иначе одна колонка. */
 internal class SettingsAppearanceForm(
     private val master: JComponent,
@@ -87,7 +114,7 @@ internal class SettingsAppearanceForm(
     override fun getPreferredSize(): Dimension {
         val rows = (fields.size + columnCount(innerWidth()) - 1) / columnCount(innerWidth())
         return Dimension(fieldWidth * 2 + columnGap + insets.left + insets.right,
-            insets.top + masterHeight() + JBUI.scale(12) + rows * rowHeight +
+            insets.top + masterHeight() + (if (rows > 0) JBUI.scale(12) else 0) + rows * rowHeight +
                 (rows - 1).coerceAtLeast(0) * rowGap + insets.bottom)
     }
 
@@ -186,7 +213,7 @@ internal class SettingsPreviewHeader(
             else -> rowHeight * 3 + gap * 2
         })
     override fun doLayout() {
-        title.setBounds(0, 0, title.preferredSize.width, rowHeight)
+        title.setBounds(0, 0, title.preferredSize.width.coerceAtMost(width), rowHeight)
         when {
             width >= title.preferredSize.width + titleGap + themeWidth -> {
                 val x = width - themeWidth

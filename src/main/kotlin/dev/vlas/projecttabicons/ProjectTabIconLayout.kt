@@ -39,6 +39,7 @@ internal class ProjectTabIconLayout(
         iconBounds = null
         val center = borderLayout?.getLayoutComponent(parent, BorderLayout.CENTER) ?: return
         val insets = parent.insets
+        val groupMargins = ((parent as? JComponent)?.border as? ProjectTabBorder)?.groupMargins() ?: ProjectTabGroupMargins.NONE
         val left = insets.left.coerceAtLeast(0)
         val right = (parent.width - insets.right.coerceAtLeast(0)).coerceAtLeast(left)
         val top = insets.top.coerceAtLeast(0)
@@ -55,9 +56,9 @@ internal class ProjectTabIconLayout(
             top, closeWidth, contentHeight,
         )
 
-        projectIcon?.let { icon ->
+        visibleProjectIcon(parent)?.let { icon ->
             val gap = JBUI.scale(4)
-            val slotWidth = iconSlotWidth()
+            val slotWidth = iconSlotWidth(icon)
             // Оба внутренних слота резервируются парой. На слишком узкой вкладке
             // скрываем значок, оставляя место для крестика и названия.
             if (contentRight - contentLeft >= slotWidth * 2) {
@@ -79,16 +80,17 @@ internal class ProjectTabIconLayout(
             val gap = JBUI.scale(4)
             // У родного TabLabel правый inset больше левого. В свободном краю
             // оставляем одинаковое поле, учитывая защиту полной обводки.
-            val edgePadding = maxOf(gap, minOf(insets.left.coerceAtLeast(0), insets.right.coerceAtLeast(0)))
+            val edgePadding = maxOf(gap, minOf((insets.left - groupMargins.left).coerceAtLeast(0),
+                (insets.right - groupMargins.right).coerceAtLeast(0)))
             val titleLeft = when {
                 icon != null && position == TabIconPosition.LEFT -> icon.x + icon.width + gap
                 closeButtonPosition == TabCloseButtonPosition.LEFT -> left + closeWidth
-                else -> edgePadding
+                else -> groupMargins.left + edgePadding
             }
             val titleRight = when {
                 icon != null && position == TabIconPosition.RIGHT -> icon.x - gap
                 closeButtonPosition == TabCloseButtonPosition.RIGHT -> right - closeWidth
-                else -> parent.width - edgePadding
+                else -> parent.width - groupMargins.right - edgePadding
             }
             val availableWidth = (titleRight - titleLeft).coerceAtLeast(0)
             if (center is ProjectTabBranchCaption && center.hasExtraInfo) {
@@ -102,7 +104,7 @@ internal class ProjectTabIconLayout(
             // его содержимое, иначе сам текст остаётся сдвинутым внутри вкладки.
             val titleInsets = (center as? Container)?.insets
             val paddingOffset = (titleInsets?.left ?: 0) - (titleInsets?.right ?: 0)
-            val titleX = ((parent.width - titleWidth - paddingOffset) / 2)
+            val titleX = ((parent.width + groupMargins.left - groupMargins.right - titleWidth - paddingOffset) / 2)
                 .coerceIn(titleLeft, maxOf(titleLeft, titleRight - titleWidth))
             center.setBounds(titleX, top, titleWidth, contentHeight)
             return
@@ -153,7 +155,12 @@ internal class ProjectTabIconLayout(
         mirroredActionBorder = null
     }
 
-    private fun iconSlotWidth(): Int = projectIcon?.let { it.iconWidth + JBUI.scale(4) * 2 } ?: 0
+    private fun visibleProjectIcon(parent: Container): CenteredProjectIcon? {
+        val border = (parent as? JComponent)?.border as? ProjectTabBorder
+        return if (border != null) border.visibleProjectIcon() else projectIcon
+    }
+
+    private fun iconSlotWidth(icon: CenteredProjectIcon?): Int = icon?.let { it.iconWidth + JBUI.scale(4) * 2 } ?: 0
 
     override fun preferredLayoutSize(parent: Container): Dimension =
         withSlotWidths(parent, original.preferredLayoutSize(parent), minimum = false)
@@ -169,6 +176,6 @@ internal class ProjectTabIconLayout(
         val originalCloseWidth = if (close != null && close.isVisible) {
             (if (minimum) close.minimumSize.width else closeWidth).coerceAtLeast(0)
         } else 0
-        return Dimension(size.width - originalCloseWidth + closeWidth * 2 + iconSlotWidth() * 2, size.height)
+        return Dimension(size.width - originalCloseWidth + closeWidth * 2 + iconSlotWidth(visibleProjectIcon(parent)) * 2, size.height)
     }
 }

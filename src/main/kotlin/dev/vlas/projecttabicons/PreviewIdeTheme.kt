@@ -47,6 +47,10 @@ internal enum class PreviewIdeTheme(val title: String, private val themeId: Stri
                 JBUI.getInt("Island.arc", 10),
                 chrome = chromePalette({ key, fallback -> JBColor.namedColor(key, fallback) },
                     EditorColorsManager.getInstance().globalScheme), nativeClose = true,
+                groupSeparatorColor = neutralGroupSeparatorColor,
+                hoverBackground = if (islands) JBColor.namedColor("MainWindow.Tab.hoverBackground",
+                    JBColor.namedColor("MainToolbar.Dropdown.transparentHoverBackground"))
+                    else JBUI.CurrentTheme.MainWindow.Tab.background(false, false, true),
             )
         }
         cached?.let { return it }
@@ -82,9 +86,27 @@ internal enum class PreviewIdeTheme(val title: String, private val themeId: Stri
             chrome = chromePalette(::color, theme.editorSchemeId?.let {
                 EditorColorsManager.getInstance().getScheme(it)
             }),
+            groupSeparatorColor = groupSeparatorNeutralColor(::color),
+            hoverBackground = color("MainWindow.Tab.hoverBackground",
+                color("MainToolbar.Dropdown.transparentHoverBackground", strip)),
         )
-        cached = result
-        return result
+        // У Light штатные оконные табы чёрные, как её тёмная шапка. В Preview
+        // показываем светлую полосу табов, сохраняя toolbar и editor самой Light.
+        val preview = if (this == LIGHT) {
+            val lightTabs = LIGHT_HEADER.palette()
+            result.copy(
+                stripBackground = lightTabs.stripBackground,
+                selectedBackground = lightTabs.selectedBackground,
+                background = lightTabs.background,
+                selectedForeground = lightTabs.selectedForeground,
+                foreground = lightTabs.foreground,
+                closeColor = lightTabs.closeColor,
+                groupSeparatorColor = lightTabs.groupSeparatorColor,
+                hoverBackground = lightTabs.hoverBackground,
+            )
+        } else result
+        cached = preview
+        return preview
     }
 }
 
@@ -98,7 +120,9 @@ internal data class PreviewThemePalette(
     val islands: Boolean,
     val arc: Int,
     val chrome: PreviewChromePalette,
+    val groupSeparatorColor: Color,
     val nativeClose: Boolean = false,
+    val hoverBackground: Color = background,
 ) {
     fun geometry(width: Int, height: Int): ProjectTabGeometry = projectTabGeometry(width, height, islands, arc)
 }

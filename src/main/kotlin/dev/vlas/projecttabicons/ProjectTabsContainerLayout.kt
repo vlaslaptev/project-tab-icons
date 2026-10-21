@@ -10,6 +10,7 @@ import java.awt.LayoutManager2
 internal class ProjectTabsContainerLayout(
     val original: LayoutManager2,
     var tabHeight: Int,
+    var groupLayout: ProjectTabGroupLayout? = null,
 ) : LayoutManager2 by original {
     override fun preferredLayoutSize(parent: Container): Dimension = withTabHeight(parent, original.preferredLayoutSize(parent))
 
@@ -22,7 +23,7 @@ internal class ProjectTabsContainerLayout(
             label?.layout?.preferredLayoutSize(label)?.height ?: 0
         } ?: 0
         val requestedHeight = JBUI.scale(tabHeight.coerceIn(DEFAULT_TAB_HEIGHT, MAX_TAB_HEIGHT))
-        val height = maxOf(requestedHeight, contentHeight) + parent.insets.top + parent.insets.bottom
+        val height = maxOf(requestedHeight, contentHeight, groupLayout?.minimumTabHeight() ?: 0) + parent.insets.top + parent.insets.bottom
         return Dimension(size.width, maxOf(size.height, height))
     }
 }

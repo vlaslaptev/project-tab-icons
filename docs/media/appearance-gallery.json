@@ -1,0 +1,73 @@
+{
+  "capturedOn": "2026-10-21",
+  "kind": "composition of real installed Settings Preview screenshots",
+  "pluginVersions": [
+    "0.3.84",
+    "0.3.85"
+  ],
+  "captureCount": 50,
+  "selectedCount": 10,
+  "layout": "one column",
+  "canvasSize": [
+    1722,
+    2684
+  ],
+  "windowSize": [
+    1594,
+    179
+  ],
+  "themes": [
+    "Islands Dark",
+    "Islands Light",
+    "Islands Darcula",
+    "Dark",
+    "Light",
+    "Light with Light Header",
+    "Darcula",
+    "High Contrast"
+  ],
+  "normalization": "Three recaptured windows were resized horizontally from 1658 to 1594 px; height remained 179 px. Other windows were cropped without resizing.",
+  "sha256": "5f2e5bed84d9d041596fac0be259113fc2f5c6be2939ad5f93d0f2f7211b2468",
+  "frames": [
+    {
+      "theme": "Islands Dark",
+      "captureSha256": "63e0a7e2433239df9af39e53ab76b18cec5be4ebf19b5bb85245263b8fe40445"
+    },
+    {
+      "theme": "Islands Light",
+      "captureSha256": "ceca2167600a277b443013a259638201cf04c8ce5d7f26406891c46a7dfdb5a9"
+    },
+    {
+      "theme": "Islands Dark",
+      "captureSha256": "ea75fa3e605c7f9bd380999fc3ff41bf9d6193d41c0acf169976c503ee9bc500"
+    },
+    {
+      "theme": "Islands Light",
+      "captureSha256": "0c0b305307c9c72ad0873dbc91916d9e0043b28abc49ebc3f91e45a8b3a608e8"
+    },
+    {
+      "theme": "Dark",
+      "captureSha256": "812f779214a1482a1aecf8f98b93c3f1584555116f1eb7d30958767e8d6893a4"
+    },
+    {
+      "theme": "High Contrast",
+      "captureSha256": "c00a860b7609c3171610454a6746d60d228901034154f0ef776ad116fdd4fdbd"
+    },
+    {
+      "theme": "Darcula",
+      "captureSha256": "3a895b7a49a207a0375408b6b04bd4006d46303fefd6de8c346d23a43f5c2c5f"
+    },
+    {
+      "theme": "Light with Light Header",
+      "captureSha256": "070b3099ac9d7fb14bfab619c1e7a6b61e13c783e2814d72cdd1cf8a0171fb22"
+    },
+    {
+      "theme": "Light",
+      "captureSha256": "0250b8874ef27af10028d04263172891f23c9bd6d557c1de01db9bb999d4beb3"
+    },
+    {
+      "theme": "Islands Darcula",
+      "captureSha256": "a1cf19946f6c0fadaefb81820700e2ad9b2375b9f760f9b897cd7ad748dc9b8f"
+    }
+  ]
+}

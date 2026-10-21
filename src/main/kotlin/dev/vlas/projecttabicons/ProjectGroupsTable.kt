@@ -30,27 +30,21 @@ import javax.swing.SwingUtilities
 /** Те же колонки и реальные Swing-контролы, что у проектов; форма редактирования — часть строки. */
 internal class ProjectGroupsTable(
     private val selectedProjects: () -> Set<String>,
-    private val save: (String?, String, Set<String>, Boolean, Map<String, Int>) -> String?,
+    private val save: (String?, String, Set<String>, Map<String, Int>) -> String?,
     private val delete: (String) -> Unit,
     private val assign: (String) -> Unit,
     private val move: (String, Int) -> Unit,
-    private val groupTabs: (String, Boolean) -> Unit,
     private val showProjects: (String) -> Unit,
     private val chooseIcon: (String) -> Unit,
     private val chooseColor: (String, ProjectColorTarget) -> Unit,
     private val editingChanged: () -> Unit,
 ) : JPanel(BorderLayout()) {
     private class Input(val id: String?, name: String, val projects: MutableSet<String>, val knownKeys: MutableSet<String>,
-                        grouping: Boolean, val positions: MutableMap<String, Int>) {
+                        val positions: MutableMap<String, Int>) {
         val nameField = JBTextField(name).apply {
             emptyText.text = "Group name"
             accessibleContext.accessibleName = if (id == null) "New project group name" else "Edit project group name"
             putClientProperty("projectGroupControl", "name")
-        }
-        val groupTabs = JBCheckBox("Group tabs", grouping).apply {
-            isOpaque = false
-            toolTipText = "Keep this group's tabs together when windows are merged. Manual moves remain available afterwards."
-            accessibleContext.accessibleName = "Group tabs when merging windows"
         }
         var error: String? = null
     }
@@ -72,7 +66,7 @@ internal class ProjectGroupsTable(
         accessibleContext.accessibleName = "Project groups table"
         setColumnHeaderView(JPanel(columns.layout(header = true)).apply {
             isOpaque = false
-            listOf("Group", "Group tabs", "Icon", "Icon color", "Outline color", "Tab color", "Actions").forEach { add(settingsHint(it)) }
+            listOf("Group", "Projects", "Icon", "Icon color", "Outline color", "Tab color", "Actions").forEach { add(settingsHint(it)) }
             border = JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 0)
         })
     }
@@ -123,9 +117,8 @@ internal class ProjectGroupsTable(
         val keys = (projects.map { it.key } + state.memberships.filterValues { it == id }.keys).toMutableSet()
         input = Input(id, group?.name.orEmpty(), if (id == null) selectedProjects().intersect(keys).toMutableSet()
             else state.memberships.filterValues { it == id }.keys.toMutableSet(), keys,
-            group?.groupTabs ?: true, group?.memberPositions.orEmpty().toMutableMap()).also { pending ->
+            group?.memberPositions.orEmpty().toMutableMap()).also { pending ->
             pending.nameField.addActionListener { submit() }
-            pending.groupTabs.addItemListener { editingChanged() }
         }
         memberScroll = null
         refresh(focusName = true)
@@ -136,7 +129,7 @@ internal class ProjectGroupsTable(
         val pending = input ?: return
         input = null
         val error = save(pending.id, pending.nameField.text.trim(), pending.projects.toSet(),
-            pending.groupTabs.isSelected, pending.positions.toMap())
+            pending.positions.toMap())
         if (error != null) { pending.error = error; input = pending }
         else memberScroll = null
         refresh(focusName = error != null)
@@ -195,7 +188,7 @@ internal class ProjectGroupsTable(
             }
         }
     }
-    private fun identity(group: ProjectTabGroup, members: List<ProjectIconSettingsRow>): JComponent = JPanel(BorderLayout(0, JBUI.scale(3))).apply {
+    private fun identity(group: ProjectTabGroup): JComponent = JPanel(BorderLayout(0, JBUI.scale(3))).apply {
         isOpaque = false
         add(register(SettingsValueButton(settingsLiteral(group.name)).apply {
             accessibleContext.accessibleName = "Show projects in group ${group.name}"
@@ -203,21 +196,14 @@ internal class ProjectGroupsTable(
             putClientProperty("projectGroupControl", "${group.id}/projects")
             addActionListener { showProjects(group.id) }
         }), BorderLayout.NORTH)
-        val total = state.memberships.count { it.value == group.id }
-        add(settingsHint("${members.size} open" + if (total != members.size) " · $total total" else "").apply {
-            border = JBUI.Borders.emptyLeft(8)
-        }, BorderLayout.SOUTH)
     }
     private fun groupRow(group: ProjectTabGroup, members: List<ProjectIconSettingsRow>): JComponent = ProjectRowPanel(columns.layout()).apply {
         accessibleContext.accessibleName = "Project group ${group.name}"
-        add(identity(group, members))
-        add(register(JBCheckBox("", group.groupTabs).apply {
-            isOpaque = false
-            accessibleContext.accessibleName = "Group tabs for ${group.name} when merging windows"
-            toolTipText = "Group tabs on merge; restore the saved order from the tab context menu"
-            SettingsPendingChange(this).update(baseline.groups.firstOrNull { it.id == group.id }?.groupTabs != group.groupTabs)
-            addItemListener { if (editingEnabled) groupTabs(group.id, isSelected) }
-        }, input == null))
+        add(identity(group))
+        val total = state.memberships.count { it.value == group.id }
+        add(settingsHint("${members.size} open" + if (total != members.size) " · $total total" else "").apply {
+            toolTipText = "Group members are arranged together on the left when windows merge"
+        })
         addAppearance(this, group, enabled = true)
         add(JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)).apply {
             isOpaque = false
@@ -249,7 +235,7 @@ internal class ProjectGroupsTable(
                     add(register(pending.nameField), BorderLayout.NORTH)
                     add(settingsHint("Name · 40 max"), BorderLayout.SOUTH)
                 })
-                add(register(pending.groupTabs))
+                add(settingsHint("Select below"))
                 addAppearance(this, group, enabled = false)
                 add(settingsHint(if (group == null) "New group" else "Editing…"))
             }, BorderLayout.NORTH)
@@ -294,7 +280,7 @@ internal class ProjectGroupsTable(
                             addActionListener { cancelInput() }
                         }))
                     }, BorderLayout.NORTH)
-                    add(settingsHint("Positions apply on merge or Restore Group Tab Order · Saved with Settings Apply"), BorderLayout.SOUTH)
+                    add(settingsHint("Grouped tabs go on the left on merge or Arrange Tabs by Group · Save with Settings Apply"), BorderLayout.SOUTH)
                 }, BorderLayout.SOUTH)
             }, BorderLayout.CENTER)
         }
@@ -340,7 +326,7 @@ internal class ProjectGroupsTable(
                 add(JPanel(FlowLayout(FlowLayout.RIGHT, JBUI.scale(6), 0)).apply {
                     isOpaque = false
                     add(settingsHint("Position:"))
-                    add(registerWhen(position) { pending.groupTabs.isSelected && include.isSelected })
+                    add(registerWhen(position) { include.isSelected })
                 }, BorderLayout.EAST)
                 maximumSize = Dimension(Int.MAX_VALUE, preferredSize.height)
             })

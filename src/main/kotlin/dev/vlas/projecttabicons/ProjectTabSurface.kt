@@ -14,7 +14,11 @@ import java.awt.RenderingHints
 import javax.swing.SwingUtilities
 import kotlin.math.roundToInt
 
-internal data class ProjectTabSurfaceColors(val strip: Color, val background: Color)
+internal data class ProjectTabSurfaceColors(
+    val strip: Color,
+    val background: Color,
+    val idleBackground: Color = strip,
+)
 
 /** Сначала смешиваем цвета, затем один раз сглаживаем внешний контур. */
 internal object ProjectTabSurface {
@@ -44,7 +48,13 @@ internal object ProjectTabSurface {
         } finally { g.dispose() }
     }
 
-    private fun blend(background: Color, foreground: Color, opacity: Float = 1f): Color {
+    fun blend(background: Color, foreground: Color, opacity: Float = 1f): Color {
+        // JBColor хранит не только RGB, но и имя цвета темы. Islands распознаёт
+        // MainWindow.background по этому имени: рисует градиент и не уменьшает
+        // его opacity у неактивного окна. Потеря имени оставляет старую подложку
+        // вкладки под полупрозрачной очисткой, особенно в отступе после группы.
+        if (foreground.alpha == 0 || opacity <= 0f) return background
+        if (foreground.alpha == 255 && opacity >= 1f) return foreground
         val alpha = foreground.alpha / 255.0 * opacity
         fun channel(back: Int, front: Int) = (back + (front - back) * alpha).roundToInt().coerceIn(0, 255)
         return Color(channel(background.red, foreground.red), channel(background.green, foreground.green),
@@ -59,7 +69,10 @@ internal fun nativeProjectTabSurfaceColors(component: Component): ProjectTabSurf
     val window = SwingUtilities.getWindowAncestor(tabs)
     val selected = label.info.`object` === window
     val strip = tabs.tabPainter.getBackgroundColor()
-    val background = if (ExperimentalUI.isNewUI() && IslandsState.isEnabled()) {
+    val islands = ExperimentalUI.isNewUI() && IslandsState.isEnabled()
+    val inactive = window != null && !window.isActive
+    val idle = if (islands) strip else JBUI.CurrentTheme.MainWindow.Tab.background(false, inactive, false)
+    val background = if (islands) {
         // В SDK 262 Islands обычный таб прозрачен, выбранный/hover имеют свою подложку.
         when {
             selected -> JBColor.namedColor("MainWindow.Tab.selectedBackground", JBUI.CurrentTheme.ToolWindow.background())
@@ -67,8 +80,8 @@ internal fun nativeProjectTabSurfaceColors(component: Component): ProjectTabSurf
                 JBColor.namedColor("MainToolbar.Dropdown.transparentHoverBackground"))
             else -> strip
         }
-    } else JBUI.CurrentTheme.MainWindow.Tab.background(selected, window != null && !window.isActive, label.isHovered)
-    return ProjectTabSurfaceColors(strip, background)
+    } else JBUI.CurrentTheme.MainWindow.Tab.background(selected, inactive, label.isHovered)
+    return ProjectTabSurfaceColors(strip, background, idle)
 }
 
 /** Возвращаем линии Classic UI поверх собранной подложки, до пользовательской обводки. */

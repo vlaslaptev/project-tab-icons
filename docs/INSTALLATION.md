@@ -6,7 +6,7 @@ branch. Check the full build number under **Help → About**. The declared range
 
 ## Install from a GitHub release
 
-1. Open [Releases](https://github.com/vlaslaptev/project-tab-icons/releases/tag/v0.3.62) and download [project-tab-icons-0.3.62.zip](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.62/project-tab-icons-0.3.62.zip).
+1. Open [Releases](https://github.com/vlaslaptev/project-tab-icons/releases/tag/v0.3.85) and download [project-tab-icons-0.3.85.zip](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.85/project-tab-icons-0.3.85.zip).
    Use the plugin ZIP attached to the release, rather than GitHub's source-code archive.
 2. In IDEA, open **Settings → Plugins**.
 3. Use the gear menu and select **Install Plugin from Disk…**.

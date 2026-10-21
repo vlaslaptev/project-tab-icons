@@ -25,12 +25,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.IdentityHashMap
 
-/** Чистый расчёт: один блок групп на месте первого участника, остальные вкладки сохраняют взаимный порядок. */
+/** Группы слева в порядке таблицы, остальные вкладки сохраняют взаимный порядок справа. */
 internal fun <T : Any> orderedProjectGroupTabs(tabs: List<T>, state: ProjectGroupsState, key: (T) -> String?): List<T> {
-    val enabled = state.groups.filter { it.groupTabs }
-    val grouped = tabs.filter { tab -> enabled.any { it.id == state.memberships[key(tab)] } }.toSet()
+    val grouped = tabs.filter { state.groupFor(key(it).orEmpty()) != null }.toSet()
     if (grouped.isEmpty()) return tabs
-    val block = enabled.flatMap { group ->
+    val block = state.groups.flatMap { group ->
         val members = tabs.filter { state.memberships[key(it)] == group.id }
         val slots = MutableList<T?>(members.size) { null }
         val pinned = members.filter { key(it) in group.memberPositions }.sortedBy { group.memberPositions[key(it)] }
@@ -44,17 +43,14 @@ internal fun <T : Any> orderedProjectGroupTabs(tabs: List<T>, state: ProjectGrou
         val automatic = members.filterNot { it in pinned }.iterator()
         slots.map { it ?: automatic.next() }
     }
-    var inserted = false
-    return buildList {
-        tabs.forEach { tab ->
-            if (tab !in grouped) add(tab)
-            else if (!inserted) { addAll(block); inserted = true }
-        }
-    }
+    return block + tabs.filterNot { it in grouped }
 }
 
 /** Реагирует на объединение состава окон, а не на перетаскивания и обычные refresh оформления. */
-internal class ProjectTabGroupOrdering(private val scope: CoroutineScope) : Disposable {
+internal class ProjectTabGroupOrdering(
+    private val scope: CoroutineScope,
+    private val orderRestored: (WindowTabsComponent, Boolean) -> Unit = { _, _ -> },
+) : Disposable {
     private data class Bar(val tabs: WindowTabsComponent, val frames: List<IdeFrameImpl>) {
         val members = frames.toSet()
     }
@@ -67,6 +63,7 @@ internal class ProjectTabGroupOrdering(private val scope: CoroutineScope) : Disp
     private var merged = false
     private val pending = mutableSetOf<Set<IdeFrameImpl>>()
     private val inFlight = mutableSetOf<Set<IdeFrameImpl>>()
+    val isOrdering: Boolean get() = merged || pending.isNotEmpty() || inFlight.isNotEmpty()
     private var job: Job? = null
     @Volatile private var disposed = false
     @Volatile private var generation = 0L
@@ -104,29 +101,34 @@ internal class ProjectTabGroupOrdering(private val scope: CoroutineScope) : Disp
             withContext(Dispatchers.EDT) {
                 if (disposed) return@withContext
                 val requested = pending.toSet(); pending.clear()
-                bars.distinctBy { it.members }.filter { it.members in requested }.forEach(::restoreOrder)
+                bars.distinctBy { it.members }.filter { it.members in requested }.forEach { restoreOrder(it) }
             }
         }
     }
 
     private fun installMenu(tabs: WindowTabsComponent) {
-        if (tabs in menus) return
+        // TabLabel открывает popupGroup самой полосы по правому клику на вкладке.
+        // IDEA может заменить группу при перестройке UI: подключаем действие заново.
+        if (menus[tabs]?.installed === tabs.popupGroup) return
         val original = tabs.popupGroup ?: return
-        val restore = object : DumbAwareAction("Restore Group Tab Order") {
+        // Штатное меню WindowTabsComponent — DefaultActionGroup. SDK 262 запрещает getChildren(null).
+        val children = (original as? DefaultActionGroup)?.childActionsOrStubs ?: return
+        val restore = object : DumbAwareAction("Arrange Tabs by Group") {
             override fun getActionUpdateThread() = ActionUpdateThread.EDT
             override fun update(event: AnActionEvent) {
                 val state = ApplicationManager.getApplication().getService(ProjectGroups::class.java).state
                 event.presentation.isEnabled = !disposed && tabs.tabCount > 1 && tabs.tabs.any { tab ->
-                    keys[tab.`object`]?.let(state::groupFor)?.groupTabs == true
+                    keys[tab.`object`]?.let(state::groupFor) != null
                 }
-                event.presentation.description = "Restore group order and fixed member positions for this window's tabs"
+                event.presentation.description = "Arrange grouped tabs on the left and restore their group appearance"
             }
             override fun actionPerformed(event: AnActionEvent) {
-                bars.firstOrNull { it.tabs === tabs }?.let(::restoreOrder)
+                bars.firstOrNull { it.tabs === tabs }?.let { restoreOrder(it, explicit = true) }
             }
         }
         val wrapper = DefaultActionGroup().apply {
-            add(original)
+            // Штатные Close / Move / Show All остаются на том же уровне меню.
+            children.forEach { add(it) }
             addSeparator(); add(restore)
         }
         val place = tabs.popupPlace ?: ActionPlaces.POPUP
@@ -134,7 +136,7 @@ internal class ProjectTabGroupOrdering(private val scope: CoroutineScope) : Disp
         tabs.setPopupGroup(wrapper, place, false)
     }
 
-    private fun restoreOrder(snapshot: Bar) {
+    private fun restoreOrder(snapshot: Bar, explicit: Boolean = false) {
         // Снимок refresh не обязан совпадать с порядком после последнего ручного DnD.
         val live = snapshot.tabs.tabs.mapNotNull { it.`object` as? IdeFrameImpl }
         if (live.size != snapshot.tabs.tabCount || live.toSet() != snapshot.members) return
@@ -142,10 +144,17 @@ internal class ProjectTabGroupOrdering(private val scope: CoroutineScope) : Disp
         if (disposed || !inFlight.add(bar.members)) return
         val state = ApplicationManager.getApplication().getService(ProjectGroups::class.java).state
         val desired = orderedProjectGroupTabs(bar.frames, state) { keys[it] }
-        if (desired == bar.frames) { inFlight.remove(bar.members); return }
+        if (desired == bar.frames && bars.filter { it.members == bar.members }.all { current ->
+                current.tabs.tabs.map { it.`object` } == desired
+            }) {
+            inFlight.remove(bar.members)
+            bars.filter { it.members == bar.members }.forEach { orderRestored(it.tabs, explicit) }
+            return
+        }
         val synchronizer = try { reorder } catch (error: Exception) {
             inFlight.remove(bar.members)
             LOG.warn("Project window tab ordering is unavailable in this IDE build", error)
+            bars.filter { it.members == bar.members }.forEach { orderRestored(it.tabs, false) }
             return
         }
         val token = generation
@@ -180,16 +189,28 @@ internal class ProjectTabGroupOrdering(private val scope: CoroutineScope) : Disp
             } catch (error: Exception) { LOG.warn("Cannot restore project group tab order", error) }
             finally {
                 ApplicationManager.getApplication().invokeLater {
-                    inFlight.remove(bar.members)
-                    if (applied && !disposed && token == generation) {
-                        val indexes = desired.withIndex().associate { it.value to it.index }
-                        try {
+                    var allCopiesSynchronized = false
+                    try {
+                        if (applied && !disposed && token == generation) {
+                            val indexes = desired.withIndex().associate { it.value to it.index }
                             bars.filter { it.members == bar.members }.forEach { current ->
                                 val liveMembers = current.tabs.tabs.mapNotNull { it.`object` as? IdeFrameImpl }
-                                if (liveMembers.size == current.tabs.tabCount && liveMembers.toSet() == bar.members)
+                                if (liveMembers.size == current.tabs.tabCount && liveMembers.toSet() == bar.members) {
                                     synchronizer.invoke(current.tabs, indexes)
+                                }
                             }
-                        } catch (error: Exception) { LOG.warn("Cannot synchronize project window tab order", error) }
+                            val currentBars = bars.filter { it.members == bar.members }
+                            allCopiesSynchronized = currentBars.isNotEmpty() && currentBars.all { current ->
+                                current.tabs.tabs.map { it.`object` } == desired
+                            }
+                        }
+                    } catch (error: Exception) { LOG.warn("Cannot synchronize project window tab order", error) }
+                    finally {
+                        // DnD-события во время синхронизации копий полосы не являются ручным разрывом.
+                        if (token == generation) inFlight.remove(bar.members)
+                        if (!disposed && token == generation) bars.filter { it.members == bar.members }.forEach {
+                            orderRestored(it.tabs, explicit && allCopiesSynchronized)
+                        }
                     }
                 }
             }
@@ -203,7 +224,7 @@ internal class ProjectTabGroupOrdering(private val scope: CoroutineScope) : Disp
 
     fun reset() {
         generation++
-        job?.cancel(); job = null; pending.clear()
+        job?.cancel(); job = null; pending.clear(); inFlight.clear()
         menus.keys.toList().forEach(::restoreMenu)
         bars = emptyList(); keys = emptyMap(); previous = emptySet(); observed = false; merged = false
     }

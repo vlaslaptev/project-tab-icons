@@ -1,5 +1,5 @@
 {
-  "version": "0.3.62",
+  "version": "0.3.85",
   "kind": "illustrations and compositions of real Settings screenshots",
   "iconCountLabel": "100+",
   "files": [
@@ -53,6 +53,15 @@
       "width": 1280,
       "height": 640,
       "kind": "illustration"
+    },
+    {
+      "name": "appearance-gallery",
+      "title": "8 IDE themes · Hundreds of appearance combinations",
+      "width": 1722,
+      "height": 2684,
+      "kind": "screenshot composition",
+      "provenance": "appearance-gallery.json",
+      "description": "Ten real Preview frames in one column, all with the same window dimensions."
     }
   ]
 }

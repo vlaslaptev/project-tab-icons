@@ -74,16 +74,19 @@ intentional part of the implementation. See [compatibility](COMPATIBILITY.md).
 
 ## Group appearance and window ordering
 
-`ProjectGroups` persists group icons, independent colors, memberships, grouping flags
-and member positions in local application state. The settings page holds a draft;
+`ProjectGroups` persists group icons, independent colors, memberships and member positions in local application state. The settings page holds a draft;
 Apply saves it. `GroupAppearanceIcons` prepares inherited SVGs off the UI thread
 with bounded validation and caching. Effective group appearance overlays personal
 project styling, so ungrouping does not need to rewrite project icon files.
 
 `ProjectTabGroupOrdering` observes merged strip membership. A changed order alone
-never triggers sorting. New merges are coalesced, groups follow their table order,
-fixed positions reserve slots and Auto members retain relative order. Restore Group
-Tab Order reads the current live strip and latest persisted group state.
+never triggers sorting. New merges are coalesced. All groups go on the left in table order; ungrouped tabs
+retain relative order on the right. Fixed positions reserve slots within a group
+and Auto members retain relative order. Arrange Tabs by Group uses the same
+calculation with the current live strip and latest persisted group state. The legacy
+groupTabs field remains readable for XML compatibility but no longer gates ordering.
+Native menu actions are copied through DefaultActionGroup.childActionsOrStubs;
+getChildren(null) is not used.
 
 On the AppKit main thread, the implementation validates the native window set,
 reorders it within its tab group and preserves the selected window. It then updates
@@ -94,3 +97,59 @@ the narrow compatibility scope, rather than a promise of cross-version stability
 
 The table block follows the Settings viewport height. The member list retains a
 minimum height so layout cannot collapse it in a short window; long content scrolls.
+
+## Group layout
+
+Since 0.3.68, Outline gap and Corner radius are independently configurable from
+0 to 12 px, with defaults of 2 and 6 for older XML/JSON. A zero radius draws a
+straight underline, including at 1 px thickness with no gap. Before 0.3.69, track
+height included thickness, gap and radius; the geometry cache accounts for scaled
+radius/bounds.
+Since 0.3.69, reserved track height is only thickness plus gap, scaled separately.
+The path starts one radius above that track so its ends curve upward; the straight
+stroke starts exactly at tab bottom plus gap. Increasing radius no longer moves
+the underline away from the tabs. Both controls are included in settings drafts,
+Custom, user presets and JSON.
+Built-in tab presets preserve all five Group layout parameters.
+
+Since 0.3.66, opaque colors and zero-opacity blends retain the original Color
+object. Islands uses `JBColor.name` to recognize gradient backgrounds and keep
+background clearing opaque when a window is inactive. Converting an opaque named
+color into a plain RGB Color lost that information and left the old selected-tab
+shape visible behind the inset body. Only actual color mixtures create a new RGB
+value; the plugin does not change the IDE's graphics wrappers or focus behavior.
+
+The fourth appearance card stores group spacing and an optional shared outline in
+`TabAppearanceState`, including preset drafts and JSON style bundles. Missing fields
+preserve zero spacing and no group outline. `ProjectTabGroupLayout` splits extra
+visual spacing between adjacent TabLabel insets; native tab slots, hit areas and
+drop indexes stay intact. The border reconstructs the strip background in these
+margins and the icon layout centers content within the remaining body.
+
+A disposable glass-pane painter draws a rounded underline using the group's
+outline color or icon color. Since 0.3.67, it has a separate track below the tab
+bodies, a 2 px gap and independent 1–6 px thickness. The container layout reserves
+space outside WindowTabsComponent and the painter is anchored to that container;
+group decoration does not require repainting every tab's native background.
+Individual tab outlines and
+fills remain visible. The track stays reserved when a group is split to avoid
+height changes during dragging. Built-in tab presets preserve Group layout;
+user presets and JSON bundles still store the complete appearance.
+
+Group ranges and neighboring boundaries are cached by TabInfo and rebuilt on
+order/membership changes, refresh and relevant scale/settings changes. Tab move,
+removal and selection events keep the snapshot current; unchanged selection
+events skip layout. A split hides the entire group's line. Only open members in
+that strip count, and merge/Arrange explicitly refresh every synchronized strip.
+Group and tab outline paths/strokes are reused until geometry or style changes;
+group painting shares one Graphics2D copy and border updates coalesce layout
+requests. No performance percentage has been measured.
+
+Disposal restores native borders/layouts and removes the painter/listener.
+Settings Preview uses the same group path/track geometry; Frontend and Backend
+form a group and Tools is ungrouped. Earlier 0.3.65 spacing/toggle checks passed;
+the 0.3.67 changes were subsequently checked in installed 0.3.68: Tools and group
+thickness at 1/6 px, Filled with independent tab/group outlines, and gap/radius at
+0/12 px in Preview and native tabs. Installed JARs match the ZIP and original
+settings were restored byte for byte. Manual drag splitting, the context command
+and inactive-window transitions were skipped due to native-tab input limitations.

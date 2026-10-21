@@ -63,6 +63,22 @@ internal enum class TabBranchPosition(private val title: String) {
 // WindowTabsComponent в целевом SDK использует 30 логических пикселей.
 internal const val DEFAULT_TAB_HEIGHT = 30
 internal const val MAX_TAB_HEIGHT = DEFAULT_TAB_HEIGHT * 2
+internal const val MAX_GROUP_SPACING = 32
+internal const val DEFAULT_GROUP_SEPARATOR_HEIGHT = 60
+
+internal enum class GroupHighlightStyle(private val title: String) {
+    BACKGROUND("Shared background"), JOINED("Joined tabs"),
+    // Только для чтения XML/JSON 0.3.80. После загрузки заменяются на BACKGROUND.
+    CLASSIC("Classic outline"), BADGE("Group badge");
+
+    fun normalized(): GroupHighlightStyle = if (this == JOINED) JOINED else BACKGROUND
+    override fun toString(): String = title
+}
+
+internal enum class GroupSeparatorColor(private val title: String) {
+    NEUTRAL("Neutral"), GROUP("Group color");
+    override fun toString(): String = title
+}
 
 internal const val MIN_OUTLINE_THICKNESS = 1
 internal const val MAX_OUTLINE_THICKNESS = 6
@@ -124,11 +140,28 @@ internal data class TabAppearanceState(
     @field:OptionTag @JvmField val iconLetterWeight: TabIconLetterWeight = TabIconLetterWeight.BOLD,
     // Пользовательский пресет использует стабильный ID, не расширяя сохранённый enum.
     @field:OptionTag @JvmField val userPresetId: String? = null,
+    @field:OptionTag @JvmField val groupSpacing: Int = 0,
+    @field:OptionTag @JvmField val showGroupOutline: Boolean = false,
+    @field:OptionTag @JvmField val groupHighlightStyle: GroupHighlightStyle = GroupHighlightStyle.BACKGROUND,
+    @field:OptionTag @JvmField val groupBackground: GroupHighlightOptions = GroupHighlightOptions(),
+    @field:OptionTag @JvmField val groupJoined: GroupHighlightOptions = GroupHighlightOptions(),
+    @field:OptionTag @JvmField val showGroupSeparator: Boolean = false,
+    @field:OptionTag @JvmField val groupSeparatorThickness: Int = 1,
+    @field:OptionTag @JvmField val groupSeparatorHeight: Int = DEFAULT_GROUP_SEPARATOR_HEIGHT,
+    @field:OptionTag @JvmField val groupSeparatorColor: GroupSeparatorColor = GroupSeparatorColor.NEUTRAL,
+    @field:OptionTag @JvmField val showGroupIcon: Boolean = false,
+    @field:OptionTag @JvmField val hideGroupedTabIcons: Boolean = false,
 ) {
     fun normalized(): TabAppearanceState = copy(
         userPresetId = userPresetId?.trim()?.takeIf { it.isNotEmpty() && it.length <= 64 },
         outlineThickness = outlineThickness.coerceIn(MIN_OUTLINE_THICKNESS, MAX_OUTLINE_THICKNESS),
         tabHeight = tabHeight.coerceIn(DEFAULT_TAB_HEIGHT, MAX_TAB_HEIGHT),
+        groupSpacing = groupSpacing.coerceIn(0, MAX_GROUP_SPACING),
+        groupHighlightStyle = groupHighlightStyle.normalized(),
+        groupBackground = groupBackground.normalized(),
+        groupJoined = groupJoined.normalized(),
+        groupSeparatorThickness = groupSeparatorThickness.coerceIn(MIN_OUTLINE_THICKNESS, MAX_OUTLINE_THICKNESS),
+        groupSeparatorHeight = groupSeparatorHeight.coerceIn(20, 100),
         tabFillInset = tabFillInset.coerceIn(MIN_TAB_FILL_INSET, MAX_TAB_FILL_INSET),
         tabFillIntensity = tabFillIntensity.coerceIn(MIN_TAB_FILL_INTENSITY, MAX_TAB_FILL_INTENSITY),
         // Старый XML мог хранить обе галочки: путь уже имел приоритет при отрисовке.
@@ -139,6 +172,9 @@ internal data class TabAppearanceState(
         tabFontSize = if (tabFontSize == 0) 0 else tabFontSize.coerceIn(MIN_TAB_FONT_SIZE, MAX_STORED_TAB_FONT_SIZE),
     )
 
+    fun groupHighlightOptions(): GroupHighlightOptions =
+        if (groupHighlightStyle == GroupHighlightStyle.JOINED) groupJoined else groupBackground
+
     fun moreInfo(): TabMoreInfo = when {
         showProjectPath -> TabMoreInfo.PROJECT_PATH
         showGitBranch && gitBranchFormat == TabGitBranchFormat.COMPACT -> TabMoreInfo.GIT_BRANCH_COMPACT
@@ -146,6 +182,21 @@ internal data class TabAppearanceState(
         showGitStatus -> TabMoreInfo.GIT_STATUS
         else -> TabMoreInfo.NONE
     }
+
+    /** Встроенный стиль вкладок не сбрасывает независимо настроенное оформление групп. */
+    fun withGroupLayoutFrom(value: TabAppearanceState): TabAppearanceState = copy(
+        groupSpacing = value.groupSpacing,
+        showGroupOutline = value.showGroupOutline,
+        groupHighlightStyle = value.groupHighlightStyle,
+        groupBackground = value.groupBackground,
+        groupJoined = value.groupJoined,
+        showGroupSeparator = value.showGroupSeparator,
+        groupSeparatorThickness = value.groupSeparatorThickness,
+        groupSeparatorHeight = value.groupSeparatorHeight,
+        groupSeparatorColor = value.groupSeparatorColor,
+        showGroupIcon = value.showGroupIcon,
+        hideGroupedTabIcons = value.hideGroupedTabIcons,
+    )
 
     companion object {
         fun defaults(): TabAppearanceState = TabAppearanceState(

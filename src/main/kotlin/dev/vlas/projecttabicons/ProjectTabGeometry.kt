@@ -33,9 +33,13 @@ internal fun projectTabGeometry(width: Int, height: Int): ProjectTabGeometry {
 }
 
 internal fun projectTabGeometry(width: Int, height: Int, islands: Boolean, arc: Int): ProjectTabGeometry {
-    val inset = if (islands) JBUI.scale(1).toDouble() else 0.0
+    val inset = projectTabHorizontalInset(islands).toDouble()
     val bounds = Rectangle2D.Double(inset, 0.0, (width - 2 * inset).coerceAtLeast(0.0), height.toDouble())
     // fillRoundRect принимает диаметр дуги. В Classic UI и обычных темах фон прямоугольный.
     val radius = if (islands) JBUI.scale(arc) / 2.0 else 0.0
     return ProjectTabGeometry(bounds, minOf(radius.coerceAtLeast(0.0), bounds.width / 2, bounds.height / 2))
 }
+
+internal fun projectTabHorizontalInset(
+    islands: Boolean = ExperimentalUI.isNewUI() && IslandsState.isEnabled(),
+): Int = if (islands) JBUI.scale(1) else 0

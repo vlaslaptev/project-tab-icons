@@ -1,3 +1,134 @@
+<h2>0.3.85</h2>
+<ul>
+  <li>Show light project-tab backgrounds, text and hover colors in the Light preview while retaining its dark toolbar and light editor.</li>
+</ul>
+<h2>0.3.84</h2>
+<ul>
+  <li>Choose 3 tabs or 5 tabs beside Preview without changing real windows, presets or Apply.</li>
+  <li>Update Backend to feature/WASD-3245. Add grouped MobileApp on hotfix/hotfix-067 and separate pet_projects on B2B-SaaS-03 in the five-tab sample.</li>
+  <li>Adapt group decoration and preview chrome to the selected samples; preserve the active example when switching modes.</li>
+</ul>
+<h2>0.3.83</h2>
+<ul>
+  <li>Always inherit regular tab appearance and icon size in Shared background and Joined tabs.</li>
+  <li>Remove matching switches and duplicate group appearance controls, stored overrides and custom rendering branches.</li>
+  <li>Keep card inset, inactive-group dimming, internal dividers, shared-icon visibility, member-icon hiding, spacing and pipes.</li>
+  <li>Keep Icon → Size available when only the shared group icon is enabled. Older settings and styles retain their remaining options.</li>
+</ul>
+<h2>0.3.82</h2>
+<ul>
+  <li>Match Shared background and Joined tabs to regular tab height, content spacing, theme corners, outlines, fills, and native active/hover colors.</li>
+  <li>Use the group's Tab color for its fill and Outline color for its outline, with the same Automatic fallback as regular tabs.</li>
+  <li>Link the shared icon size to tab icons. Keep custom per-variant appearance and icon size available without losing saved values.</li>
+  <li>Use one outline renderer in native tabs and Preview, including Full outline, Bottom only and Rounded corners.</li>
+</ul>
+<h2>0.3.81</h2>
+<ul>
+  <li>Keep Shared background and Joined tabs with independently saved intensity, roundness, active-tab contrast, and inactive-group dimming.</li>
+  <li>Customize the active card's inset and color, or the joined capsule's dividers and thin outer frame. Optionally hide dividers beside the active tab.</li>
+  <li>Click preview project tabs to inspect active and inactive states. Preserve all settings in Custom, presets and portable styles.</li>
+  <li>Migrate former Classic and Badge selections to Shared background.</li>
+</ul>
+<h2>0.3.80</h2>
+<ul>
+  <li>Choose a group highlight variant: Classic outline, Shared background, Group badge, or Joined tabs.</li>
+  <li>Shared background and Joined tabs create a continuous group surface with a distinct active tab. Group badge shows the name and open tab count, with an optional icon.</li>
+  <li>Preview each variant before applying it. Save the choice in Custom, presets and portable styles; existing settings keep Classic outline.</li>
+</ul>
+<h2>0.3.79</h2>
+<ul>
+  <li>Remove the experimental Soft group outline and its style selector.</li>
+  <li>Keep the original outline geometry, saved thickness, constant opacity, and fixed 3 px gap.</li>
+</ul>
+<h2>0.3.78</h2>
+<ul>
+  <li>Choose Classic or Soft in Group layout. Classic keeps the original group outline and its saved thickness.</li>
+  <li>Soft uses a 1.5 px line, 8 px corners, and subdued outlines for groups without the selected tab.</li>
+  <li>Keep the fixed 3 px gap, group icons and individual tab styling. Save the choice in Custom, presets and portable styles.</li>
+</ul>
+<h2>0.3.77</h2>
+<ul>
+  <li>Fix the group outline gap at 3 px and remove the gap control.</li>
+  <li>Optionally hide member tab icons while their shared group icon is visible. Ungrouped tabs keep following the global tab icon setting.</li>
+  <li>Move presets above Preview and organize Group layout into clear icon, outline, and spacing/separator sections.</li>
+</ul>
+<h2>0.3.76</h2>
+<ul>
+  <li>Draw the shared group line above its tabs, wrapping around the group icon when visible.</li>
+  <li>Keep the configured color, thickness and gap, with matching rendering in native tabs and Preview.</li>
+  <li>Reserve room for thick icon wraps and remove empty icon slots and misplaced pipes on narrow tabs.</li>
+</ul>
+<h2>0.3.75</h2>
+<ul>
+  <li>Completely hide a broken group's shared appearance: spacing, icon slot, outline track, pipes and extra height.</li>
+  <li>Keep it hidden until an explicit Arrange Tabs by Group, even if tabs are moved back together, settings change, windows merge or the IDE restarts.</li>
+  <li>Preserve individual tab icons and inherited colors; other intact groups remain visible.</li>
+</ul>
+<h2>0.3.74</h2>
+<ul>
+  <li>Hide a split group's icon together with its outline and pipes. Arrange Tabs by Group restores it before the first tab.</li>
+  <li>Remove the hidden icon's reserved space and extra height without changing the group's saved settings or individual tab icons.</li>
+</ul>
+<h2>0.3.73</h2>
+<ul>
+  <li>Hide pipes at every boundary of a split group until Arrange Tabs by Group restores its order, matching the group outline.</li>
+  <li>Use the same neutral separator color in native tabs and Preview. Remove pipe-only padding while the pipe is hidden.</li>
+</ul>
+<h2>0.3.72</h2>
+<ul>
+  <li>Add optional vertical group separators with independent thickness, height and neutral/group color.</li>
+  <li>Show each group's own icon before its tabs, with a separate size setting. Group icons and tab icons can be enabled independently or together.</li>
+  <li>Preview and save these controls in Custom, named presets and portable styles. Existing layouts remain unchanged until enabled.</li>
+</ul>
+<h2>0.3.71</h2>
+<ul>
+  <li>Use fixed 10 px group corners and extend the straight sides halfway up the actual tab height.</li>
+  <li>Remove the Corner radius slider; preserve 2 px clearance at both outer edges and the configured bottom gap.</li>
+</ul>
+<h2>0.3.70</h2>
+<ul>
+  <li>Default group corners now follow half the actual tab height. Manual radii remain available up to 30 px and are capped at half the tab height.</li>
+  <li>Keep the group outline 2 px outside the visible left and right tab edges, while preserving the bottom gap.</li>
+</ul>
+<h2>0.3.69</h2>
+<ul>
+  <li>Keep the group underline close to the tabs: Outline gap measures the distance to the straight line, without adding the corner radius.</li>
+  <li>Curve the outer ends upward and reserve only the gap plus stroke thickness below the tab strip, in both the IDE and Preview.</li>
+</ul>
+<h2>0.3.68</h2>
+<ul>
+  <li>Add Outline gap (0–12 px) and Corner radius (0–12 px) to Group layout, including a straight underline at zero radius.</li>
+  <li>Save both controls in presets and portable styles; built-in tab presets preserve all Group layout settings.</li>
+</ul>
+<h2>0.3.67</h2>
+<ul>
+  <li>Give group outlines a separate track below the tabs and an independent 1–6 px thickness control.</li>
+  <li>Keep tab outlines and fills visible inside groups; built-in tab presets preserve Group layout settings.</li>
+  <li>Fix the preview: Tools is ungrouped and follows tab outline thickness, while Frontend and Backend share the group underline.</li>
+  <li>Cache group boundaries and outline paths, reuse strokes, and avoid redundant layout requests.</li>
+</ul>
+<h2>0.3.66</h2>
+<ul>
+  <li>Fix the doubled tab background next to a group when the IDE window is inactive.</li>
+  <li>Preserve named theme colors while reconstructing tab surfaces so Islands can clear the old background and retain its native gradient and inactive-window appearance.</li>
+</ul>
+<h2>0.3.65</h2>
+<ul>
+  <li>Add Group layout after Tab layout, with 0–32 px group spacing and an optional shared group underline.</li>
+  <li>Use the group's outline color or icon color, with rounded ends only on its first and last tabs. Hide the entire underline when members are split; Arrange Tabs by Group restores it.</li>
+  <li>Preview group layout in Settings and preserve it in named presets and portable style bundles. Existing settings retain zero spacing and no group underline.</li>
+</ul>
+<h2>0.3.64</h2>
+<ul>
+  <li>Always place project groups together on the left after merging windows, in the order of the group table, followed by ungrouped tabs.</li>
+  <li>Use Arrange Tabs by Group directly in a project tab's context menu to reapply exactly the same arrangement and fixed member positions.</li>
+  <li>Remove the extra Group tabs switch: existing and new groups participate automatically, including groups saved by older versions with grouping off.</li>
+</ul>
+<h2>0.3.63</h2>
+<ul>
+  <li>Use Разложить по группам (Arrange Tabs by Group) directly in a project window tab's context menu to restore saved group order and fixed member positions.</li>
+  <li>Keep standard window-tab actions at the same menu level and reconnect the command if the IDE replaces its popup group.</li>
+</ul>
 <h2>0.3.62</h2>
 <ul>
   <li>Replace bulk appearance actions with group styling, while keeping Assign and Ungroup.</li>

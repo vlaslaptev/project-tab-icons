@@ -1,19 +1,13 @@
 package dev.vlas.projecttabicons
 
-import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
-import java.awt.BasicStroke
+import com.intellij.ui.tabs.TabInfo
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.Insets
-import java.awt.RenderingHints
-import java.awt.Shape
-import java.awt.geom.Path2D
-import java.awt.geom.Line2D
-import java.awt.geom.RoundRectangle2D
 import javax.swing.border.Border
 
 /** Линия — часть border самого TabLabel: закрытие, hover и перетаскивание остаются штатными. */
@@ -28,34 +22,36 @@ internal class ProjectTabBorder(
     var tabFillIntensity: Int = DEFAULT_TAB_FILL_INTENSITY,
     private val geometryOverride: ((Int, Int) -> ProjectTabGeometry)? = null,
     private val surfaceColors: ((Component) -> ProjectTabSurfaceColors?)? = ::nativeProjectTabSurfaceColors,
+    var groupLayout: ProjectTabGroupLayout? = null,
+    var groupTab: TabInfo? = null,
 ) : Border {
+    var sharedGroupSurfacePreview: Boolean = false
+    var hideProjectIconPreview: Boolean = false
+    fun groupMargins(): ProjectTabGroupMargins = groupTab?.let { groupLayout?.margins(it) } ?: ProjectTabGroupMargins.NONE
+    fun visibleProjectIcon(): CenteredProjectIcon? = projectIcon?.takeUnless {
+        hideProjectIconPreview || groupTab?.let { groupLayout?.hidesTabIcon(it) } == true
+    }
+    private val outline = ProjectTabOutline()
+
     override fun getBorderInsets(component: Component): Insets {
         val source = original?.getBorderInsets(component) ?: Insets(0, 0, 0, 0)
         val edges = protectedEdges()
+        val margins = groupMargins()
         if (edges.top + edges.left + edges.bottom + edges.right == 0) {
-            return Insets(source.top, source.left, source.bottom, source.right)
+            return Insets(source.top, source.left + margins.left, source.bottom, source.right + margins.right)
         }
         // Толстая линия и полная рамка не должны перекрывать иконку, подпись и крестик.
         val fontHeight = component.getFontMetrics(component.font ?: UIUtil.getLabelFont()).height
         val iconPadding = ((projectIcon?.iconHeight ?: 0) - fontHeight).coerceAtLeast(0).let { (it + 1) / 2 }
         return Insets(source.top.coerceAtLeast(0) + edges.top + iconPadding,
-            source.left.coerceAtLeast(0) + edges.left,
+            source.left.coerceAtLeast(0) + edges.left + margins.left,
             source.bottom.coerceAtLeast(0) + edges.bottom + iconPadding,
-            source.right.coerceAtLeast(0) + edges.right)
+            source.right.coerceAtLeast(0) + edges.right + margins.right)
     }
 
     override fun isBorderOpaque(): Boolean = false
 
-    private fun protectedEdges(): Insets {
-        if (outlineColor == null) return Insets(0, 0, 0, 0)
-        val thickness = outlineThickness.coerceIn(MIN_OUTLINE_THICKNESS, MAX_OUTLINE_THICKNESS)
-        val edge = JBUI.scale(thickness)
-        return when {
-            outlineStyle == TabOutlineStyle.FULL -> Insets(edge, edge, edge, edge)
-            thickness > DEFAULT_OUTLINE_THICKNESS -> Insets(0, 0, edge, 0)
-            else -> Insets(0, 0, 0, 0)
-        }
-    }
+    private fun protectedEdges(): Insets = projectTabOutlineInsets(outlineColor, outlineThickness, outlineStyle)
 
     override fun paintBorder(component: Component, graphics: Graphics, x: Int, y: Int, width: Int, height: Int) {
         if (graphics !is Graphics2D || width <= 0 || height <= 0) {
@@ -65,15 +61,24 @@ internal class ProjectTabBorder(
         val g = graphics.create() as Graphics2D
         try {
             g.translate(x, y)
-            val geometry = geometryOverride?.invoke(width, height) ?: projectTabGeometry(width, height)
-            tabColor?.let { color ->
-                surfaceColors?.invoke(component)?.let { colors ->
-                    ProjectTabSurface.paint(g, width, height, geometry, colors, color, tabFillInset, tabFillIntensity)
-                    paintNativeProjectTabEdges(component, g, width, height)
+            val margins = groupMargins()
+            val bodyWidth = (width - margins.left - margins.right).coerceAtLeast(0)
+            val body = geometryOverride?.invoke(bodyWidth, height) ?: projectTabGeometry(bodyWidth, height)
+            val geometry = if (margins.left == 0) body else body.copy(bounds = java.awt.geom.Rectangle2D.Double(
+                body.bounds.x + margins.left, body.bounds.y, body.bounds.width, body.bounds.height))
+            val colors = surfaceColors?.invoke(component)
+            val sharedSurface = sharedGroupSurfacePreview || (colors != null &&
+                groupTab?.let { groupLayout?.paintTabSurface(it, g, width, height, colors) } == true)
+            if (!sharedSurface && (tabColor != null || margins.left + margins.right > 0)) {
+                colors?.let {
+                    ProjectTabSurface.paint(g, width, height, geometry, colors, tabColor, tabFillInset, tabFillIntensity)
+                    val edges = g.create(margins.left, 0, bodyWidth, height) as Graphics2D
+                    try { paintNativeProjectTabEdges(component, edges, bodyWidth, height) }
+                    finally { edges.dispose() }
                 }
             }
-            original?.paintBorder(component, g, 0, 0, width, height)
-            projectIcon?.let { icon ->
+            if (!sharedSurface) original?.paintBorder(component, g, margins.left, 0, bodyWidth, height)
+            visibleProjectIcon()?.let { icon ->
                 val bounds = ((component as? Container)?.layout as? ProjectTabIconLayout)?.iconBounds
                 if (bounds != null) {
                     // Контур ограничивает только иконку; заливка и линия не проходят через hard clip.
@@ -84,34 +89,12 @@ internal class ProjectTabBorder(
                     } finally { image.dispose() }
                 }
             }
+            if (sharedSurface) return
             val color = outlineColor ?: return
-            val stroke = JBUI.scale(outlineThickness.coerceIn(MIN_OUTLINE_THICKNESS, MAX_OUTLINE_THICKNESS)).toFloat()
-            val halfStroke = stroke / 2.0
-            val left = geometry.bounds.x + halfStroke
-            val right = geometry.bounds.maxX - halfStroke
-            val top = geometry.bounds.y + halfStroke
-            val bottom = geometry.bounds.maxY - halfStroke
-            val radius = (geometry.radius - halfStroke).coerceAtLeast(0.0)
-            if (right <= left || bottom <= top) return
-            val control = radius * 0.5522847498307936
-            val line: Shape = when (outlineStyle) {
-                TabOutlineStyle.BOTTOM -> Line2D.Double(left + radius, bottom, right - radius, bottom)
-                TabOutlineStyle.ROUNDED -> Path2D.Double().apply {
-                    moveTo(left, bottom - radius)
-                    curveTo(left, bottom - radius + control, left + radius - control, bottom, left + radius, bottom)
-                    lineTo(right - radius, bottom)
-                    curveTo(right - radius + control, bottom, right, bottom - radius + control, right, bottom - radius)
-                }
-                TabOutlineStyle.FULL -> RoundRectangle2D.Double(
-                    left, top, right - left, bottom - top, radius * 2, radius * 2,
-                )
-            }
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-            g.stroke = BasicStroke(stroke, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
-            g.color = color
-            g.draw(line)
+            outline.paint(g, geometry, color, outlineThickness, outlineStyle)
         } finally {
             g.dispose()
         }
     }
+
 }

@@ -1,123 +1,95 @@
 # Project Tab Icons
 
-![Installed 0.3.62 Settings preview with Git context and separate User presets](docs/media/git-context.png)
+Project icons, colored outlines, translucent fills and Git context for IntelliJ IDEA's **macOS project window tabs**.
 
-## Local by design
+### [↓ Download ZIP 0.3.85](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.85/project-tab-icons-0.3.85.zip)
 
-> No accounts, telemetry or plugin network requests. [Privacy](PRIVACY.md).
+## 8 IDE themes. Hundreds of appearance combinations.
 
----
+![Real Preview screenshots across all eight IDE themes, with different tab and group styles](docs/media/appearance-gallery.png)
+
+Choose tab height, text size, icon position, outline, fill and group styling independently.
+The gallery shows ten examples from the installed plugin; they are a small selection of the available combinations.
 
 ## Install in a minute
 
-### [↓ Download ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.62/project-tab-icons-0.3.62.zip)
-
-1. Open **Settings → Plugins → ⚙ → Install Plugin from Disk…** and select the ZIP.
+1. Open **Settings → Plugins → ⚙ → Install Plugin from Disk…** and select the downloaded ZIP.
 2. Open several projects in separate windows, then use **Window → Merge All Project Windows**.
-3. Open **Settings → Appearance & Behavior → Project Tab Icons**.
+3. Open **Settings → Appearance & Behavior → Project Tab Icons**, choose a preset, adjust it and click **Apply**.
 
-**Choose a preset, assign your project icons, and click Apply.**
+Requires **macOS** and **IntelliJ IDEA 2026.2.3**, builds `262.10968.63` through `262.*`.
+The plugin customizes project window tabs; editor file tabs use the IDE's normal appearance.
+See the [installation guide](docs/INSTALLATION.md) for updates, missing tabs and removal.
 
-The [installation guide](docs/INSTALLATION.md) covers missing tabs, updates and removal.
+## Make each project easy to recognize
 
+- Set tab height, text size and close-button position.
+- Choose a bottom line, rounded lower outline or full frame, with independent outline and fill colors.
+- Adjust fill intensity and inset, and place project icons on either side of the title.
+- Start with a built-in preset or save up to 10 named presets. Custom remembers your last manual appearance.
+- Preview **three or five tabs** in any of the **eight IDE themes** before applying changes.
+- Click a sample tab to compare active and inactive states. Preview theme and sample count stay local to the example window.
 
-## Main features
-![Installed 0.3.62 Settings with Custom appearance, Icon controls and User presets](docs/media/appearance-presets.png)
-### You can change tab height, text size and the close button’s position
-### You can give each project its own outline and translucent fill colors
-### You can adjust fill intensity and return to your last Custom appearance
-### You can start with a preset, adjust it and see the result before Apply
-### You can save up to 10 named presets for your own tab styles
-### You can preview your tabs in different IDE themes
-
----
-![A selection from 100+ bundled icons, rendered from the plugin's actual SVG resources](docs/media/icon-library.png)
-### You can assign an icon to each project tab and place it on the left or right
-### You can pick from 100+ icons, import your own SVG or use your project’s initials
-### You can import SVG folders as categories and create text icons such as DB, QA or API
-### You can adjust the icon’s color and size to make each project easy to recognize
+The **Light** preview uses light tab surfaces and readable text while keeping its dark toolbar and light editor.
 
 ## One group. One shared style.
 
-![Project groups tab, matching columns, Group tabs and the Add group row in installed 0.3.62](docs/media/captures/groups-settings.png)
+Create and edit groups in **Project groups**. Assign an icon, icon color, outline color
+and tab color to the group; members inherit them, including projects added later.
+**Ungroup** restores each project's personal styling.
 
-Create and edit groups directly in the table. Give a group its own **icon**, **icon
-color**, **outline color** and **tab color**; every member inherits them, including
-projects assigned later. **Ungroup** restores each project's individual style.
-The Projects tab keeps paths below project names and shows membership in a separate
-**Group** column, with **—** for ungrouped projects.
+Under **Group layout → Group highlight → Variant**, choose **Shared background** or
+**Joined tabs**. Both follow regular tab dimensions, theme corners, fill settings,
+active and hover colors, and **Icon → Size**. Tune inactive-group dimming, active-card
+inset or internal dividers, and show a shared group icon with optional hidden member icons.
+Add spacing and vertical pipes between groups.
 
-Enable **Group tabs**, use **↑ / ↓** to arrange groups, and give members optional
-fixed positions. For example:
-
-| Member | Position on merge |
-| --- | --- |
-| Tools | 1 |
-| Backend | Auto |
-| Frontend | Auto |
-
-Tools comes first; Auto members retain their relative order. Group order follows
-the group table. Ordering runs when windows are merged, and you can move tabs
-freely afterwards. **Restore Group Tab Order** in the tab context menu reapplies
-the saved arrangement. Existing groups keep grouping off until enabled.
-
-## Quick actions and portable styles
-
-Use **Tools → Project Tab Icons** or **Find Action** to change the current project's
-icon and colors, choose a preset or open Settings. Shortcuts are configurable.
-**Manage…** updates, duplicates and reorders saved presets. **Import styles…** and
-**Export styles…** share selected appearance presets, SVG categories and text icons
-as JSON, with choices for name conflicts. Project paths and group memberships stay local.
-
-## About the plugin
-
-### Find the right project before you read its name.
-
-**Project icons**, **colored outlines**, **translucent fills** and **Git context**
-for IntelliJ IDEA's **macOS window tabs**.
-
-Give each project a visual identity and keep the information you need beside its name.
-
-- **Platform:** macOS
-- **IDE:** IntelliJ IDEA **2026.2.3** / build **262**
-- **Version:** **0.3.62**
-- **License:** MIT
-
-> **Updates & future IDE support**
->
-> Updates and support for newer IntelliJ IDEA versions are planned.
-
-**Independent · Experimental · Distributed through GitHub**
+Groups are placed on the left in group-table order when windows merge, followed by
+ungrouped projects. Use **↑ / ↓** to reorder groups and optional fixed member positions
+to put a project first within its group. Manual rearrangement remains available;
+**Arrange Tabs by Group** reapplies the saved order. A manually split group's shared
+decoration stays hidden until that action restores its contiguous arrangement.
 
 ## 100+ shapes. Your colors.
 
-Search by name or keyword, filter by category, and choose a color with the native
-IDE picker, a HEX value, or one of 14 swatches. Icon sizes are **20, 24 and 28 px**.
-Your existing SVG/PNG artwork keeps its own colors.
+![A selection from 100+ bundled icons, rendered from the plugin's actual SVG resources](docs/media/icon-library.png)
 
-Import a folder and its SVG subfolders as a shared category, with search and original
-colors. Copies remain available after moving the source folder. Or open **Text icon**
-to create a 1–6-character label with four styles, three font families and a custom color.
-Text icons save as transparent SVG paths and can be edited later. Apply saves library
-imports and project assignments; Cancel discards the draft.
+Search icons by name or category, choose a color with the native IDE picker, a HEX
+value or one of 14 swatches, and select **20, 24 or 28 px** icon sizes.
 
-Selected SVG icons are saved in the IDE's native project icon storage. They remain
-project icons after the plugin is removed. Replacing an icon updates that project's
-light and dark variants; keep a copy if you want to restore custom artwork later.
+Import your own SVG or a folder of SVG categories. Existing custom artwork keeps its
+colors. **Text icon** creates editable 1–6-character labels such as DB, QA or API,
+with four styles, three font families and a custom color. Selected artwork is saved
+in IDEA's native project icon storage and remains a project icon after removing the plugin.
 
-## Project notes
+## Git context beside the project name
 
-- [Compatibility and internal APIs](docs/COMPATIBILITY.md)
+Show full or compact Git branches, tracked added/removed-line counts, or both.
+Choose whether extra information appears before or after the project name.
+Counts cover saved tracked changes against HEAD, including staged and unstaged
+changes. Git4Idea supplies branches; local background diffs supply counts without
+fetching from remotes.
+
+## Quick actions and portable styles
+
+Use **Tools → Project Tab Icons** or **Find Action** for current-project styling,
+preset switching and Settings. Shortcuts are configurable. **Manage…** updates,
+duplicates and reorders saved presets. **Import styles… / Export styles…** shares
+selected presets, SVG categories and editable text icons as JSON, with name-conflict
+choices. Project paths and group memberships stay local.
+
+## Local by design
+
+No accounts, telemetry or plugin network requests. [Privacy](PRIVACY.md).
+The unsigned ZIP is distributed through GitHub. This experimental plugin uses
+internal IntelliJ and AppKit APIs; [compatibility notes](docs/COMPATIBILITY.md)
+describe the supported environment and recorded validation limits.
+
 - [Feature guide](docs/FEATURES.md)
+- [Changelog](CHANGELOG.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Contributing](CONTRIBUTING.md)
 - [Third-party artwork and licenses](THIRD_PARTY_NOTICES.md)
+- [Media sources](docs/media/README.md)
 
-The appearance and Git slides use two crops from **the installed 0.3.62 Settings
-page**, captured on **20 October 2026**. They show Custom appearance and the plugin's
-built-in Frontend, Backend and Tools fixtures. The group image includes only the
-switcher, column header and Add group row; saved groups and real project paths are
-excluded. The icon-library slide is an illustration made from the plugin's SVGs.
-[Media sources and capture provenance](docs/media/README.md) describe each crop.
-
-This project is independent of JetBrains and is not an official JetBrains product.
+MIT licensed. Independent of JetBrains; not an official JetBrains product.

@@ -1,11 +1,23 @@
 # GitHub media
 
-The gallery combines illustrations and real Settings crops from installed
+The README's main gallery, `appearance-gallery.png`, contains **ten real Preview
+frames** from installed **0.3.84/0.3.85**, captured on **21 October 2026**. All eight
+IDE themes are represented. Each window is 1594 × 179 px; the slide is 1722 × 2684 px
+in one column. Captions contain only theme names. The header describes hundreds of
+possible combinations; ten screenshots illustrate a selection. The first frame uses
+the current custom appearance, High Contrast uses larger text and right-side icons,
+and Light includes the corrected tab palette. Three recaptures were normalized in
+width from 1658 to 1594 px without changing their 179 px height. UI content was not
+redrawn. The 50 original captures remain local and excluded from Git.
+[Gallery metadata](appearance-gallery.json) records dimensions and hashes.
+
+The other preserved assets combine illustrations and real Settings crops from installed
 **Project Tab Icons 0.3.62**, captured in IntelliJ IDEA 2026.2.3 on **20 October 2026**.
 Frontend, Backend, Tools, editor text, branches and line counts are built-in fixtures.
 
 | Asset | Purpose |
 | --- | --- |
+| `appearance-gallery.png` | Current README gallery: ten previews across eight IDE themes |
 | `appearance-presets.png` | Real Settings crop: Custom appearance, Icon controls and separate User presets |
 | `git-context.png` | A second crop from the same capture, focusing on Preview, Git context and presets |
 | `captures/groups-settings.png` | Projects / Project groups switcher, group columns and Add group row |

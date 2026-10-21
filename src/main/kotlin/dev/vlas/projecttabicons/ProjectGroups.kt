@@ -12,6 +12,7 @@ internal data class ProjectTabGroup(
     @field:OptionTag @JvmField val icon: ProjectGroupIcon = ProjectGroupIcon(),
     @field:OptionTag @JvmField val outlineColor: String = "",
     @field:OptionTag @JvmField val tabColor: String = "",
+    // Сохраняем старое поле для чтения/обратной совместимости; наличие группы уже задаёт группировку.
     @field:OptionTag @JvmField val groupTabs: Boolean = false,
     @field:OptionTag @JvmField val memberPositions: Map<String, Int> = emptyMap(),
 )

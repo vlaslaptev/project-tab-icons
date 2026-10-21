@@ -17,3 +17,6 @@ out/
 local.properties
 private-evidence/
 /artifacts/
+
+# Original screenshots and local selection sheets for the README gallery.
+/screenshots/preview-gallery-*/

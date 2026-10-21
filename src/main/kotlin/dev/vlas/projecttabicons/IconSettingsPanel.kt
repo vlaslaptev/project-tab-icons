@@ -83,6 +83,17 @@ internal class IconSettingsPanel(
     private val countLabel = JBLabel("Open projects").apply { font = font.deriveFont(Font.BOLD) }
     private val status = settingsHint("Loading open projects…")
     private val preview = WindowTabsPreview()
+    private val previewTabCounts = PreviewTabCount.entries.associateWith { count ->
+        JBRadioButton(count.title, count == PreviewTabCount.THREE).apply {
+            isOpaque = false
+            accessibleContext.accessibleName = "Preview tab count: ${count.title}"
+            toolTipText = "Changes only the example window. Does not change real project tabs or Apply."
+        }
+    }
+    private val previewGroupHint = settingsHint("<html>Split groups hide their decoration until Arrange Tabs by Group.<br>" +
+        "Preview: ${preview.groupDescription}</html>").apply {
+        border = JBUI.Borders.empty(0, 12, 12, 12)
+    }
     private val previewTheme = ComboBox(PreviewIdeTheme.entries.toTypedArray()).apply {
         preferredSize = JBUI.size(270, 30)
         accessibleContext.accessibleName = "IDE theme for this preview window"
@@ -108,7 +119,7 @@ internal class IconSettingsPanel(
     private var editingUserPresetId: String? = null
     private var presetManagerDialog: UserPresetManagerDialog? = null
     private val savePreset = JButton("Save as new preset").apply { isVisible = false }
-    private val showIcons = JBCheckBox("Show icons", true)
+    private val showIcons = JBCheckBox("Show tab icons", true)
     private val showOutline = JBCheckBox("Show outline", true)
     private val showTabBackground = JBCheckBox("Fill tab", false)
     private val iconSize = ComboBox(TabIconSize.entries.toTypedArray())
@@ -179,6 +190,38 @@ internal class IconSettingsPanel(
     }
     private val tabHeightLabel = JBLabel("Tab height:").apply { labelFor = tabHeight }
     private val tabHeightValue = JBLabel("$DEFAULT_TAB_HEIGHT px", SwingConstants.RIGHT)
+    private val groupSpacing = JSlider(0, MAX_GROUP_SPACING, 0).apply {
+        minorTickSpacing = 1
+        snapToTicks = true
+        isOpaque = false
+    }
+    private val groupSpacingLabel = JBLabel("Group spacing:").apply { labelFor = groupSpacing }
+    private val groupSpacingValue = JBLabel("0 px", SwingConstants.RIGHT)
+    private val showGroupOutline = JBCheckBox("Show group highlight")
+    private val groupHighlightStyle = ComboBox(arrayOf(GroupHighlightStyle.BACKGROUND, GroupHighlightStyle.JOINED))
+    private val groupVariantLabel = JBLabel("Variant:").apply { labelFor = groupHighlightStyle }
+    private val backgroundHighlight = GroupHighlightControls(GroupHighlightStyle.BACKGROUND) { appearanceChanged() }
+    private val joinedHighlight = GroupHighlightControls(GroupHighlightStyle.JOINED) { appearanceChanged() }
+    private val groupVariantDetails = JPanel(BorderLayout()).apply { isOpaque = false }
+    private lateinit var backgroundHighlightForm: JComponent
+    private lateinit var joinedHighlightForm: JComponent
+    private val showGroupSeparator = JBCheckBox("Show separator (pipe)")
+    private val groupSeparatorThickness = JSlider(1, MAX_OUTLINE_THICKNESS, 1).apply {
+        minorTickSpacing = 1; snapToTicks = true; isOpaque = false
+    }
+    private val separatorThicknessLabel = JBLabel("Thickness:").apply { labelFor = groupSeparatorThickness }
+    private val separatorThicknessValue = JBLabel("1 px", SwingConstants.RIGHT)
+    private val groupSeparatorHeight = JSlider(20, 100, DEFAULT_GROUP_SEPARATOR_HEIGHT).apply {
+        minorTickSpacing = 1; snapToTicks = true; isOpaque = false
+    }
+    private val separatorHeightLabel = JBLabel("Height:").apply { labelFor = groupSeparatorHeight }
+    private val separatorHeightValue = JBLabel("$DEFAULT_GROUP_SEPARATOR_HEIGHT%", SwingConstants.RIGHT)
+    private val groupSeparatorColor = ComboBox(GroupSeparatorColor.entries.toTypedArray())
+    private val separatorColorLabel = JBLabel("Color:").apply { labelFor = groupSeparatorColor }
+    private val showGroupIcon = JBCheckBox("Show group icon")
+    private val hideGroupedTabIcons = JBCheckBox("Hide tab icons inside the group").apply {
+        border = JBUI.Borders.emptyLeft(20)
+    }
     private val moreInfoLabel = JBLabel("Show more info:")
     private val moreInfoButtons = TabMoreInfo.entries.associateWith { JBRadioButton(it.title) }
     private val branchPosition = ComboBox(TabBranchPosition.entries.toTypedArray())
@@ -205,22 +248,25 @@ internal class IconSettingsPanel(
 
     init {
         presetButtons.values.forEach(presetGroup::add)
+        ButtonGroup().apply { previewTabCounts.values.forEach(::add) }
         ButtonGroup().apply { moreInfoButtons.values.forEach(::add) }
-        (listOf(showIcons, showOutline, showTabBackground) + moreInfoButtons.values).forEach { it.isOpaque = false }
+        (listOf(showIcons, showOutline, showTabBackground, showGroupOutline, showGroupIcon, hideGroupedTabIcons, showGroupSeparator) + moreInfoButtons.values).forEach { it.isOpaque = false }
         appearanceTabs.background = component.background
         component.border = JBUI.Borders.empty(16)
         component.preferredSize = JBUI.size(880, 700)
         component.minimumSize = JBUI.size(360, 400)
         page.add(JPanel(BorderLayout(0, JBUI.scale(20))).apply {
             add(JPanel(BorderLayout(0, JBUI.scale(12))).apply {
+                add(presetRow, BorderLayout.NORTH)
                 add(JPanel(BorderLayout(0, JBUI.scale(8))).apply {
                     add(SettingsPreviewHeader(
-                        JBLabel("Preview").apply { font = font.deriveFont(Font.BOLD) },
+                        SettingsRadioRow(JBLabel("Preview").apply { font = font.deriveFont(Font.BOLD) },
+                            previewTabCounts.values.toList(), availableWidth = ::pageWidth),
                         JBLabel("IDE theme for this preview window:").apply { labelFor = previewTheme },
                         previewTheme, ::pageWidth,
                     ), BorderLayout.NORTH)
                     add(preview, BorderLayout.CENTER)
-                }, BorderLayout.NORTH)
+                }, BorderLayout.CENTER)
                 add(JPanel(BorderLayout(JBUI.scale(12), 0)).apply {
                     add(pluginEnabled, BorderLayout.WEST)
                     add(JPanel(GridBagLayout()).apply {
@@ -287,6 +333,15 @@ internal class IconSettingsPanel(
             add(status, BorderLayout.CENTER)
         }, BorderLayout.SOUTH)
         previewTheme.addActionListener { refreshPreviewTheme() }
+        previewTabCounts.forEach { (count, button) ->
+            button.addActionListener {
+                preview.showTabCount(count)
+                previewGroupHint.text = "<html>Split groups hide their decoration until Arrange Tabs by Group.<br>" +
+                    "Preview: ${preview.groupDescription}</html>"
+                page.revalidate()
+                page.repaint()
+            }
+        }
         pluginEnabled.addActionListener { appearanceChanged(manualEdit = false) }
         savePreset.addActionListener { saveUserPreset() }
         updatePreset.addActionListener {
@@ -334,24 +389,27 @@ internal class IconSettingsPanel(
 
     private fun appearancePanel(): JPanel = JPanel(BorderLayout(0, JBUI.scale(12))).apply {
         rebuildPresetRow()
-        add(presetRow, BorderLayout.NORTH)
         val rowHeight = maxOf(iconSize.preferredSize.height, outlineThickness.preferredSize.height, JBUI.scale(30))
         val gitInfoControl = JPanel(BorderLayout(JBUI.scale(12), 0)).apply {
             isOpaque = false
             add(branchPosition, BorderLayout.CENTER)
             add(branchStatus, BorderLayout.EAST)
         }
-        val controls = listOf(iconSize, iconPosition, iconInitials, iconLetterWeight, outlineStyle, closeButtonPosition, gitInfoControl)
+        val controls = listOf(iconSize, iconPosition, iconInitials, iconLetterWeight, outlineStyle, closeButtonPosition,
+            gitInfoControl, groupSeparatorColor, groupHighlightStyle)
         val controlWidth = maxOf(controls.maxOf {
             it.preferredSize.width + if (it === gitInfoControl) SettingsPendingChange.reservedWidth else 0
         }, JBUI.scale(240))
         val labelWidth = { listOf(sizeLabel, positionLabel, initialsLabel, letterWeightLabel, styleLabel,
-            thicknessLabel, fillInsetLabel, fillIntensityLabel, closeButtonLabel, fontSizeLabel, tabHeightLabel, branchPositionLabel)
+            thicknessLabel, fillInsetLabel, fillIntensityLabel, closeButtonLabel, fontSizeLabel, tabHeightLabel, branchPositionLabel,
+            groupSpacingLabel, groupVariantLabel, separatorThicknessLabel, separatorHeightLabel,
+            separatorColorLabel)
             .maxOf { it.preferredSize.width } + JBUI.scale(12) }
         controls.forEach { it.preferredSize = Dimension(controlWidth, rowHeight) }
         fun sliderControl(slider: JSlider, value: JBLabel, maxValue: Int, unit: String = "px") = JPanel(BorderLayout(JBUI.scale(6), 0)).apply {
             isOpaque = false
-            value.preferredSize = Dimension(value.getFontMetrics(value.font).stringWidth("$maxValue $unit"), rowHeight)
+            val metrics = value.getFontMetrics(value.font)
+            value.preferredSize = Dimension(metrics.stringWidth("$maxValue $unit"), rowHeight)
             add(slider, BorderLayout.CENTER)
             add(value, BorderLayout.EAST)
             preferredSize = Dimension(controlWidth, rowHeight)
@@ -361,6 +419,9 @@ internal class IconSettingsPanel(
         val fillIntensityControl = sliderControl(tabFillIntensity, fillIntensityValue, MAX_TAB_FILL_INTENSITY, "%")
         val heightControl = sliderControl(tabHeight, tabHeightValue, MAX_TAB_HEIGHT)
         val fontControl = sliderControl(tabFontSize, fontSizeValue, maxOf(MAX_TAB_FONT_SIZE, defaultTabFontSize() + 2))
+        val groupSpacingControl = sliderControl(groupSpacing, groupSpacingValue, MAX_GROUP_SPACING)
+        val separatorThicknessControl = sliderControl(groupSeparatorThickness, separatorThicknessValue, MAX_OUTLINE_THICKNESS)
+        val separatorHeightControl = sliderControl(groupSeparatorHeight, separatorHeightValue, 100, "%")
         fun form(master: JComponent, fields: List<AppearanceField>, masterLabel: JBLabel? = null,
                  singleColumn: Boolean = false) = SettingsAppearanceForm(
             master, fields, labelWidth, controlWidth, rowHeight,
@@ -388,6 +449,58 @@ internal class IconSettingsPanel(
                 AppearanceField(branchPositionLabel, gitInfoControl),
             )), BorderLayout.CENTER)
         })
+        val groupLabelWidth = { maxOf(backgroundHighlight.labelWidth(), joinedHighlight.labelWidth(),
+            listOf(groupSpacingLabel, groupVariantLabel,
+                separatorThicknessLabel, separatorHeightLabel, separatorColorLabel).maxOf { it.preferredSize.width }) }
+        val groupColumns = SettingsAppearanceColumns(
+            { (pageWidth() - appearanceTabs.insets.left - appearanceTabs.insets.right).coerceAtLeast(1) },
+            { maxOf(groupLabelWidth() + controlWidth + JBUI.scale(36),
+                hideGroupedTabIcons.preferredSize.width + JBUI.scale(24)) },
+        )
+        fun groupForm(master: JComponent, fields: List<AppearanceField>, label: JBLabel? = null) =
+            SettingsAppearanceForm(master, fields, groupLabelWidth, controlWidth, rowHeight,
+                groupColumns::columnWidth, label, singleColumn = true)
+        fun section(title: String, content: JComponent, hint: String) = JPanel(BorderLayout()).apply {
+            isOpaque = false
+            add(JPanel(BorderLayout(JBUI.scale(12), 0)).apply {
+                isOpaque = false
+                border = JBUI.Borders.empty(0, 12)
+                add(JBLabel(title).apply { font = font.deriveFont(Font.BOLD) }, BorderLayout.WEST)
+                add(JPanel(GridBagLayout()).apply {
+                    isOpaque = false
+                    add(JSeparator(), GridBagConstraints().apply { weightx = 1.0; fill = GridBagConstraints.HORIZONTAL })
+                }, BorderLayout.CENTER)
+            }, BorderLayout.NORTH)
+            add(content, BorderLayout.CENTER)
+            add(settingsHint("<html>$hint</html>").apply { border = JBUI.Borders.empty(0, 12, 12, 12) }, BorderLayout.SOUTH)
+        }
+        backgroundHighlightForm = backgroundHighlight.form(controlWidth, rowHeight, groupLabelWidth, groupColumns::columnWidth)
+        joinedHighlightForm = joinedHighlight.form(controlWidth, rowHeight, groupLabelWidth, groupColumns::columnWidth)
+        groupColumns.add(section("Group highlight", JPanel(BorderLayout()).apply {
+            isOpaque = false
+            add(groupForm(showGroupOutline, listOf(AppearanceField(groupVariantLabel, groupHighlightStyle))), BorderLayout.NORTH)
+            add(groupVariantDetails, BorderLayout.CENTER)
+        }, "Groups always use Color and Tab layout settings.<br>Only group-specific options are configured here."))
+        groupColumns.add(JPanel(BorderLayout(0, JBUI.scale(16))).apply {
+            isOpaque = false
+            add(section("Group icon", groupForm(showGroupIcon, listOf(
+                AppearanceField(null, hideGroupedTabIcons),
+            )), "One icon before the group; size follows Icon → Size.<br>Ungrouped tabs follow Icon → Show tab icons."), BorderLayout.NORTH)
+            add(section("Spacing & separator", JPanel(BorderLayout()).apply {
+                isOpaque = false
+                add(groupForm(groupSpacingControl, emptyList(), groupSpacingLabel), BorderLayout.NORTH)
+                add(groupForm(showGroupSeparator, listOf(
+                    AppearanceField(separatorThicknessLabel, separatorThicknessControl),
+                    AppearanceField(separatorHeightLabel, separatorHeightControl),
+                    AppearanceField(separatorColorLabel, groupSeparatorColor),
+                )), BorderLayout.CENTER)
+            }, "Space and a vertical pipe between groups.<br>Internal dividers are configured under Joined tabs."), BorderLayout.CENTER)
+        })
+        appearanceTabs.addTab("Group layout", JPanel(BorderLayout()).apply {
+            isOpaque = false
+            add(groupColumns, BorderLayout.NORTH)
+            add(previewGroupHint, BorderLayout.SOUTH)
+        })
         // Навигация локальна для открытой формы: не выбирает Custom и не меняет Apply.
         appearanceTabs.addChangeListener { page.revalidate(); page.repaint() }
         add(appearanceTabs, BorderLayout.CENTER)
@@ -407,7 +520,7 @@ internal class IconSettingsPanel(
                     editingUserPresetId = null
                     canSaveAsPreset = preset == TabAppearancePreset.CUSTOM
                     val next = if (preset == TabAppearancePreset.CUSTOM) lastCustomAppearance.copy(enabled = pluginEnabled.isSelected)
-                        else TabAppearanceState.forPreset(preset, pluginEnabled.isSelected)
+                        else TabAppearanceState.forPreset(preset, pluginEnabled.isSelected).withGroupLayoutFrom(displayedAppearance)
                     setAppearance(next)
                     updateStatus()
                 }
@@ -424,8 +537,33 @@ internal class IconSettingsPanel(
         tabFillIntensity.accessibleContext.accessibleDescription = "From 0% (transparent) to 100% (solid). Use arrow keys for one-percent steps."
         tabFillIntensity.toolTipText = "Adjust fill opacity. 0% hides the fill; 100% uses the solid tab color. Icon and outline colors stay unchanged."
         tabFillIntensity.addChangeListener { appearanceChanged() }
+        groupSpacing.accessibleContext.accessibleName = "Spacing between project groups in pixels"
+        groupSpacing.accessibleContext.accessibleDescription = "From 0 to $MAX_GROUP_SPACING pixels. Use arrow keys for one-pixel steps."
+        groupSpacing.toolTipText = "Extra space between visible groups and between grouped and ungrouped tabs. Hidden for split groups until Arrange Tabs by Group."
+        groupSpacing.addChangeListener { appearanceChanged() }
+        showGroupOutline.toolTipText = "Highlight each intact group using its Tab color and Outline color, or icon color for Automatic. Split groups hide their highlight until Arrange Tabs by Group."
+        showGroupOutline.addActionListener { appearanceChanged() }
+        groupHighlightStyle.accessibleContext.accessibleName = "Group highlight variant"
+        groupHighlightStyle.toolTipText = "Shared background or joined tabs. Each variant keeps its own settings."
+        groupHighlightStyle.addActionListener { appearanceChanged() }
+        showGroupSeparator.toolTipText = "Draw a vertical pipe at intact group boundaries. Hidden for split groups until Arrange Tabs by Group. Reserves space even when Group spacing is zero."
+        showGroupSeparator.addActionListener { appearanceChanged() }
+        groupSeparatorThickness.accessibleContext.accessibleName = "Group separator thickness in pixels"
+        groupSeparatorThickness.toolTipText = "Pipe thickness: 1–6 px."
+        groupSeparatorThickness.addChangeListener { appearanceChanged() }
+        groupSeparatorHeight.accessibleContext.accessibleName = "Group separator height in percent"
+        groupSeparatorHeight.toolTipText = "Pipe height: 20–100% of the actual tab height."
+        groupSeparatorHeight.addChangeListener { appearanceChanged() }
+        groupSeparatorColor.accessibleContext.accessibleName = "Group separator color"
+        groupSeparatorColor.toolTipText = "Neutral theme color, or the left group's outline color. If the left tab is ungrouped, uses the right group."
+        groupSeparatorColor.addActionListener { appearanceChanged() }
+        showGroupIcon.toolTipText = "Show the group's own icon before its first tab. Hidden for split groups until Arrange Tabs by Group. Tab icons can be hidden inside the group below."
+        showGroupIcon.addActionListener { appearanceChanged() }
+        hideGroupedTabIcons.toolTipText = "Hide member tab icons while their group icon is visible. Ungrouped tabs still follow Icon → Show tab icons. If the group icon is hidden, member icons return."
+        hideGroupedTabIcons.addActionListener { appearanceChanged() }
         showOutline.toolTipText = "Use each project's icon color or its custom outline color."
         iconSize.accessibleContext.accessibleName = "Project icon size"
+        iconSize.toolTipText = "Size of tab icons and shared group icons."
         iconPosition.accessibleContext.accessibleName = "Project icon position"
         iconInitials.accessibleContext.accessibleName = "Generated icon initials"
         iconInitials.toolTipText = "Two initials uses IDE abbreviations, or the first two letters for a single word without inner capitals: Backend → BA. Two initials · Ab uses the same letters with mixed case: Ba. SVG/PNG artwork is unchanged."
@@ -513,7 +651,7 @@ internal class IconSettingsPanel(
         savePreset.isEnabled = pluginEnabled.isSelected && userPresetDraft.size < MAX_USER_APPEARANCE_PRESETS
         savePreset.toolTipText = if (userPresetDraft.size >= MAX_USER_APPEARANCE_PRESETS)
             "All $MAX_USER_APPEARANCE_PRESETS user preset slots are used. Right-click a user preset to delete it, then save a new one."
-        else "Save Icon, Color and Tab layout as a named preset · ${userPresetDraft.size} of $MAX_USER_APPEARANCE_PRESETS slots used · Apply to keep it"
+        else "Save Icon, Color, Tab layout and Group layout as a named preset · ${userPresetDraft.size} of $MAX_USER_APPEARANCE_PRESETS slots used · Apply to keep it"
         if (visibilityChanged) rebuildPresetRow()
     }
 
@@ -629,6 +767,17 @@ internal class IconSettingsPanel(
         watch(fillInsetLabel) { it.tabFillInset }
         watch(fillIntensityLabel) { it.tabFillIntensity }
         watch(tabHeightLabel) { it.tabHeight }
+        watch(groupSpacingLabel) { it.groupSpacing }
+        watch(showGroupOutline) { it.showGroupOutline }
+        watch(groupVariantLabel) { it.groupHighlightStyle }
+        backgroundHighlight.installMarkers(::watch)
+        joinedHighlight.installMarkers(::watch)
+        watch(showGroupSeparator) { it.showGroupSeparator }
+        watch(separatorThicknessLabel) { it.groupSeparatorThickness }
+        watch(separatorHeightLabel) { it.groupSeparatorHeight }
+        watch(separatorColorLabel) { it.groupSeparatorColor }
+        watch(showGroupIcon) { it.showGroupIcon }
+        watch(hideGroupedTabIcons) { it.hideGroupedTabIcons }
         watch(fontSizeLabel) { it.tabFontSize }
         watch(closeButtonLabel) { it.closeButtonPosition }
         watch(moreInfoLabel) { it.moreInfo() }
@@ -685,6 +834,17 @@ internal class IconSettingsPanel(
         outlineStyle = outlineStyle.selectedItem as TabOutlineStyle,
         closeButtonPosition = closeButtonPosition.selectedItem as TabCloseButtonPosition,
         tabHeight = tabHeight.value,
+        groupSpacing = groupSpacing.value,
+        showGroupOutline = showGroupOutline.isSelected,
+        groupHighlightStyle = groupHighlightStyle.selectedItem as GroupHighlightStyle,
+        groupBackground = backgroundHighlight.value(),
+        groupJoined = joinedHighlight.value(),
+        showGroupSeparator = showGroupSeparator.isSelected,
+        groupSeparatorThickness = groupSeparatorThickness.value,
+        groupSeparatorHeight = groupSeparatorHeight.value,
+        groupSeparatorColor = groupSeparatorColor.selectedItem as GroupSeparatorColor,
+        showGroupIcon = showGroupIcon.isSelected,
+        hideGroupedTabIcons = hideGroupedTabIcons.isSelected,
         preset = presetButtons.entries.firstOrNull { it.value.isSelected }?.key ?: TabAppearancePreset.CUSTOM,
         userPresetId = userPresetButtons.entries.firstOrNull { it.value.isSelected }?.key,
         tabFontSize = fontSizeSelection.storedSize,
@@ -740,6 +900,17 @@ internal class IconSettingsPanel(
             outlineThickness.value = value.outlineThickness
             closeButtonPosition.selectedItem = value.closeButtonPosition
             tabHeight.value = value.tabHeight
+            groupSpacing.value = value.groupSpacing
+            showGroupOutline.isSelected = value.showGroupOutline
+            groupHighlightStyle.selectedItem = value.groupHighlightStyle.normalized()
+            backgroundHighlight.setValue(value.groupBackground)
+            joinedHighlight.setValue(value.groupJoined)
+            showGroupSeparator.isSelected = value.showGroupSeparator
+            groupSeparatorThickness.value = value.groupSeparatorThickness
+            groupSeparatorHeight.value = value.groupSeparatorHeight
+            groupSeparatorColor.selectedItem = value.groupSeparatorColor
+            showGroupIcon.isSelected = value.showGroupIcon
+            hideGroupedTabIcons.isSelected = value.hideGroupedTabIcons
             moreInfoButtons.getValue(value.moreInfo()).isSelected = true
             branchStatus.isSelected = value.showGitBranch && value.showGitStatus
             branchPosition.selectedItem = value.branchPosition
@@ -759,15 +930,37 @@ internal class IconSettingsPanel(
         userPresetButtons.values.forEach { it.isEnabled = enabled }
         refreshSavePresetAction()
         listOf(showIcons, showOutline, showTabBackground, closeButtonPosition, closeButtonLabel,
-            tabHeight, tabHeightLabel, tabHeightValue, tabFontSize, fontSizeLabel, fontSizeValue, moreInfoLabel)
+            tabHeight, tabHeightLabel, tabHeightValue, tabFontSize, fontSizeLabel, fontSizeValue, moreInfoLabel,
+            groupSpacing, groupSpacingLabel, groupSpacingValue, showGroupOutline, showGroupSeparator, showGroupIcon)
             .forEach { it.isEnabled = enabled }
-        listOf(iconSize, iconPosition, iconInitials, iconLetterWeight,
-            sizeLabel, positionLabel, initialsLabel, letterWeightLabel).forEach {
+        listOf(iconSize, sizeLabel).forEach {
+            it.isEnabled = enabled && (showIcons.isSelected || showGroupIcon.isSelected)
+        }
+        listOf(iconPosition, iconInitials, iconLetterWeight,
+            positionLabel, initialsLabel, letterWeightLabel).forEach {
             it.isEnabled = enabled && showIcons.isSelected
         }
         listOf(outlineStyle, outlineThickness, styleLabel, thicknessLabel, thicknessValue).forEach {
             it.isEnabled = enabled && showOutline.isSelected
         }
+        listOf(groupHighlightStyle, groupVariantLabel).forEach {
+            it.isEnabled = enabled && showGroupOutline.isSelected
+        }
+        val highlightEnabled = enabled && showGroupOutline.isSelected
+        backgroundHighlight.refresh(highlightEnabled)
+        joinedHighlight.refresh(highlightEnabled)
+        val details = if (groupHighlightStyle.selectedItem == GroupHighlightStyle.JOINED) joinedHighlightForm else backgroundHighlightForm
+        if (groupVariantDetails.components.firstOrNull() !== details) {
+            groupVariantDetails.removeAll()
+            groupVariantDetails.add(details, BorderLayout.CENTER)
+            page.revalidate()
+            page.repaint()
+        }
+        listOf(groupSeparatorThickness, separatorThicknessLabel, separatorThicknessValue,
+            groupSeparatorHeight, separatorHeightLabel, separatorHeightValue, groupSeparatorColor, separatorColorLabel).forEach {
+            it.isEnabled = enabled && showGroupSeparator.isSelected
+        }
+        hideGroupedTabIcons.isEnabled = enabled && showGroupIcon.isSelected
         listOf(tabFillInset, fillInsetLabel, fillInsetValue, tabFillIntensity, fillIntensityLabel, fillIntensityValue).forEach {
             it.isEnabled = enabled && showTabBackground.isSelected
         }
@@ -782,6 +975,9 @@ internal class IconSettingsPanel(
         fillIntensityValue.text = "${tabFillIntensity.value}%"
         thicknessValue.text = "${outlineThickness.value} px"
         tabHeightValue.text = "${tabHeight.value} px"
+        groupSpacingValue.text = "${groupSpacing.value} px"
+        separatorThicknessValue.text = "${groupSeparatorThickness.value} px"
+        separatorHeightValue.text = "${groupSeparatorHeight.value}%"
         fontSizeValue.text = "${tabFontSize.value} px"
     }
 

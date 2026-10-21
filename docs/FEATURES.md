@@ -1,7 +1,7 @@
 # Feature guide
 
 Open **Settings → Appearance & Behavior → Project Tab Icons**.
-The preview uses fictional Frontend, Backend and Tools projects. It updates
+The preview uses three or five fictional projects: Frontend, Backend, MobileApp, Tools and pet_projects. It updates
 immediately; changes to real project windows are applied through **Apply**.
 
 ## Appearance
@@ -51,8 +51,8 @@ each project name and its group in a separate column (**—** when ungrouped).
 Select projects to **Assign** them to a group or **Ungroup** them. Appearance is
 edited in project rows or shared through the group; bulk appearance controls are removed.
 
-The first group row is **+ Add group**. Add or edit a name, member checkboxes,
-**Group tabs** and optional positions directly in the table, then use **Add / Save**.
+The first group row is **+ Add group**. Edit a name, select members and set
+optional positions directly in the table, then use **Add / Save**.
 Paths appear under member names; long lists scroll within the form. **Cancel**
 closes the inline draft. Group changes are persisted with Settings **Apply**.
 Groups have their own icon and three colors. Members inherit them dynamically,
@@ -60,14 +60,22 @@ including newly assigned and reopened projects. Removing a member or deleting it
 group restores that project's personal appearance. Group styling does not overwrite
 its personal icon files. Inherited values are edited in Project groups.
 
-Enable **Group tabs** to keep a group's open members together when project windows
-are merged. **↑ / ↓** sets group order. Each member can use **Auto** or a distinct
+Groups' open members are placed together on the left when project windows
+are merged, followed by ungrouped projects. **↑ / ↓** sets group order. Each member can use **Auto** or a distinct
 fixed position within the group. For Tools = 1, Tools comes before Auto members;
 Auto members retain their relative order. Closed members remain editable and do not
-leave gaps while absent. Existing groups default to Group tabs off; new groups start on.
+leave gaps while absent. Existing groups follow the same ordering without an extra grouping switch.
 
 Order is applied on merge. Later manual rearrangements remain available.
-**Restore Group Tab Order** in a window tab's context menu reapplies the saved order.
+**Arrange Tabs by Group** in a window tab's context menu reapplies the saved order.
+
+Under **Group layout → Group highlight → Variant**, choose **Shared background**
+or **Joined tabs**. Both inherit regular tab dimensions, theme corners, Color
+settings, active/hover colors and **Icon → Size**. Group controls cover inactive
+dimming, active-card inset, internal dividers, shared-icon visibility, hiding member
+icons, group spacing and boundary pipes. Group Tab color supplies the fill; Outline
+color supplies the contour, with icon color as the Automatic fallback. A split group's
+shared decoration remains hidden until **Arrange Tabs by Group** restores it.
 
 ## Quick actions
 
@@ -136,6 +144,11 @@ The branch comes from the IDE's Git model. Counts use a local background Git dif
 with cancellation, a delay and a timeout. This does not fetch or contact remotes.
 
 ## Preview and persistence
+
+Choose **3 tabs** or **5 tabs** beside Preview and switch among eight IDE themes.
+Click a sample tab, or use Space/Enter while it has focus, to compare active states.
+The sample count never changes real windows, presets or Apply. Light uses light tab
+surfaces and readable foregrounds while retaining its dark toolbar and light editor.
 
 The preview theme is temporary and does not change the IDE's theme. Appearance
 settings persist in `projectTabIcons.xml`; last Custom memory is saved in

@@ -12,10 +12,10 @@
   ],
   "socialPreview": "docs/media/social-preview.png",
   "license": "MIT",
-  "version": "0.3.62",
+  "version": "0.3.85",
   "githubUrl": "https://github.com/vlaslaptev/project-tab-icons",
-  "status": "Published 0.3.62 release: shared group appearance, inline group editing, merge-time ordering and refreshed screenshots",
-  "releaseUrl": "https://github.com/vlaslaptev/project-tab-icons/releases/tag/v0.3.62",
+  "status": "Prepared 0.3.85: group variants, eight-theme Preview and refreshed README gallery",
+  "releaseUrl": "https://github.com/vlaslaptev/project-tab-icons/releases/tag/v0.3.85",
   "publishedRelease": "0.3.62",
   "releasePublishedOn": "2026-10-20"
 }

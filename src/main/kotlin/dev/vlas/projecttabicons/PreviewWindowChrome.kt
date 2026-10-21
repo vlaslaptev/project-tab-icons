@@ -16,7 +16,8 @@ import java.awt.geom.RoundRectangle2D
 internal object PreviewWindowChrome {
     const val TOOLBAR_HEIGHT = 40
 
-    fun paint(graphics: Graphics2D, width: Int, height: Int, tabBottom: Int, palette: PreviewThemePalette) {
+    fun paint(graphics: Graphics2D, width: Int, height: Int, tabBottom: Int, palette: PreviewThemePalette,
+              activeTitle: String, activeBranch: String, tabCount: Int) {
         val g = graphics.create() as Graphics2D
         try {
             val scale = JBUIScale.scale(1f).toDouble()
@@ -28,12 +29,12 @@ internal object PreviewWindowChrome {
             g.stroke = BasicStroke(1f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
             g.color = palette.stripBackground
             g.fillRect(0, 0, w.toInt(), h.toInt())
-            toolbar(g, w, palette.chrome)
-            editor(g, w, h, bottom + 6, palette.chrome)
+            toolbar(g, w, palette.chrome, activeTitle, activeBranch)
+            editor(g, w, h, bottom + 6, palette.chrome, activeTitle, tabCount)
         } finally { g.dispose() }
     }
 
-    private fun toolbar(g: Graphics2D, width: Double, colors: PreviewChromePalette) {
+    private fun toolbar(g: Graphics2D, width: Double, colors: PreviewChromePalette, activeTitle: String, activeBranch: String) {
         g.color = colors.toolbarBackground
         g.fillRect(0, 0, width.toInt(), TOOLBAR_HEIGHT)
         // Всегда видимый macOS-светофор; кнопки намеренно не реагируют на наведение/клики.
@@ -50,14 +51,19 @@ internal object PreviewWindowChrome {
             text.clipRect(91, 0, (width - 208).toInt().coerceAtLeast(0), TOOLBAR_HEIGHT)
             text.color = colors.toolbarForeground
             text.font = JBFont.medium().deriveFont(13f)
-            text.drawString("Backend", 92, 25)
-            chevron(text, 157.0, 19.0)
-            if (width >= 470) {
+            val title = fitLabel(text, activeTitle, (width - 316).toInt())
+            text.drawString(title, 92, 25)
+            val titleEnd = 92.0 + text.fontMetrics.stringWidth(title)
+            chevron(text, titleEnd + 10, 19.0)
+            val branchX = titleEnd + 40
+            val branchWidth = (width - 208 - branchX - 35).toInt()
+            if (width >= 470 && branchWidth >= 60) {
                 text.color = colors.muted
-                branch(text, 188.0, 15.0)
+                branch(text, branchX, 15.0)
                 text.font = JBFont.regular().deriveFont(12f)
-                text.drawString("main", 207, 25)
-                chevron(text, 242.0, 19.0)
+                val label = fitLabel(text, activeBranch, branchWidth)
+                text.drawString(label, (branchX + 19).toFloat(), 25f)
+                chevron(text, branchX + 19 + text.fontMetrics.stringWidth(label) + 10, 19.0)
             }
         } finally { text.dispose() }
         val actions = g.create() as Graphics2D
@@ -66,7 +72,7 @@ internal object PreviewWindowChrome {
             if (width >= 620) {
                 actions.font = JBFont.regular().deriveFont(12f)
                 actions.color = colors.toolbarForeground
-                actions.drawString("Backend", (width - 197).toFloat(), 25f)
+                actions.drawString(fitLabel(actions, activeTitle, 52), (width - 197).toFloat(), 25f)
                 chevron(actions, width - 136, 19.0)
             }
             actions.color = Color(0x59A869)
@@ -82,7 +88,7 @@ internal object PreviewWindowChrome {
     }
 
     private fun editor(graphics: Graphics2D, width: Double, height: Double, top: Double,
-                       colors: PreviewChromePalette) {
+                       colors: PreviewChromePalette, activeTitle: String, tabCount: Int) {
         val g = graphics.create() as Graphics2D
         try {
             val card = RoundRectangle2D.Double(8.0, top, (width - 16).coerceAtLeast(0.0),
@@ -119,7 +125,7 @@ internal object PreviewWindowChrome {
                 content.clipRect(41, (top + 31).toInt(), (width - 49).toInt().coerceAtLeast(0),
                     (height - top - 39).toInt().coerceAtLeast(0))
                 content.font = Font(Font.MONOSPACED, Font.PLAIN, 12)
-                val lines = listOf("# Backend workspace", "Three projects. One window.")
+                val lines = listOf("# $activeTitle workspace", "$tabCount projects. One window.")
                 lines.forEachIndexed { index, line ->
                     val baseline = (top + 50 + index * 18).toFloat()
                     content.color = colors.muted
@@ -129,6 +135,13 @@ internal object PreviewWindowChrome {
                 }
             } finally { content.dispose() }
         } finally { g.dispose() }
+    }
+
+    private fun fitLabel(g: Graphics2D, value: String, width: Int): String {
+        if (g.fontMetrics.stringWidth(value) <= width) return value
+        var prefix = value
+        while (prefix.isNotEmpty() && g.fontMetrics.stringWidth("$prefix…") > width) prefix = prefix.dropLast(1)
+        return if (prefix.isEmpty()) "" else "$prefix…"
     }
 
     private fun chevron(g: Graphics2D, x: Double, y: Double) = g.draw(Path2D.Double().apply {

@@ -44,7 +44,6 @@ internal class ProjectGroupsPanel(
         delete = ::deleteGroup,
         assign = ::assignSelected,
         move = ::moveGroup,
-        groupTabs = { id, enabled -> updateGroup(id) { it.copy(groupTabs = enabled) } },
         showProjects = { id -> filterId = id; changed(); showProjects() },
         chooseIcon = chooseGroupIcon,
         chooseColor = chooseGroupColor,
@@ -92,7 +91,7 @@ internal class ProjectGroupsPanel(
         refreshTable()
     }
 
-    private fun saveGroup(id: String?, name: String, projectKeys: Set<String>, groupTabs: Boolean,
+    private fun saveGroup(id: String?, name: String, projectKeys: Set<String>,
                           positions: Map<String, Int>): String? {
         if (!editingEnabled || disposed) return "Group editing is unavailable."
         if (id != null && draft.groups.none { it.id == id }) return "This group no longer exists."
@@ -106,7 +105,7 @@ internal class ProjectGroupsPanel(
         if (positionsToSave.values.any { it !in 1..projectKeys.size } || positionsToSave.values.distinct().size != positionsToSave.size)
             return "Use a different position from 1 to ${projectKeys.size} for each member, or choose Auto."
         val group = (if (id == null) ProjectTabGroup(UUID.randomUUID().toString(), name)
-            else draft.groups.first { it.id == id }.copy(name = name)).copy(groupTabs = groupTabs, memberPositions = positionsToSave)
+            else draft.groups.first { it.id == id }.copy(name = name)).copy(memberPositions = positionsToSave)
         val localKeys = allRows.filter { it.target.path != null && !it.target.project.isDisposed }.map { it.key }.toSet()
         val editableKeys = localKeys + draft.memberships.filterValues { it == group.id }.keys
         val memberships = draft.memberships.filterValues { it != group.id }.toMutableMap()

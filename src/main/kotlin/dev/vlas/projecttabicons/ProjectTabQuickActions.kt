@@ -109,11 +109,12 @@ private fun quickWork(project: Project, parent: JComponent, title: String, work:
 private data class AppearanceChoice(val title: String, val state: TabAppearanceState) { override fun toString() = title }
 private fun appearanceChoices(): List<AppearanceChoice> {
     val app = ApplicationManager.getApplication()
-    val enabled = app.getService(TabAppearanceSettings::class.java).state.enabled
+    val current = app.getService(TabAppearanceSettings::class.java).state
+    val enabled = current.enabled
     return TabAppearancePreset.entries.map { preset ->
         AppearanceChoice(preset.title, if (preset == TabAppearancePreset.CUSTOM)
             (app.getService(LastCustomAppearanceSettings::class.java).state.appearance ?: TabAppearanceState.defaults().asCustomAppearance()).copy(enabled = enabled)
-            else TabAppearanceState.forPreset(preset, enabled))
+            else TabAppearanceState.forPreset(preset, enabled).withGroupLayoutFrom(current))
     } + app.getService(UserAppearancePresets::class.java).state.presets.map {
         AppearanceChoice(it.name, it.appearance.copy(enabled = enabled, userPresetId = it.id))
     }

@@ -1,6 +1,6 @@
 # Compatibility
 
-| Area | Scope for 0.3.62 |
+| Area | Scope for 0.3.85 |
 | --- | --- |
 | Operating system | macOS |
 | IDE | IntelliJ IDEA 2026.2.3 and later 2026.2 updates within the declared build range |
@@ -27,6 +27,23 @@ change, not a way to make an unreviewed build install on a newer IDE.
 
 ## Evidence and limits
 
+### Release 0.3.85
+
+The 0.3.85 ZIP was built and installed in IntelliJ IDEA 2026.2.3 / 262.10968.63.
+Installed JAR hashes match the packaged ZIP. Visual checks cover the Light preview
+palette, three/five-tab samples, and the README gallery across all eight preview
+themes. The High Contrast example uses larger text and icons on the right.
+Earlier local 0.3.83 checks cover both group variants inheriting tab appearance
+and icon size. Original settings were restored after the gallery captures.
+
+The release keeps the same compatibility range. Manual drag-and-Arrange interactions,
+quick actions, style import/export and preset-manager operations were not all repeated
+in the final 0.3.85 pass. No standalone JVM tests, linters or Plugin Verifier were run.
+The recorded checks do not establish every theme, display scale or macOS/IDE patch
+combination. The ZIP is unsigned.
+
+### Earlier 0.3.62 checks
+
 The 0.3.62 release ZIP was built and installed in IDEA 2026.2.3. Both installed
 JARs match the ZIP byte for byte. UI checks cover the two table tabs, inline group
 creation/editing, member paths, fixed positions, group-order arrows, persistence
@@ -51,3 +68,62 @@ tests, linters or Plugin Verifier run is claimed. The artifact is unsigned.
 
 The packaged release metadata and SHA-256 are prepared alongside the GitHub release
 assets. See [installation](INSTALLATION.md) and [architecture](ARCHITECTURE.md).
+
+
+## Local 0.3.69 follow-up
+
+Installed in IDEA 262.10968.63; installed JARs match the packaged ZIP. The compact
+group underline was checked after merging nine windows. Preview at 6/12 px corner
+radius kept the same straight-line height with a 2 px gap. Four settings files
+remain byte-identical and no new plugin errors were found. DnD, Arrange and focus
+transitions were not rechecked; no standalone JVM verification tools were run.
+
+## Local 0.3.68 follow-up
+
+Packaged and installed in IDEA 262.10968.63; installed JARs match the ZIP. Checks
+covered Tools and group thickness at 1/6 px, Filled with independent tab/group
+outlines, and gap/radius at 0/12 px in Preview and native tabs after a nine-window
+merge. All four plugin settings files were restored byte for byte, preserving
+the user's pending appearance edits saved before installation. No new plugin
+errors were found. Manual DnD, Arrange and inactive-window transitions were skipped
+because native input is not reliably automated. No standalone JVM tests, linters
+or Plugin Verifier were run; no timing benchmark is claimed.
+
+## Local 0.3.67 follow-up
+
+Compiled and packaged against SDK 262.10968.63. Group outlines now have a separate
+track and independent thickness; tab outlines/fills remain independent. Static
+inspection covers gutter/inset sizing, shared IDE/Preview geometry, cached boundary
+invalidation on order/removal/selection/scale changes, XML/JSON defaults and preset
+preservation. No installation, new runtime QA, timing benchmark, standalone JVM
+tests, linters or Plugin Verifier run is claimed for this version.
+
+## Local 0.3.65 follow-up
+
+Group layout was compiled and packaged against the same SDK 262.10968.63.
+Static API inspection covers `IdeGlassPaneUtil.installPainter`, `AbstractPainter`,
+`TabsListener.tabsMoved`, live TabLabel bounds and disposal. The update was
+installed and the installed JARs match the ZIP. Spacing at 0, 24 and 32 px,
+the continuous outline after merging nine windows and restoration of individual
+outlines when disabling it were visually checked. Original settings were restored
+byte for byte. Manual drag splitting and restoration through Arrange Tabs by Group
+remain unverified: native-tab input could not be automated and an alternative
+input method was declined. No standalone JVM tests, linters or Plugin Verifier
+were run.
+
+## Local 0.3.64 follow-up
+
+Local 0.3.64 was packaged and installed in the same IDEA build. The installed JARs
+match the ZIP. Checks covered restart and merge of nine windows with one existing
+three-member group, plus two-group table ordering and a fixed first member on merge.
+All grouped tabs were placed on the left. Settings Apply preserved the current tab
+order. Four plugin settings files were restored byte for byte after the checks.
+The legacy grouping flag no longer gates ordering. Native popup actions now use
+childActionsOrStubs instead of getChildren(null); no plugin stack traces were found
+in the final restarted session.
+
+The English context action and its shared ordering calculation were inspected
+statically. Automated right-click and drag interaction with the macOS project tab
+strip could not be completed reliably, so clicking Arrange Tabs by Group after a
+manual rearrangement remains unverified at runtime. This follow-up is not a new
+published release.

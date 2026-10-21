@@ -142,6 +142,17 @@ private fun encodeAppearance(value: TabAppearanceState): JsonObject = JsonObject
     addProperty("tabFontSize", value.tabFontSize)
     addProperty("tabFillInset", value.tabFillInset)
     addProperty("tabFillIntensity", value.tabFillIntensity)
+    addProperty("groupSpacing", value.groupSpacing)
+    addProperty("showGroupOutline", value.showGroupOutline)
+    addProperty("groupHighlightStyle", value.groupHighlightStyle.name)
+    add("groupBackground", encodeGroupHighlight(value.groupBackground))
+    add("groupJoined", encodeGroupHighlight(value.groupJoined))
+    addProperty("showGroupSeparator", value.showGroupSeparator)
+    addProperty("groupSeparatorThickness", value.groupSeparatorThickness)
+    addProperty("groupSeparatorHeight", value.groupSeparatorHeight)
+    addProperty("groupSeparatorColor", value.groupSeparatorColor.name)
+    addProperty("showGroupIcon", value.showGroupIcon)
+    addProperty("hideGroupedTabIcons", value.hideGroupedTabIcons)
     addProperty("iconInitials", value.iconInitials.name)
     addProperty("iconLetterWeight", value.iconLetterWeight.name)
 }
@@ -165,7 +176,39 @@ private fun decodeAppearance(value: JsonObject): TabAppearanceState {
         tabFontSize = value.integer("tabFontSize", defaults.tabFontSize),
         tabFillInset = value.integer("tabFillInset", defaults.tabFillInset),
         tabFillIntensity = value.integer("tabFillIntensity", defaults.tabFillIntensity),
+        groupSpacing = value.integer("groupSpacing", defaults.groupSpacing),
+        showGroupOutline = value.bool("showGroupOutline", defaults.showGroupOutline),
+        groupHighlightStyle = value.enum("groupHighlightStyle", defaults.groupHighlightStyle),
+        groupBackground = decodeGroupHighlight(value.get("groupBackground"), defaults.groupBackground),
+        groupJoined = decodeGroupHighlight(value.get("groupJoined"), defaults.groupJoined),
+        showGroupSeparator = value.bool("showGroupSeparator", defaults.showGroupSeparator),
+        groupSeparatorThickness = value.integer("groupSeparatorThickness", defaults.groupSeparatorThickness),
+        groupSeparatorHeight = value.integer("groupSeparatorHeight", defaults.groupSeparatorHeight),
+        groupSeparatorColor = value.enum("groupSeparatorColor", defaults.groupSeparatorColor),
+        showGroupIcon = value.bool("showGroupIcon", defaults.showGroupIcon),
+        hideGroupedTabIcons = value.bool("hideGroupedTabIcons", defaults.hideGroupedTabIcons),
         iconInitials = value.enum("iconInitials", defaults.iconInitials),
         iconLetterWeight = value.enum("iconLetterWeight", defaults.iconLetterWeight),
     ).normalized().asCustomAppearance()
+}
+
+private fun encodeGroupHighlight(value: GroupHighlightOptions): JsonObject = JsonObject().apply {
+    addProperty("inactiveDimming", value.inactiveDimming)
+    addProperty("cardInset", value.cardInset)
+    addProperty("showDividers", value.showDividers)
+    addProperty("dividerIntensity", value.dividerIntensity)
+    addProperty("dividerHeight", value.dividerHeight)
+    addProperty("hideDividersNearActive", value.hideDividersNearActive)
+}
+
+private fun decodeGroupHighlight(element: JsonElement?, defaults: GroupHighlightOptions): GroupHighlightOptions {
+    val value = element?.objectValue() ?: return defaults
+    return GroupHighlightOptions(
+        inactiveDimming = value.integer("inactiveDimming", defaults.inactiveDimming),
+        cardInset = value.integer("cardInset", defaults.cardInset),
+        showDividers = value.bool("showDividers", defaults.showDividers),
+        dividerIntensity = value.integer("dividerIntensity", defaults.dividerIntensity),
+        dividerHeight = value.integer("dividerHeight", defaults.dividerHeight),
+        hideDividersNearActive = value.bool("hideDividersNearActive", defaults.hideDividersNearActive),
+    ).normalized()
 }

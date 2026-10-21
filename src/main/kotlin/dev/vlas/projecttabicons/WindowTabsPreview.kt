@@ -16,20 +16,36 @@ import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.RenderingHints
+import java.awt.event.ActionEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import java.awt.geom.Rectangle2D
 import java.awt.geom.RoundRectangle2D
+import javax.swing.AbstractAction
+import javax.swing.JComponent
+import javax.swing.KeyStroke
 import javax.swing.Icon
 import javax.swing.JPanel
 
 internal typealias PreviewArtwork = Map<String, Map<TabIconSize, Icon>>
 
 private data class PreviewSample(val title: String, val path: String, val branch: String,
-                                 val contourId: String?, val color: Color, val selected: Boolean)
+                                 val contourId: String?, val color: Color,
+                                 val groupMember: Boolean = false, val extendedOnly: Boolean = false)
 
+internal enum class PreviewTabCount(val title: String) {
+    THREE("3 tabs"), FIVE("5 tabs"),
+}
+
+private val PREVIEW_GROUP_COLOR = Color(0xC084FC)
 private val PREVIEW_SAMPLES = listOf(
-    PreviewSample("Frontend", "~/web", "feature/improve-project-tabs", "globe-simple", Color(0x60A5FA), selected = false),
-    PreviewSample("Backend", "~/api", "feature/PROJ-1287-show-current-branch", null, Color(0xC084FC), selected = true),
-    PreviewSample("Tools", "~/tools", "main", "brackets-curly", Color(0x4ADE80), selected = false),
+    PreviewSample("Frontend", "~/web", "feature/improve-project-tabs", "globe-simple", Color(0x60A5FA), groupMember = true),
+    PreviewSample("Backend", "~/api", "feature/WASD-3245", null, PREVIEW_GROUP_COLOR, groupMember = true),
+    PreviewSample("MobileApp", "~/mobile", "hotfix/hotfix-067", "device-mobile", Color(0x22D3EE), groupMember = true, extendedOnly = true),
+    PreviewSample("Tools", "~/tools", "main", "brackets-curly", Color(0x4ADE80)),
+    PreviewSample("pet_projects", "~/pet_projects", "B2B-SaaS-03", "paw-print", Color(0xFB923C), extendedOnly = true),
 )
+private const val PREVIEW_GROUP_ARTWORK = "preview-group"
 
 /** Постоянные примеры: никаких окон, файлов проекта или записей в настройки. */
 internal class WindowTabsPreview : JPanel(null) {
@@ -37,18 +53,62 @@ internal class WindowTabsPreview : JPanel(null) {
     private var theme = PreviewIdeTheme.CURRENT
     private var appearance = TabAppearanceState.defaults()
     private var palette = theme.palette()
-    private val sampleTabs = PREVIEW_SAMPLES.map { sample ->
-        PreviewTab(sample.title, sample.path, sample.branch, sample.contourId, sample.color, sample.selected)
+    private val groupSeparator = ProjectTabGroupSeparator()
+    private var groupArtwork = emptyMap<TabIconSize, Icon>()
+    private var groupIcon: Icon? = null
+    private var groupIconSlot = 0
+    private var tabCount = PreviewTabCount.THREE
+    private var samples = PREVIEW_SAMPLES.filterNot { it.extendedOnly }
+    private var artwork: PreviewArtwork = emptyMap()
+    private var selectedIndex = 1
+    private var sampleTabs: List<PreviewTab> = createTabs()
+    private val groupTabCount get() = samples.count { it.groupMember }
+    private val activeGroup get() = samples[selectedIndex].groupMember
+
+    val groupDescription: String get() {
+        val grouped = samples.filter { it.groupMember }.joinToString(" + ") { it.title }
+        val ungrouped = samples.filterNot { it.groupMember }
+        return "$grouped are grouped; ${ungrouped.joinToString(" + ") { it.title }} ${if (ungrouped.size == 1) "is" else "are"} ungrouped."
+    }
+
+    private fun createTabs() = samples.mapIndexed { index, sample ->
+        PreviewTab(sample.title, sample.path, sample.branch, sample.contourId, sample.color, index == selectedIndex, sample.groupMember) {
+            selectTab(index)
+        }
     }
 
     init {
         isOpaque = false
         sampleTabs.forEach { add(it) }
         getAccessibleContext().accessibleName = "IDE window preview"
-        getAccessibleContext().accessibleDescription = "Decorative macOS window with traffic lights, toolbar, three project tabs and an editor fragment. Backend is active. Toolbar and file tabs are not interactive."
+        updateAccessibleDescription()
     }
 
-    private fun contentHeight(): Int = sampleTabs.maxOf { it.minimumContentHeight() }
+    private fun updateAccessibleDescription() {
+        getAccessibleContext().accessibleDescription = "Decorative macOS window with traffic lights, toolbar, ${samples.size} project tabs and an editor fragment. $groupDescription Click a project tab to preview activation and inactive group dimming. Toolbar and file tabs are not interactive."
+    }
+
+    fun showTabCount(value: PreviewTabCount) {
+        if (tabCount == value) return
+        val selectedTitle = samples[selectedIndex].title
+        tabCount = value
+        samples = PREVIEW_SAMPLES.filter { value == PreviewTabCount.FIVE || !it.extendedOnly }
+        selectedIndex = samples.indexOfFirst { it.title == selectedTitle }.takeIf { it >= 0 } ?: 1
+        removeAll()
+        sampleTabs = createTabs()
+        sampleTabs.forEach { tab -> tab.showArtwork(artwork); add(tab) }
+        updateAccessibleDescription()
+        showAppearance(appearance)
+    }
+
+    private fun selectTab(index: Int) {
+        selectedIndex = index
+        sampleTabs.forEachIndexed { tabIndex, tab -> tab.select(tabIndex == selectedIndex) }
+        showAppearance(appearance)
+    }
+
+    private fun contentHeight(): Int = maxOf(sampleTabs.maxOf { it.minimumContentHeight() },
+        if (groupIcon != null) groupIconMinimumHeight(appearance) else 0)
 
     override fun getPreferredSize(): Dimension = Dimension(JBUI.scale(400), JBUI.scale(180))
 
@@ -57,15 +117,43 @@ internal class WindowTabsPreview : JPanel(null) {
     override fun doLayout() {
         // Высота всего окна постоянна. Растут только табы; фрагмент редактора сокращается.
         val top = JBUI.scale(PreviewWindowChrome.TOOLBAR_HEIGHT)
-        val actualHeight = maxOf(JBUI.scale(tabHeight), contentHeight()).coerceAtMost((height - top).coerceAtLeast(0))
+        val availableHeight = (height - top).coerceAtLeast(0)
         val edge = JBUI.scale(8)
         val available = (width - edge * 2).coerceAtLeast(0)
+        val gap = (if (appearance.enabled) JBUI.scale(groupBoundarySpacing(appearance)) else 0).coerceIn(0, available / sampleTabs.size)
+        groupIconSlot = if (groupIcon != null) groupIconSlotWidth(appearance).takeIf { it <= available / 4 } ?: 0 else 0
+        val iconHeight = maxOf(JBUI.scale(tabHeight), groupIconMinimumHeight(appearance)).coerceAtMost(availableHeight)
+        val sharedIconVisible = visibleGroupIcon(groupIcon, groupIconSlot, iconHeight, appearance) != null
+        val hideGroupMembers = appearance.hideGroupedTabIcons && sharedIconVisible
+        sampleTabs.forEachIndexed { index, tab -> tab.setTabIconHidden(hideGroupMembers && samples[index].groupMember) }
+        val actualHeight = maxOf(JBUI.scale(tabHeight), contentHeight()).coerceAtMost(availableHeight)
+        val tabSpace = (available - gap - groupIconSlot).coerceAtLeast(0)
         sampleTabs.forEachIndexed { index, tab ->
-            val left = edge + available * index / sampleTabs.size
-            val right = edge + available * (index + 1) / sampleTabs.size
+            val groupOffset = if (index >= groupTabCount) gap else 0
+            val left = edge + groupIconSlot + tabSpace * index / sampleTabs.size + groupOffset
+            val right = edge + groupIconSlot + tabSpace * (index + 1) / sampleTabs.size + groupOffset
             tab.setBounds(left, top, right - left, actualHeight)
+        }
+        val shared = appearance.enabled && appearance.showGroupOutline
+        val geometry = groupSurfaceGeometry()
+        val bounds = geometry.bounds
+        sampleTabs.forEachIndexed { index, tab ->
+            tab.setGroupSurface(if (shared && samples[index].groupMember) ProjectTabGroupSurfaceState(appearance,
+                geometry.copy(bounds = Rectangle2D.Double(bounds.x - tab.x, bounds.y - tab.y, bounds.width, bounds.height)),
+                Rectangle2D.Double(0.0, 0.0, tab.width.toDouble(), tab.height.toDouble()),
+                ProjectTabGroupColors(PREVIEW_GROUP_COLOR, PREVIEW_GROUP_COLOR),
+                index == 0, index == groupTabCount - 1, activeGroup, selectedIndex == index + 1) else null)
             tab.doLayout()
         }
+    }
+
+    private fun groupSurfaceGeometry(): ProjectTabGeometry {
+        val first = sampleTabs[0]
+        val last = sampleTabs[groupTabCount - 1]
+        val left = first.x - groupIconSlot
+        val geometry = palette.geometry((last.x + last.width - left).coerceAtLeast(0), first.height)
+        return geometry.copy(bounds = Rectangle2D.Double(geometry.bounds.x + left,
+            geometry.bounds.y + first.y, geometry.bounds.width, geometry.bounds.height))
     }
 
     // Форма внешнего окна не зависит от скруглений проектных табов выбранной темы.
@@ -80,7 +168,25 @@ internal class WindowTabsPreview : JPanel(null) {
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
             g.clip(windowShape())
             val bottom = sampleTabs.first().let { it.y + it.height }
-            PreviewWindowChrome.paint(g, width, height, bottom, palette)
+            val active = samples[selectedIndex]
+            PreviewWindowChrome.paint(g, width, height, bottom, palette, active.title, active.branch, samples.size)
+            if (appearance.enabled && appearance.showGroupOutline) {
+                // Префикс общей иконки принадлежит первому сегменту, включая его активную заливку.
+                val first = sampleTabs[0]
+                val left = first.x - groupIconSlot
+                val geometry = groupSurfaceGeometry()
+                val bounds = geometry.bounds
+                val prefix = g.create(left, first.y, groupIconSlot, first.height) as Graphics2D
+                try {
+                    val state = ProjectTabGroupSurfaceState(appearance,
+                        geometry.copy(bounds = Rectangle2D.Double(bounds.x - left, bounds.y - first.y, bounds.width, bounds.height)),
+                        Rectangle2D.Double(groupIconSlot.toDouble(), 0.0, first.width.toDouble(), first.height.toDouble()),
+                        ProjectTabGroupColors(PREVIEW_GROUP_COLOR, PREVIEW_GROUP_COLOR),
+                        true, false, activeGroup, selectedIndex == 1)
+                    ProjectTabGroupSurface.paint(prefix, groupIconSlot, first.height, state,
+                        first.surfaceColors(), selectedIndex == 0, first.isPreviewHovered())
+                } finally { prefix.dispose() }
+            }
         } finally { g.dispose() }
     }
 
@@ -89,6 +195,21 @@ internal class WindowTabsPreview : JPanel(null) {
         try {
             g.clip(windowShape())
             super.paintChildren(g)
+            if (appearance.enabled) {
+                val first = sampleTabs[0]
+                val last = sampleTabs[groupTabCount - 1]
+                val icon = visibleGroupIcon(groupIcon, groupIconSlot, first.height, appearance)
+                val iconX = first.x - groupIconSlot + (groupIconSlot - (icon?.iconWidth ?: 0)) / 2
+                icon?.paintIcon(this, g, iconX, first.y + first.insets.top +
+                    (first.height - first.insets.top - first.insets.bottom - icon.iconHeight) / 2)
+                if (appearance.showGroupSeparator) {
+                    val next = sampleTabs[groupTabCount]
+                    val color = if (appearance.groupSeparatorColor == GroupSeparatorColor.GROUP) PREVIEW_GROUP_COLOR
+                        else palette.groupSeparatorColor
+                    groupSeparator.paint(g, (last.x + last.width + next.x) / 2.0, first.y.toDouble(), first.height,
+                        appearance.groupSeparatorThickness, appearance.groupSeparatorHeight, color)
+                }
+            }
             g.color = palette.chrome.border
             g.stroke = BasicStroke(JBUIScale.scale(1f))
             g.draw(windowShape())
@@ -103,6 +224,8 @@ internal class WindowTabsPreview : JPanel(null) {
     }
 
     fun showArtwork(artwork: PreviewArtwork) {
+        this.artwork = artwork
+        groupArtwork = artwork[PREVIEW_GROUP_ARTWORK].orEmpty()
         sampleTabs.forEach { it.showArtwork(artwork) }
         showAppearance(appearance)
     }
@@ -113,6 +236,11 @@ internal class WindowTabsPreview : JPanel(null) {
             appearance.tabHeight.coerceIn(DEFAULT_TAB_HEIGHT, MAX_TAB_HEIGHT)
         } else DEFAULT_TAB_HEIGHT
         palette = theme.palette()
+        groupIcon = if (appearance.enabled && appearance.showGroupIcon) {
+            val image = groupArtwork[appearance.iconSize] ?: ProjectInitialsIcon("Gr", PREVIEW_GROUP_COLOR,
+                appearance.iconSize.pixels, DEFAULT_ICON_INITIALS, TabIconLetterWeight.BOLD, projectName = "Group")
+            CenteredProjectIcon(image, appearance.iconSize.pixels, artwork = { image })
+        } else null
         sampleTabs.forEach { it.showAppearance(appearance, palette) }
         revalidate()
         // null-layout требует явно обновить дочернюю геометрию и при смене шрифта,
@@ -130,7 +258,10 @@ internal class WindowTabsPreview : JPanel(null) {
                     RecentProjectIconHelper.createIcon(svg, true, size.pixels)
                 }
             }
-        }.toMap()
+        }.toMap() + (PREVIEW_GROUP_ARTWORK to TabIconSize.entries.associateWith { size ->
+            val svg = ContourCatalog.entries.first { it.id == "folder" }.svg(PREVIEW_GROUP_COLOR)
+            RecentProjectIconHelper.createIcon(svg, true, size.pixels)
+        })
     }
 }
 
@@ -140,8 +271,12 @@ private class PreviewTab(
     private val sampleBranch: String,
     private val contourId: String?,
     private val color: Color,
-    private val selected: Boolean,
+    private var selected: Boolean,
+    private val groupMember: Boolean,
+    private val activate: () -> Unit,
 ) : JPanel(BorderLayout()) {
+    private var groupSurface: ProjectTabGroupSurfaceState? = null
+    private var hovered = false
     private var palette = PreviewIdeTheme.CURRENT.palette()
     private var tabFillColor: Color? = null
     private var tabFillInset = 0
@@ -159,6 +294,7 @@ private class PreviewTab(
     }
     private val close = JBLabel().apply { border = JBUI.Borders.emptyLeft(6) }
     private var artwork = emptyMap<TabIconSize, Icon>()
+    private var tabIcon: CenteredProjectIcon? = null
 
     init {
         isOpaque = false
@@ -166,16 +302,44 @@ private class PreviewTab(
         add(close, BorderLayout.WEST)
         add(caption, BorderLayout.CENTER)
         layout = previewLayout
-        getAccessibleContext().accessibleName = "$title, ${if (selected) "active" else "inactive"} example tab"
+        isFocusable = true
+        toolTipText = "Click to preview $title as the active tab"
+        val click = object : MouseAdapter() {
+            override fun mousePressed(event: MouseEvent) { activate() }
+            override fun mouseEntered(event: MouseEvent) { hovered = true; parent?.repaint() }
+            override fun mouseExited(event: MouseEvent) { hovered = false; parent?.repaint() }
+        }
+        listOf(this, caption, close).forEach { it.addMouseListener(click) }
+        getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("SPACE"), "activatePreview")
+        getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("ENTER"), "activatePreview")
+        actionMap.put("activatePreview", object : AbstractAction() {
+            override fun actionPerformed(event: ActionEvent) = activate()
+        })
+        select(selected)
     }
 
-    fun minimumContentHeight(): Int = maxOf(layout.preferredLayoutSize(this).height,
-        maxOf(caption.getFontMetrics(caption.font).height,
-            if (layout === previewLayout) previewLayout.projectIcon?.iconHeight ?: 0 else 0) +
-            insets.top + insets.bottom + JBUI.scale(4))
+    fun select(value: Boolean) {
+        selected = value
+        getAccessibleContext().accessibleName = "$title, ${if (selected) "active" else "inactive"} example tab"
+        getAccessibleContext().accessibleDescription = "Click or press Space to preview this tab as active."
+    }
+
+    // Как в ProjectTabsContainerLayout: border уже учитывает иконку и защиту линии.
+    fun minimumContentHeight(): Int = layout.preferredLayoutSize(this).height
 
     fun showArtwork(icons: PreviewArtwork) {
         artwork = contourId?.let(icons::get).orEmpty()
+    }
+
+    fun setTabIconHidden(hidden: Boolean) {
+        val visibleIcon = tabIcon?.takeUnless { hidden }
+        previewLayout.projectIcon = visibleIcon
+        (border as? ProjectTabBorder)?.hideProjectIconPreview = hidden
+    }
+
+    fun setGroupSurface(value: ProjectTabGroupSurfaceState?) {
+        groupSurface = value
+        (border as? ProjectTabBorder)?.sharedGroupSurfacePreview = value != null
     }
 
     fun showAppearance(appearance: TabAppearanceState, theme: PreviewThemePalette) {
@@ -219,28 +383,41 @@ private class PreviewTab(
             return
         }
         layout = previewLayout
-        // Backend — буквенный пример; Frontend и Tools сохраняют свои SVG.
+        // Backend — буквенный пример; остальные образцы сохраняют свои SVG.
         val image = artwork[appearance.iconSize] ?: ProjectInitialsIcon(AvatarUtils.initials(title), color,
             appearance.iconSize.pixels, appearance.iconInitials, appearance.iconLetterWeight, projectName = title)
         val icon = if (appearance.showIcons) CenteredProjectIcon(
             image, appearance.iconSize.pixels, artwork = { image },
         ) else null
+        tabIcon = icon
         previewLayout.projectIcon = icon
         previewLayout.position = appearance.iconPosition
         previewLayout.closeButtonPosition = appearance.closeButtonPosition
         previewLayout.centerProjectName = mode == TabMoreInfo.NONE
         border = ProjectTabBorder(baseBorder, icon, color.takeIf { appearance.showOutline },
             appearance.outlineThickness, appearance.outlineStyle, geometryOverride = palette::geometry,
-            surfaceColors = null)
+            surfaceColors = null).apply {
+                sharedGroupSurfacePreview = groupMember && appearance.showGroupOutline
+            }
         revalidate()
         repaint()
     }
 
+    fun isPreviewHovered(): Boolean = hovered
+
+    fun surfaceColors(): ProjectTabSurfaceColors = ProjectTabSurfaceColors(palette.stripBackground,
+        when { selected -> palette.selectedBackground; hovered -> palette.hoverBackground; else -> palette.background },
+        palette.background)
+
     override fun paintComponent(graphics: Graphics) {
         super.paintComponent(graphics)
+        val colors = surfaceColors()
+        groupSurface?.let {
+            ProjectTabGroupSurface.paint(graphics as Graphics2D, width, height, it, colors, selected, hovered)
+            return
+        }
         ProjectTabSurface.paint(graphics as Graphics2D, width, height, palette.geometry(width, height),
-            ProjectTabSurfaceColors(palette.stripBackground,
-                if (selected) palette.selectedBackground else palette.background), tabFillColor, tabFillInset, tabFillIntensity)
+            colors, tabFillColor, tabFillInset, tabFillIntensity)
     }
 }
 
