@@ -17,6 +17,16 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JSlider
 import javax.swing.SwingConstants
+import kotlin.math.roundToInt
+
+private const val MAX_ACTIVE_TAB_HIGHLIGHT_LEVEL = 100
+private const val MAX_INACTIVE_TAB_DIMMING_LEVEL = 100
+
+private fun activeTabHighlightLevel(value: Double): Int =
+    (normalizedActiveTabHighlight(value) * MAX_ACTIVE_TAB_HIGHLIGHT_LEVEL / MAX_ACTIVE_TAB_HIGHLIGHT).roundToInt()
+
+private fun inactiveTabDimmingLevel(value: Double): Int =
+    (normalizedInactiveTabDimming(value) * MAX_INACTIVE_TAB_DIMMING_LEVEL / MAX_INACTIVE_TAB_DIMMING).roundToInt()
 
 /** Поля Style / Tab layout / Group layout; пресеты и сохранение остаются снаружи. */
 internal class TabAppearanceForm(
@@ -61,6 +71,17 @@ internal class TabAppearanceForm(
     }
     private val fillIntensityLabel = JBLabel("Intensity:").apply { labelFor = tabFillIntensity }
     private val fillIntensityValue = JBLabel("$DEFAULT_TAB_FILL_INTENSITY%", SwingConstants.RIGHT)
+    private val inactiveTabDimming = JSlider(0, MAX_INACTIVE_TAB_DIMMING_LEVEL, inactiveTabDimmingLevel(DEFAULT_INACTIVE_TAB_DIMMING)).apply {
+        minorTickSpacing = 1; snapToTicks = true; isOpaque = false
+    }
+    private val inactiveTabDimmingLabel = JBLabel("Inactive tab dimming:").apply { labelFor = inactiveTabDimming }
+    private val inactiveTabDimmingValue = JBLabel("${inactiveTabDimming.value}%", SwingConstants.RIGHT)
+    private var displayedInactiveTabDimming = DEFAULT_INACTIVE_TAB_DIMMING
+    private val activeTabHighlight = JSlider(0, MAX_ACTIVE_TAB_HIGHLIGHT_LEVEL, activeTabHighlightLevel(DEFAULT_ACTIVE_TAB_HIGHLIGHT)).apply {
+        minorTickSpacing = 1; snapToTicks = true; isOpaque = false
+    }
+    private val activeTabHighlightLabel = JBLabel("Active tab highlight:").apply { labelFor = activeTabHighlight }
+    private val activeTabHighlightValue = JBLabel("${activeTabHighlight.value}%", SwingConstants.RIGHT)
     private val closeButtonPosition = appearanceChoice(TabCloseButtonPosition.entries)
     private val closeButtonLabel = JBLabel("Close button:").apply { labelFor = closeButtonPosition }
     private val fontSizeSelection = TabFontSizeSelection()
@@ -155,6 +176,8 @@ internal class TabAppearanceForm(
             preferredSize = Dimension(controlWidth, rowHeight)
         }
         val fillIntensityControl = sliderControl(tabFillIntensity, fillIntensityValue, MAX_TAB_FILL_INTENSITY, "%")
+        val inactiveTabDimmingControl = sliderControl(inactiveTabDimming, inactiveTabDimmingValue, MAX_INACTIVE_TAB_DIMMING_LEVEL, "%")
+        val activeTabHighlightControl = sliderControl(activeTabHighlight, activeTabHighlightValue, MAX_ACTIVE_TAB_HIGHLIGHT_LEVEL, "%")
         val heightControl = sliderControl(tabHeight, tabHeightValue, MAX_TAB_HEIGHT)
         val fontControl = sliderControl(tabFontSize, fontSizeValue, maxOf(MAX_TAB_FONT_SIZE, defaultTabFontSize() + 2))
         val groupSpacingControl = sliderControl(groupSpacing, groupSpacingValue, MAX_GROUP_SPACING)
@@ -211,6 +234,8 @@ internal class TabAppearanceForm(
         appearanceTabs.addTab("Tab layout", form(moreInfoRow, listOf(
             AppearanceField(tabHeightLabel, heightControl), AppearanceField(fontSizeLabel, fontControl),
             AppearanceField(closeButtonLabel, closeButtonPosition, stretch = false), AppearanceField(branchPositionLabel, gitInfoControl),
+            AppearanceField(inactiveTabDimmingLabel, inactiveTabDimmingControl),
+            AppearanceField(activeTabHighlightLabel, activeTabHighlightControl),
         )))
         val groupLabelWidth = { maxOf(backgroundHighlight.labelWidth(), joinedHighlight.labelWidth(),
             listOf(groupSpacingLabel, groupVariantLabel,
@@ -260,6 +285,14 @@ internal class TabAppearanceForm(
         tabFillIntensity.accessibleContext.accessibleDescription = "From 0% (transparent) to 100% (solid). Use arrow keys for one-percent steps."
         tabFillIntensity.toolTipText = "Adjust fill opacity. 0% hides the fill; 100% uses the solid tab color. Icon and outline colors stay unchanged."
         tabFillIntensity.addChangeListener { appearanceChanged() }
+        inactiveTabDimming.accessibleContext.accessibleName = "Inactive tab dimming in percent"
+        inactiveTabDimming.accessibleContext.accessibleDescription = "From 0% to $MAX_INACTIVE_TAB_DIMMING_LEVEL%. Use arrow keys for one-percent steps."
+        inactiveTabDimming.toolTipText = "Reduce the fill and outline of each inactive tab, including tabs inside the active group. 0% disables dimming; 75% is the default. Text and icons keep their colors."
+        inactiveTabDimming.addChangeListener { appearanceChanged() }
+        activeTabHighlight.accessibleContext.accessibleName = "Active tab highlight in percent"
+        activeTabHighlight.accessibleContext.accessibleDescription = "From 0% to $MAX_ACTIVE_TAB_HIGHLIGHT_LEVEL%. Use arrow keys for one-percent steps."
+        activeTabHighlight.toolTipText = "Adjust the active tab's background and fill highlighting. 0% keeps the theme's selection; 25% is the default. Hover brightening never exceeds the active tab's level."
+        activeTabHighlight.addChangeListener { appearanceChanged() }
         groupSpacing.accessibleContext.accessibleName = "Spacing between project groups in pixels"
         groupSpacing.accessibleContext.accessibleDescription = "From 0 to $MAX_GROUP_SPACING pixels. Use arrow keys for one-pixel steps."
         groupSpacing.toolTipText = "Extra space between visible groups and between grouped and ungrouped tabs. Hidden for split groups until Arrange Tabs by Group."
@@ -348,6 +381,11 @@ internal class TabAppearanceForm(
         showTabBackground = showTabBackground.isSelected,
         tabFillInset = tabFillInset.value as Int,
         tabFillIntensity = tabFillIntensity.value,
+        // Старое целое значение между делениями новой шкалы не меняется при просмотре
+        // или возврате ползунка на исходное деление.
+        inactiveTabDimming = if (inactiveTabDimming.value == inactiveTabDimmingLevel(displayedInactiveTabDimming)) displayedInactiveTabDimming
+            else inactiveTabDimming.value * MAX_INACTIVE_TAB_DIMMING / MAX_INACTIVE_TAB_DIMMING_LEVEL,
+        activeTabHighlight = activeTabHighlight.value * MAX_ACTIVE_TAB_HIGHLIGHT / MAX_ACTIVE_TAB_HIGHLIGHT_LEVEL,
         iconSize = iconSize.selectedItem as TabIconSize,
         iconPosition = iconPosition.selectedItem as TabIconPosition,
         iconInitials = iconInitials.selectedItem as TabIconInitials,
@@ -389,6 +427,9 @@ internal class TabAppearanceForm(
             showTabBackground.isSelected = value.showTabBackground
             tabFillInset.value = value.tabFillInset
             tabFillIntensity.value = value.tabFillIntensity
+            displayedInactiveTabDimming = normalizedInactiveTabDimming(value.inactiveTabDimming)
+            inactiveTabDimming.value = inactiveTabDimmingLevel(displayedInactiveTabDimming)
+            activeTabHighlight.value = activeTabHighlightLevel(value.activeTabHighlight)
             iconSize.selectedItem = value.iconSize
             iconPosition.selectedItem = value.iconPosition
             iconInitials.selectedItem = value.iconInitials
@@ -420,6 +461,8 @@ internal class TabAppearanceForm(
     fun refreshEnabled(enabled: Boolean) {
         listOf(showIcons, showOutline, showTabBackground, closeButtonPosition, closeButtonLabel,
             tabHeight, tabHeightLabel, tabHeightValue, tabFontSize, fontSizeLabel, fontSizeValue, moreInfoLabel,
+            inactiveTabDimming, inactiveTabDimmingLabel, inactiveTabDimmingValue,
+            activeTabHighlight, activeTabHighlightLabel, activeTabHighlightValue,
             groupSpacing, groupSpacingLabel, groupSpacingValue, showGroupOutline, showGroupSeparator, showGroupIcon)
             .forEach { it.isEnabled = enabled }
         listOf(iconSize, sizeLabel).forEach {
@@ -457,6 +500,8 @@ internal class TabAppearanceForm(
             it.isEnabled = enabled && moreInfoButtons.entries.any { it.key.isGit && it.value.isSelected }
         }
         branchStatus.isEnabled = enabled && moreInfoButtons.entries.any { it.key.isBranch && it.value.isSelected }
+        activeTabHighlightValue.text = "${activeTabHighlight.value}%"
+        inactiveTabDimmingValue.text = "${inactiveTabDimming.value}%"
         fillIntensityValue.text = "${tabFillIntensity.value}%"
         tabHeightValue.text = "${tabHeight.value} px"
         groupSpacingValue.text = "${groupSpacing.value} px"
@@ -478,6 +523,8 @@ internal class TabAppearanceForm(
         watch(fillInsetLabel) { it.tabFillInset }
         watch(fillIntensityLabel) { it.tabFillIntensity }
         watch(tabHeightLabel) { it.tabHeight }
+        watch(inactiveTabDimmingLabel) { it.inactiveTabDimming }
+        watch(activeTabHighlightLabel) { it.activeTabHighlight }
         watch(groupSpacingLabel) { it.groupSpacing }
         watch(showGroupOutline) { it.showGroupOutline }
         watch(groupVariantLabel) { it.groupHighlightStyle }

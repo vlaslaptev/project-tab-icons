@@ -126,6 +126,7 @@ private fun JsonObject.string(key: String): String = get(key)?.also { require(it
 private fun JsonObject.name(max: Int): String = string("name").trim().also { require(it.isNotBlank() && it.codePointCount(0, it.length) <= max && it.none(Char::isISOControl)) { "Invalid style name." } }
 private fun JsonObject.bool(key: String, default: Boolean): Boolean = get(key)?.let { require(it.isJsonPrimitive && it.asJsonPrimitive.isBoolean) { "Invalid $key." }; it.asBoolean } ?: default
 private fun JsonObject.integer(key: String, default: Int): Int = get(key)?.let { require(it.isJsonPrimitive && it.asJsonPrimitive.isNumber) { "Invalid $key." }; it.asString.toIntOrNull() ?: error("Invalid $key.") } ?: default
+private fun JsonObject.decimal(key: String, default: Double): Double = get(key)?.let { require(it.isJsonPrimitive && it.asJsonPrimitive.isNumber) { "Invalid $key." }; it.asString.toDoubleOrNull()?.takeIf(Double::isFinite) ?: error("Invalid $key.") } ?: default
 private inline fun <reified T : Enum<T>> JsonObject.enum(key: String, default: T): T = if (!has(key)) default else enumValues<T>().firstOrNull { it.name == string(key) } ?: error("Unknown $key.")
 
 private fun encodeAppearance(value: TabAppearanceState): JsonObject = JsonObject().apply {
@@ -146,6 +147,8 @@ private fun encodeAppearance(value: TabAppearanceState): JsonObject = JsonObject
     addProperty("tabFontSize", value.tabFontSize)
     addProperty("tabFillInset", value.tabFillInset)
     addProperty("tabFillIntensity", value.tabFillIntensity)
+    addProperty("inactiveTabDimming", value.inactiveTabDimming)
+    addProperty("activeTabHighlight", value.activeTabHighlight)
     addProperty("groupSpacing", value.groupSpacing)
     addProperty("showGroupOutline", value.showGroupOutline)
     addProperty("groupHighlightStyle", value.groupHighlightStyle.name)
@@ -180,6 +183,8 @@ private fun decodeAppearance(value: JsonObject): TabAppearanceState {
         tabFontSize = value.integer("tabFontSize", defaults.tabFontSize),
         tabFillInset = value.integer("tabFillInset", defaults.tabFillInset),
         tabFillIntensity = value.integer("tabFillIntensity", defaults.tabFillIntensity),
+        inactiveTabDimming = value.decimal("inactiveTabDimming", defaults.inactiveTabDimming),
+        activeTabHighlight = value.decimal("activeTabHighlight", defaults.activeTabHighlight),
         groupSpacing = value.integer("groupSpacing", defaults.groupSpacing),
         showGroupOutline = value.bool("showGroupOutline", defaults.showGroupOutline),
         groupHighlightStyle = value.enum("groupHighlightStyle", defaults.groupHighlightStyle),
@@ -197,7 +202,6 @@ private fun decodeAppearance(value: JsonObject): TabAppearanceState {
 }
 
 private fun encodeGroupHighlight(value: GroupHighlightOptions): JsonObject = JsonObject().apply {
-    addProperty("inactiveDimming", value.inactiveDimming)
     addProperty("cardInset", value.cardInset)
     addProperty("showDividers", value.showDividers)
     addProperty("dividerIntensity", value.dividerIntensity)
@@ -208,7 +212,6 @@ private fun encodeGroupHighlight(value: GroupHighlightOptions): JsonObject = Jso
 private fun decodeGroupHighlight(element: JsonElement?, defaults: GroupHighlightOptions): GroupHighlightOptions {
     val value = element?.objectValue() ?: return defaults
     return GroupHighlightOptions(
-        inactiveDimming = value.integer("inactiveDimming", defaults.inactiveDimming),
         cardInset = value.integer("cardInset", defaults.cardInset),
         showDividers = value.bool("showDividers", defaults.showDividers),
         dividerIntensity = value.integer("dividerIntensity", defaults.dividerIntensity),

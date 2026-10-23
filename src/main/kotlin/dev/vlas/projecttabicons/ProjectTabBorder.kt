@@ -24,6 +24,8 @@ internal class ProjectTabBorder(
     private val surfaceColors: ((Component) -> ProjectTabSurfaceColors?)? = ::nativeProjectTabSurfaceColors,
     var groupLayout: ProjectTabGroupLayout? = null,
     var groupTab: TabInfo? = null,
+    var inactiveTabDimming: Double = DEFAULT_INACTIVE_TAB_DIMMING,
+    var activeTabHighlight: Double = DEFAULT_ACTIVE_TAB_HIGHLIGHT,
 ) : Border {
     var sharedGroupSurfacePreview: Boolean = false
     var hideProjectIconPreview: Boolean = false
@@ -67,12 +69,17 @@ internal class ProjectTabBorder(
             val geometry = if (margins.left == 0) body else body.copy(bounds = java.awt.geom.Rectangle2D.Double(
                 body.bounds.x + margins.left, body.bounds.y, body.bounds.width, body.bounds.height))
             val colors = surfaceColors?.invoke(component)
+            val strength = if (colors == null || colors.state == ProjectTabSurfaceState.NATIVE) 1f
+                else inactiveTabStrength(colors.state == ProjectTabSurfaceState.SELECTED, inactiveTabDimming)
+            val intensity = (tabFillIntensity * strength).toInt()
+            val moving = groupTab?.let { groupLayout?.isMovingTab(it) } == true
             val sharedSurface = sharedGroupSurfacePreview || (colors != null &&
                 groupTab?.let { groupLayout?.paintTabSurface(it, g, width, height, colors) } == true)
             // Состояния выделяются и при выключенной цветной заливке.
             if (!sharedSurface) {
                 colors?.let {
-                    ProjectTabSurface.paint(g, width, height, geometry, colors, tabColor, tabFillInset, tabFillIntensity)
+                    ProjectTabSurface.paint(g, width, height, geometry, colors, tabColor, tabFillInset, intensity, activeTabHighlight,
+                        clearBackground = !moving)
                     val edges = g.create(margins.left, 0, bodyWidth, height) as Graphics2D
                     try { paintNativeProjectTabEdges(component, edges, bodyWidth, height) }
                     finally { edges.dispose() }
@@ -92,7 +99,11 @@ internal class ProjectTabBorder(
             }
             if (sharedSurface) return
             val color = outlineColor ?: return
-            outline.paint(g, geometry, color, outlineThickness, outlineStyle)
+            val idle = colors?.let {
+                ProjectTabSurface.resolve(it.copy(background = it.idleBackground, state = ProjectTabSurfaceState.IDLE), null, 0, activeTabHighlight).background
+            }
+            outline.paint(g, geometry, if (idle == null) color else ProjectTabSurface.blend(idle, color, strength),
+                outlineThickness, outlineStyle)
         } finally {
             g.dispose()
         }

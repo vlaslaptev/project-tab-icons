@@ -1,8 +1,8 @@
 # Project Tab Icons
 
-Project icons, colored outlines, translucent fills and Git context for IntelliJ IDEA's **macOS project window tabs**.
+Project icons, colored outlines, adjustable fills and Git context for IntelliJ IDEA's **macOS project window tabs**.
 
-### [↓ Download ZIP 0.3.99](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.99/project-tab-icons-0.3.99.zip)
+### [↓ Download ZIP 0.3.107](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.107/project-tab-icons-0.3.107.zip)
 
 ## Install in a minute
 
@@ -24,7 +24,8 @@ tab sizes and readable colors. They are a small selection of the available combi
 - Adjust fill intensity and inset, and place project icons on either side of the title.
 - Start with a built-in preset or save up to 10 named presets. Custom remembers your last manual appearance.
 - Preview **three or five tabs** in any of the **eight IDE themes** before applying changes.
-- The active tab stays lighter than its inactive state, including with colored fills and group styling.
+- Adjust **Active tab highlight** and **Inactive tab dimming** independently, including inside groups.
+- Tab surfaces stay opaque above the IDE project gradient; the gradient remains visible around their contours.
 - Click a sample tab to compare active and inactive states. Preview theme and sample count stay local to the example window.
 
 The **Light** preview uses light tab surfaces and readable text while keeping its dark toolbar and light editor.
@@ -67,9 +68,13 @@ and tab color to the group; members inherit them, including projects added later
 
 Under **Group layout → Group highlight → Variant**, choose **Shared background** or
 **Joined tabs**. Both follow regular tab dimensions, theme corners, fill settings,
-active and hover colors, and **Style → Icon → Size**. Tune inactive-group dimming,
-active-card inset or internal dividers, and show a shared group icon with optional hidden member icons.
+active and hover colors, and **Style → Icon → Size**. Tune active-card inset or
+internal dividers, and show a shared group icon with optional hidden member icons.
 Add spacing and vertical pipes between groups.
+
+While dragging inside a group, its original boundaries and separators stay fixed.
+Dragging outside previews the split; moving the tab back before release restores
+the grouped appearance. Transparent drag margins keep neighboring tabs readable.
 
 Groups are placed on the left in group-table order when windows merge, followed by
 ungrouped projects. Use **↑ / ↓** to reorder groups and optional fixed member positions

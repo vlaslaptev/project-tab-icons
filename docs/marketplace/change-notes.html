@@ -1,3 +1,54 @@
+<h2>0.3.107</h2>
+<ul>
+  <li>Draw tab and group surfaces on an opaque background above the IDE project gradient, including fill insets.</li>
+  <li>Keep the native gradient outside tab shapes and preserve transparent drag margins, fixed group boundaries and return behaviour.</li>
+  <li>Reuse the native graphics delegate without adding image buffers or per-pixel work to tab painting.</li>
+</ul>
+
+<h2>0.3.106</h2>
+<ul>
+  <li>Keep the dragged tab background within its visible shape, preserving neighbouring tab text under transparent margins.</li>
+  <li>Paint empty group slots behind tab content while keeping group outlines, separators and return boundaries stable.</li>
+  <li>Restore the native painter after every drag; avoid foreground gap fills and per-frame area subtraction.</li>
+</ul>
+
+<h2>0.3.105</h2>
+<ul>
+  <li>Keep group outlines, icons and separators stable while reordering tabs inside a group.</li>
+  <li>Preview a group split only after dragging a tab outside its original bounds; restore the group when the tab returns before release.</li>
+  <li>Commit the final group appearance after the drag finishes, consistently across all native window tab bars.</li>
+</ul>
+
+<h2>0.3.104</h2>
+<ul>
+  <li>Refine Inactive tab dimming with a 0–100% slider and a 75% default.</li>
+  <li>Restore the original preset selection when all manual appearance edits are undone, and disable Save as new preset again.</li>
+</ul>
+
+<h2>0.3.103</h2>
+<ul>
+  <li>Refine Active tab highlight with a 0–100% slider and a 25% default in all presets.</li>
+  <li>Keep hover highlighting at or below the active tab's level and preserve saved custom brightness.</li>
+</ul>
+
+<h2>0.3.102</h2>
+<ul>
+  <li>Add Active tab highlight beside Inactive tab dimming in Tab layout, adjustable from 0% to 30% with an 8% default in all presets.</li>
+  <li>Keep hover brightening at or below the selected highlight level, including at 0%, in project tabs, group variants and Preview.</li>
+</ul>
+
+<h2>0.3.101</h2>
+<ul>
+  <li>Replace inactive group dimming with an Inactive tab dimming slider in Tab layout.</li>
+  <li>Dim each inactive tab's fill and outline, including tabs inside the active group. All presets start at 60%; 0% disables dimming.</li>
+</ul>
+
+<h2>0.3.100</h2>
+<ul>
+  <li>Expand the built-in icon library with characters, food, science, games, art, weather and travel silhouettes, including matching plain and smiling poop icons.</li>
+  <li>Add English names and Russian search keywords for the new icons, with source licenses preserved in exported SVG files.</li>
+</ul>
+
 <h2>0.3.99</h2>
 <ul>
   <li>Refresh the English README and installation guide, with four three-tab theme examples and the current Settings interface.</li>

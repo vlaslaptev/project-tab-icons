@@ -63,7 +63,6 @@ internal class WindowTabsPreview : JPanel(null) {
     private var selectedIndex = 1
     private var sampleTabs: List<PreviewTab> = createTabs()
     private val groupTabCount get() = samples.count { it.groupMember }
-    private val activeGroup get() = samples[selectedIndex].groupMember
 
     private val groupDescription: String get() {
         val grouped = samples.filter { it.groupMember }.joinToString(" + ") { it.title }
@@ -85,7 +84,7 @@ internal class WindowTabsPreview : JPanel(null) {
     }
 
     private fun updateAccessibleDescription() {
-        getAccessibleContext().accessibleDescription = "Decorative macOS window with traffic lights, toolbar, ${samples.size} project tabs and an editor fragment. $groupDescription Click a project tab to preview activation and inactive group dimming. Toolbar and file tabs are not interactive."
+        getAccessibleContext().accessibleDescription = "Decorative macOS window with traffic lights, toolbar, ${samples.size} project tabs and an editor fragment. $groupDescription Click a project tab to preview activation and inactive tab dimming. Toolbar and file tabs are not interactive."
     }
 
     fun showTabCount(value: PreviewTabCount) {
@@ -142,7 +141,7 @@ internal class WindowTabsPreview : JPanel(null) {
                 geometry.copy(bounds = Rectangle2D.Double(bounds.x - tab.x, bounds.y - tab.y, bounds.width, bounds.height)),
                 Rectangle2D.Double(0.0, 0.0, tab.width.toDouble(), tab.height.toDouble()),
                 ProjectTabGroupColors(PREVIEW_GROUP_COLOR, PREVIEW_GROUP_COLOR),
-                index == 0, index == groupTabCount - 1, activeGroup, selectedIndex == index + 1) else null)
+                index == 0, index == groupTabCount - 1, selectedIndex == index + 1) else null)
             tab.doLayout()
         }
     }
@@ -182,7 +181,7 @@ internal class WindowTabsPreview : JPanel(null) {
                         geometry.copy(bounds = Rectangle2D.Double(bounds.x - left, bounds.y - first.y, bounds.width, bounds.height)),
                         Rectangle2D.Double(groupIconSlot.toDouble(), 0.0, first.width.toDouble(), first.height.toDouble()),
                         ProjectTabGroupColors(PREVIEW_GROUP_COLOR, PREVIEW_GROUP_COLOR),
-                        true, false, activeGroup, selectedIndex == 1)
+                        true, false, selectedIndex == 1)
                     ProjectTabGroupSurface.paint(prefix, groupIconSlot, first.height, state,
                         first.surfaceColors(), selectedIndex == 0, first.isPreviewHovered())
                 } finally { prefix.dispose() }
@@ -279,9 +278,6 @@ private class PreviewTab(
     private var hovered = false
     private var customizationEnabled = true
     private var palette = PreviewIdeTheme.CURRENT.palette()
-    private var tabFillColor: Color? = null
-    private var tabFillInset = 0
-    private var tabFillIntensity = DEFAULT_TAB_FILL_INTENSITY
     private val baseLayout = layout as BorderLayout
     private val baseBorder = JBUI.Borders.empty(0, 4)
     private val previewLayout = ProjectTabIconLayout(baseLayout, null, TabIconPosition.RIGHT,
@@ -346,9 +342,6 @@ private class PreviewTab(
     fun showAppearance(appearance: TabAppearanceState, theme: PreviewThemePalette) {
         customizationEnabled = appearance.enabled
         palette = theme
-        tabFillColor = color.takeIf { appearance.enabled && appearance.showTabBackground }
-        tabFillInset = appearance.tabFillInset
-        tabFillIntensity = appearance.tabFillIntensity
         caption.foreground = if (selected) palette.selectedForeground else palette.foreground
         caption.branchForeground = palette.chrome.muted
         close.icon = when {
@@ -397,8 +390,11 @@ private class PreviewTab(
         previewLayout.closeButtonPosition = appearance.closeButtonPosition
         previewLayout.centerProjectName = mode == TabMoreInfo.NONE
         border = ProjectTabBorder(baseBorder, icon, color.takeIf { appearance.showOutline },
-            appearance.outlineThickness, appearance.outlineStyle, geometryOverride = palette::geometry,
-            surfaceColors = null).apply {
+            appearance.outlineThickness, appearance.outlineStyle,
+            tabColor = color.takeIf { appearance.showTabBackground }, tabFillInset = appearance.tabFillInset,
+            tabFillIntensity = appearance.tabFillIntensity, geometryOverride = palette::geometry,
+            surfaceColors = { surfaceColors() }, inactiveTabDimming = appearance.inactiveTabDimming,
+            activeTabHighlight = appearance.activeTabHighlight).apply {
                 sharedGroupSurfacePreview = groupMember && appearance.showGroupOutline
             }
         revalidate()
@@ -419,8 +415,9 @@ private class PreviewTab(
             ProjectTabGroupSurface.paint(graphics as Graphics2D, width, height, it, colors, selected, hovered)
             return
         }
-        ProjectTabSurface.paint(graphics as Graphics2D, width, height, palette.geometry(width, height),
-            colors, tabFillColor, tabFillInset, tabFillIntensity)
+        // Обычная вкладка использует тот же border, что и реальная полоса IDEA.
+        if (!customizationEnabled) ProjectTabSurface.paint(graphics as Graphics2D, width, height,
+            palette.geometry(width, height), colors, null, 0)
     }
 }
 

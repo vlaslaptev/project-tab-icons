@@ -17,7 +17,6 @@ internal data class ProjectTabGroupSurfaceState(
     val colors: ProjectTabGroupColors,
     val first: Boolean,
     val last: Boolean,
-    val activeGroup: Boolean,
     val nextSelected: Boolean,
 ) {
     val options: GroupHighlightOptions get() = appearance.groupHighlightOptions()
@@ -28,7 +27,8 @@ internal object ProjectTabGroupSurface {
     private val outline = ProjectTabOutline()
 
     fun paint(graphics: Graphics2D, width: Int, height: Int, state: ProjectTabGroupSurfaceState,
-              colors: ProjectTabSurfaceColors, selected: Boolean, hovered: Boolean = false) {
+              colors: ProjectTabSurfaceColors, selected: Boolean, hovered: Boolean = false, outlineVisible: Boolean = true,
+              clearBackground: Boolean = true) {
         val g = graphics.create() as Graphics2D
         try {
             g.clipRect(0, 0, width, height)
@@ -37,20 +37,20 @@ internal object ProjectTabGroupSurface {
             val options = state.options
             val geometry = state.geometry
             val bounds = geometry.bounds
-            val strength = if (state.activeGroup) 1f else 1f - options.inactiveDimming / 100f
+            val strength = inactiveTabStrength(selected, appearance.inactiveTabDimming)
             val fill = state.colors.background.takeIf { appearance.showTabBackground }
             val intensity = (appearance.tabFillIntensity * strength).toInt()
             val fillInset = appearance.tabFillInset
             val fillGeometry = geometry.inset(JBUI.scale(fillInset).toDouble())
             val idleColors = colors.copy(background = colors.idleBackground, state = ProjectTabSurfaceState.IDLE)
-            val idlePaint = ProjectTabSurface.resolve(idleColors, fill, intensity)
+            val idlePaint = ProjectTabSurface.resolve(idleColors, fill, intensity, appearance.activeTabHighlight)
             val idle = idlePaint.background
             val base = idlePaint.fill ?: idle
-            ProjectTabSurface.paint(g, width, height, geometry, idleColors, fill, fillInset, intensity)
+            ProjectTabSurface.paint(g, width, height, geometry, idleColors, fill, fillInset, intensity, appearance.activeTabHighlight, clearBackground)
             if (bounds.width <= 0 || bounds.height <= 0) return
             if (selected || hovered) {
                 val activeColors = colors.copy(state = ProjectTabSurfaceState.of(selected, hovered))
-                val activePaint = ProjectTabSurface.resolve(activeColors, fill, intensity)
+                val activePaint = ProjectTabSurface.resolve(activeColors, fill, intensity, appearance.activeTabHighlight)
                 if (appearance.groupHighlightStyle == GroupHighlightStyle.BACKGROUND) {
                     // Отступ карточки не меняет размер таба, расположение текста и область клика.
                     val cardBounds = Rectangle2D.Double(state.body.x, bounds.y,
@@ -60,13 +60,14 @@ internal object ProjectTabGroupSurface {
                         .inset(JBUI.scale(options.cardInset).toDouble())
                     val cardGraphics = g.create() as Graphics2D
                     try {
-                        cardGraphics.clip(geometry.shape())
-                        cardGraphics.color = activePaint.background
-                        cardGraphics.fill(card.shape())
+                        val bodyGraphics = ProjectTabSurface.solidBodyGraphics(cardGraphics)
+                        bodyGraphics.clip(geometry.shape())
+                        bodyGraphics.color = activePaint.background
+                        bodyGraphics.fill(card.shape())
                         if (activePaint.fill != null) {
-                            cardGraphics.clip(fillGeometry.shape())
-                            cardGraphics.color = activePaint.fill
-                            cardGraphics.fill(card.shape())
+                            bodyGraphics.clip(fillGeometry.shape())
+                            bodyGraphics.color = activePaint.fill
+                            bodyGraphics.fill(card.shape())
                         }
                     } finally { cardGraphics.dispose() }
                 } else {
@@ -76,7 +77,7 @@ internal object ProjectTabGroupSurface {
                         val right = if (state.last) bounds.maxX else state.body.maxX
                         segment.clip(Rectangle2D.Double(left, bounds.y, (right - left).coerceAtLeast(0.0), bounds.height))
                         ProjectTabSurface.paint(segment, width, height, geometry,
-                            activeColors, fill, fillInset, intensity)
+                            activeColors, fill, fillInset, intensity, appearance.activeTabHighlight, clearBackground)
                     } finally { segment.dispose() }
                 }
             }
@@ -90,7 +91,7 @@ internal object ProjectTabGroupSurface {
                 g.color = ProjectTabSurface.blend(base, state.colors.outline, options.dividerIntensity / 100f * strength)
                 g.draw(Line2D.Double(state.body.maxX - stroke / 2, y, state.body.maxX - stroke / 2, y + length))
             }
-            if (appearance.showOutline) {
+            if (appearance.showOutline && outlineVisible) {
                 outline.paint(g, geometry, ProjectTabSurface.blend(idle, state.colors.outline, strength),
                     appearance.outlineThickness, appearance.outlineStyle)
             }

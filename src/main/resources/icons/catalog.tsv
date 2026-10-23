@@ -248,3 +248,103 @@ greek-lower-omega	ω · Omega	JETBRAINS_MONO	Greek letters	ω omega омега g
 greek-lower-final-sigma	ς · Final sigma	JETBRAINS_MONO	Greek letters	ς sigma final lowercase small сигма конечная строчная греческая буква буквы
 monogram-ai	AI	OWN	AI monograms	AI artificial intelligence monogram serif capital barred i ии искусственный интеллект монограмма засечки перекладины
 monogram-ai-lower	Ai	OWN	AI monograms	Ai artificial intelligence monogram lowercase small i geometric straight sans serif ии искусственный интеллект монограмма маленькая строчная прямая геометрическая
+poop	Poop	FLUENT_EMOJI	Characters	какашка без лица с характером какашка какаха говно дерьмо poo shit turd emoji без глаз без лица
+poop-eyes	Poop with eyes	FLUENT_EMOJI	Characters	какашка с глазами с характером какашка какаха говно дерьмо poo shit turd emoji лицо глаза улыбка
+skull	Skull	PHOSPHOR	Characters	череп с характером
+alien	Alien	PHOSPHOR	Characters	инопланетянин с характером
+flying-saucer	Flying saucer	PHOSPHOR	Characters	летающая тарелка с характером
+detective	Detective	PHOSPHOR	Characters	детектив с характером
+smiley	Smiley	PHOSPHOR	Characters	улыбка с характером
+smiley-melting	Melting smiley	PHOSPHOR	Characters	плавящийся смайлик с характером
+smiley-x-eyes	X-eyes smiley	PHOSPHOR	Characters	смайлик с крестиками с характером
+bomb	Bomb	PHOSPHOR	Characters	бомба с характером
+horse	Horse	PHOSPHOR	Nature	лошадь природа
+cow	Cow	PHOSPHOR	Nature	корова природа
+shrimp	Shrimp	PHOSPHOR	Nature	креветка природа
+bone	Bone	PHOSPHOR	Nature	кость природа
+feather	Feather	PHOSPHOR	Nature	перо природа
+clover	Clover	PHOSPHOR	Nature	клевер природа
+acorn	Acorn	PHOSPHOR	Nature	жёлудь природа
+grains	Wheat	PHOSPHOR	Nature	колос природа
+tree-palm	Palm tree	PHOSPHOR	Nature	пальма природа
+mushroom	Mushroom	TABLER	Nature	гриб природа гриб грибок грибы
+coffee	Coffee	PHOSPHOR	Food & drink	чашка кофе еда и напитки
+coffee-bean	Coffee bean	PHOSPHOR	Food & drink	кофейное зерно еда и напитки
+hamburger	Hamburger	PHOSPHOR	Food & drink	бургер еда и напитки
+bread	Bread	PHOSPHOR	Food & drink	хлеб еда и напитки
+cheese	Cheese	PHOSPHOR	Food & drink	сыр еда и напитки
+cookie	Cookie	PHOSPHOR	Food & drink	печенье еда и напитки
+cake	Cake	PHOSPHOR	Food & drink	торт еда и напитки
+ice-cream	Ice cream	PHOSPHOR	Food & drink	мороженое еда и напитки
+avocado	Avocado	PHOSPHOR	Food & drink	авокадо еда и напитки
+pepper	Chili pepper	PHOSPHOR	Food & drink	острый перец еда и напитки
+planet	Ringed planet	PHOSPHOR	Space & weather	планета с кольцом космос и стихии
+meteor	Meteor	PHOSPHOR	Space & weather	метеор космос и стихии
+shooting-star	Shooting star	PHOSPHOR	Space & weather	падающая звезда космос и стихии
+rainbow	Rainbow	PHOSPHOR	Space & weather	радуга космос и стихии
+tornado	Tornado	PHOSPHOR	Space & weather	торнадо космос и стихии
+wind	Wind	PHOSPHOR	Space & weather	ветер космос и стихии
+drop	Drop	PHOSPHOR	Space & weather	капля космос и стихии
+waves	Waves	PHOSPHOR	Space & weather	волны космос и стихии
+campfire	Campfire	PHOSPHOR	Space & weather	костёр космос и стихии
+cloud-rain	Cloud rain	PHOSPHOR	Space & weather	дождевая туча космос и стихии
+dice-six	Dice	PHOSPHOR	Games & magic	игральный кубик игры и магия
+poker-chip	Poker chip	PHOSPHOR	Games & magic	покерная фишка игры и магия
+spade	Spades	PHOSPHOR	Games & magic	пиковая масть игры и магия
+club	Clubs	PHOSPHOR	Games & magic	трефовая масть игры и магия
+magic-wand	Magic wand	PHOSPHOR	Games & magic	волшебная палочка игры и магия
+scroll	Scroll	PHOSPHOR	Games & magic	свиток игры и магия
+treasure-chest	Treasure chest	PHOSPHOR	Games & magic	сундук сокровищ игры и магия
+castle-turret	Castle tower	PHOSPHOR	Games & magic	башня замка игры и магия
+confetti	Confetti	PHOSPHOR	Games & magic	конфетти игры и магия
+gift	Gift	PHOSPHOR	Games & magic	подарок игры и магия
+brain	Brain	PHOSPHOR	Science	мозг наука и интеллект ai интеллект neural
+head-circuit	Circuit head	PHOSPHOR	Science	голова с микросхемой наука и интеллект
+atom	Atom	PHOSPHOR	Science	атом наука и интеллект наука физика science physics
+dna	DNA	PHOSPHOR	Science	днк наука и интеллект
+microscope	Microscope	PHOSPHOR	Science	микроскоп наука и интеллект лаборатория lab research
+test-tube	Test tube	PHOSPHOR	Science	пробирка наука и интеллект лаборатория lab experiment
+magnet	Magnet	PHOSPHOR	Science	магнит наука и интеллект
+circuitry	Circuitry	PHOSPHOR	Science	электронная схема наука и интеллект
+binary	Binary	PHOSPHOR	Science	двоичный код наука и интеллект биты нули единицы bits code
+calculator	Calculator	PHOSPHOR	Science	калькулятор наука и интеллект
+git-fork	Git fork	PHOSPHOR	Development	форк git разработка и инструменты
+git-diff	Git diff	PHOSPHOR	Development	изменения git разработка и инструменты
+crutch	Crutch	TABLER	Development	костыль разработка и инструменты костыль костыли workaround hack temporary fix
+kanban	Kanban	PHOSPHOR	Development	канбан-доска разработка и инструменты доска задачи board tasks
+gauge	Gauge	PHOSPHOR	Development	шкала производительности разработка и инструменты скорость производительность speed performance
+fingerprint	Fingerprint	PHOSPHOR	Development	отпечаток пальца разработка и инструменты авторизация безопасность auth security
+shipping-container	Shipping container	PHOSPHOR	Development	грузовой контейнер разработка и инструменты контейнер docker shipping
+traffic-cone	Traffic cone	PHOSPHOR	Development	дорожный конус разработка и инструменты
+toolbox	Toolbox	PHOSPHOR	Development	ящик инструментов разработка и инструменты
+broom	Broom	PHOSPHOR	Development	метла разработка и инструменты уборка очистка clean cleanup
+users-three	Team	PHOSPHOR	Files & work	команда работа и сервисы люди пользователи people users
+graduation-cap	Graduation cap	PHOSPHOR	Files & work	академическая шапочка работа и сервисы
+scales	Scales	PHOSPHOR	Files & work	весы работа и сервисы
+bank	Bank	PHOSPHOR	Files & work	банк работа и сервисы
+credit-card	Credit card	PHOSPHOR	Files & work	банковская карта работа и сервисы
+first-aid-kit	First aid kit	PHOSPHOR	Files & work	аптечка работа и сервисы
+shopping-cart	Shopping cart	PHOSPHOR	Files & work	корзина покупок работа и сервисы
+storefront	Storefront	PHOSPHOR	Files & work	витрина магазина работа и сервисы
+handshake	Handshake	PHOSPHOR	Files & work	рукопожатие работа и сервисы
+hourglass	Hourglass	PHOSPHOR	Files & work	песочные часы работа и сервисы
+cassette-tape	Cassette tape	PHOSPHOR	Art & music	аудиокассета музыка и творчество кассета лента tape music audio
+guitar	Guitar	PHOSPHOR	Art & music	гитара музыка и творчество
+piano-keys	Piano keys	PHOSPHOR	Art & music	клавиши пианино музыка и творчество
+vinyl-record	Vinyl record	PHOSPHOR	Art & music	виниловая пластинка музыка и творчество
+film-slate	Film slate	PHOSPHOR	Art & music	кинохлопушка музыка и творчество
+video-camera	Video camera	PHOSPHOR	Art & music	видеокамера музыка и творчество
+palette	Palette	PHOSPHOR	Art & music	палитра музыка и творчество
+paint-brush	Paint brush	PHOSPHOR	Art & music	кисть музыка и творчество
+pen-nib	Pen nib	PHOSPHOR	Art & music	перо для письма музыка и творчество
+scissors	Scissors	PHOSPHOR	Art & music	ножницы музыка и творчество
+motorcycle	Motorcycle	PHOSPHOR	Travel	мотоцикл путешествия и предметы
+truck	Truck	PHOSPHOR	Travel	грузовик путешествия и предметы
+tractor	Tractor	PHOSPHOR	Travel	трактор путешествия и предметы
+parachute	Parachute	PHOSPHOR	Travel	парашют путешествия и предметы
+lighthouse	Lighthouse	PHOSPHOR	Travel	маяк путешествия и предметы
+drone	Drone	PHOSPHOR	Travel	дрон путешествия и предметы дрон квадрокоптер uav quadcopter
+backpack	Backpack	PHOSPHOR	Travel	рюкзак путешествия и предметы
+binoculars	Binoculars	PHOSPHOR	Travel	бинокль путешествия и предметы
+island	Island	PHOSPHOR	Travel	остров путешествия и предметы
+sunglasses	Sunglasses	PHOSPHOR	Travel	солнечные очки путешествия и предметы

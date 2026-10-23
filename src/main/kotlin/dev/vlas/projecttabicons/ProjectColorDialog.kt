@@ -254,7 +254,7 @@ internal class ProjectColorPreview(projectName: String, private val appearance: 
         ProjectTabSurface.paint(graphics as Graphics2D, width, height, projectTabGeometry(width, height),
             ProjectTabSurfaceColors(palette.stripBackground, palette.selectedBackground, palette.background,
                 ProjectTabSurfaceState.SELECTED),
-            tabColor, appearance.tabFillInset, appearance.tabFillIntensity)
+            tabColor, appearance.tabFillInset, appearance.tabFillIntensity, appearance.activeTabHighlight)
     }
 }
 

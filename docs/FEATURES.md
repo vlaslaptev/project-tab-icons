@@ -17,17 +17,25 @@ immediately; changes to real project windows are applied through **Apply**.
 | Height | 30–60 px |
 | Tab fill | 0–100% intensity, in one-percent steps; an independent project color |
 | Fill inset | 0–6 px |
+| Active tab highlight | 0–100%, default 25% |
+| Inactive tab dimming | 0–100%, default 75% |
 | Info | None, Project path, Git branch, Git Branch Compact, Git status |
 | Git position | Before or after the project name |
 
-The active tab is lighter than its inactive state. Brightness is adjusted after
-compositing the fill, including at 100% intensity; a sufficiently light native
-selected color is preserved. The same rule applies to regular tabs, both group
-variants and Preview. Disabling customization restores native state colors.
+Active highlight and inactive dimming apply to regular tabs, both group variants
+and Preview. Hover highlighting stays at or below the selected level. Inactive
+dimming affects each inactive tab's fill and outline, including tabs in the active
+group. Zero disables the corresponding adjustment.
+
+Tab and group bodies, including fill insets, use an opaque base above the IDE
+project gradient. Fill intensity mixes the chosen color with that base; the native
+gradient remains outside the tab contours. Disabling customization restores native
+state colors.
 
 **Tab layout** uses a compact **Info** row, then **Height / Font size** and
-**Close button / Git position** pairs. Narrow windows use one column. Switching
-**Icon / Color / Tab layout / Group layout** resizes the block to the visible page.
+**Close button / Git position** pairs and the two brightness sliders. Narrow windows
+use one column. Switching **Style / Tab layout / Group layout** resizes the block
+to the visible page.
 
 Choose a preset, then adjust any appearance value to switch to **Custom**.
 Click **Custom** to return to the last manual appearance. Apply remembers it across
@@ -35,6 +43,8 @@ IDE sessions; Cancel discards draft changes to that memory. Filled uses Small
 20 px icons, a full 1 px outline, 12% fill intensity, a 3 px inset and 34 px height.
 Existing settings default to 50% intensity; other presets and Restore defaults use 50%.
 Changing the preview theme or a project's icon assignment does not change the preset.
+Undoing all manual appearance edits restores the original preset selection and
+disables **Save as new preset** again.
 After a manual appearance edit, **Save as new preset** lets you name the current
 Icon, Color and Tab layout settings. Names must be unique and at most 32 characters.
 User presets appear in a separate **User presets** row with the standard text color.
@@ -80,11 +90,16 @@ Order is applied on merge. Later manual rearrangements remain available.
 
 Under **Group layout → Group highlight → Variant**, choose **Shared background**
 or **Joined tabs**. Both inherit regular tab dimensions, theme corners, Color
-settings, active/hover colors and **Icon → Size**. Group controls cover inactive
-dimming, active-card inset, internal dividers, shared-icon visibility, hiding member
+settings, active/hover colors and **Icon → Size**. Group controls cover
+active-card inset, internal dividers, shared-icon visibility, hiding member
 icons, group spacing and boundary pipes. Group Tab color supplies the fill; Outline
 color supplies the contour, with icon color as the Automatic fallback. A split group's
 shared decoration remains hidden until **Arrange Tabs by Group** restores it.
+
+Reordering within a group keeps its original frame, icon, spacing and separators
+stable. Moving a tab outside the original group bounds previews the split; returning
+before release restores the group. The final appearance is committed when the drag
+ends. The dragged background follows its visible shape, leaving its margins transparent.
 
 ## Quick actions
 
@@ -98,6 +113,8 @@ edited through its group.
 The bundled library has **100+ icons**, including language symbols, animals,
 tools and navigation icons. Search by name or keyword and filter by category.
 The library also includes digits, Roman numerals, Latin and Greek letters, and AI/Ai monograms.
+Additional silhouettes cover characters, food, science, games, art, weather and
+travel, with English names and Russian search keywords.
 Use the native IDE color picker, a HEX value, or 14 swatches.
 
 Import a standalone SVG or browse the SVG icons used by open projects. Existing

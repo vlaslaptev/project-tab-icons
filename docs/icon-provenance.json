@@ -1330,6 +1330,678 @@
           "sourceSha256": "4f4805d0b8b0090b9cc3be37f9286f703a2e084f9b4ea12bd1f714ccdd71dbf6",
           "sha256": "1b344f0893cb0cf16d86e49fde1964485f81d19e6cb8ddc6a5ed35af9b9ab125",
           "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "skull",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/skull-fill.svg",
+          "sourceSha256": "1a1eab22a03268af2f34ab05aab19eee5b01e739e2df3fedca1ff683f3fcc3fd",
+          "sha256": "5b0e764535c809f24993eea62c489ec1cee363abeef8692e4395fa03ae5fd52d",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "alien",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/alien-fill.svg",
+          "sourceSha256": "42ca0d1c01352a0e0bc463d619e7eaba1b6dcf642915b0fd57d4124b1562f9bf",
+          "sha256": "c29f0a45734344bcf5112ac391e8ae0abbde32a4ddcc055bb50f4f299bc79bf3",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "flying-saucer",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/flying-saucer-fill.svg",
+          "sourceSha256": "d01ced5952077600a8ca361adf0401eb854d35e6526547035a1c30b3208f7f93",
+          "sha256": "99f4f2799a97563b10b10da7b2c1486536b621a6443979245754519ba177aae8",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "detective",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/detective-fill.svg",
+          "sourceSha256": "445c7c739517e81f87624196217d25debb804ab28e28bf05a46fe18634cb55b9",
+          "sha256": "d26956930d14dab56ffab841d919d29e8ab96be6ee2de1179ac3befbc153dcc0",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "smiley",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/smiley-fill.svg",
+          "sourceSha256": "2f993043ef4566931f5ad81be6d1030734d2dbad5e5d7c5d380debfeaeeb9399",
+          "sha256": "ce26e8700922c7d5ebba65e342afce9e099b0cf5587276b09764fe3895a7f7b8",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "smiley-melting",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/smiley-melting-fill.svg",
+          "sourceSha256": "bb0acbe528151e7a028dc0133c74dbbbb7231e258b1e923f057808c1abeb5d32",
+          "sha256": "f2fb7ab69994bb29fdde98f07d2b045aff818d0ec972aa1416003d4343a66793",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "smiley-x-eyes",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/smiley-x-eyes-fill.svg",
+          "sourceSha256": "c3d6c437d2d6bcf27202bb66af1c66d5bcc0ae2051270e03a52a18e224f31192",
+          "sha256": "9631de41bc3a32c7953d2ee3a19e057a24ea99cbd8f964e5b2d78ac08b9fcc49",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "bomb",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/bomb-fill.svg",
+          "sourceSha256": "5f10db1aad98be5acedfede9624b51e2fe1943017002446b701ee1fc0f3d2e5f",
+          "sha256": "2625251aa3f36b915ce1e97017db3d655d62bd4db38a48fb529b183f0f810a26",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "horse",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/horse-fill.svg",
+          "sourceSha256": "294a6886d9122ecf74de69b84780d984f5db526ef6c06fe0b81ec8d2046ffcec",
+          "sha256": "1fd27aec620827b206032a38af13d4716cfe722d8e4433c3504030693712f1f3",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "cow",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/cow-fill.svg",
+          "sourceSha256": "57564c39e939010fdac49db1f486b0f3e24f3ff1489156703c03e4e6c3ef710e",
+          "sha256": "521bf2883ec4e6a51e03791e4e3c581d36b54dda7dfd12fd0c139d6523589dbf",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "shrimp",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/shrimp-fill.svg",
+          "sourceSha256": "8e03a72c5e581ace0c0f9a46d53a6d3f675f94aef49eb67612aa786933e2c03d",
+          "sha256": "d57eb3d7f6e91d5a0290dceafc09c9f7343551db3a42f7529ba2603f227a0d01",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "bone",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/bone-fill.svg",
+          "sourceSha256": "f8fb5eba68e6a52bfc6d7c5a94c4a302b28f0d79495b3576fe3532101af7382f",
+          "sha256": "f9f05e78936ea706b92951482be50cefd65b975d4ce58d494e99ef7ba4eb3a77",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "feather",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/feather-fill.svg",
+          "sourceSha256": "a1ad61140dc7a7b1eb7846c4a8e0b381a9545f6f73a5bf05c54b1e9a756bd172",
+          "sha256": "bc60b3a396d6a0d8c984183a2bdbca38191d05291961b763adcf3b97c3f14773",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "clover",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/clover-fill.svg",
+          "sourceSha256": "b511caa7b8fdedd27303fe796e9cf93f21a226e36fbb6a5c6c07c0e8e13a6be2",
+          "sha256": "70bdd53712d0866ef6fe0a9655ba115fca4dff55a1df4f38da0500a5ce7f662c",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "acorn",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/acorn-fill.svg",
+          "sourceSha256": "be678fb6904c07257108ecbdb455547fa3525f95f7e00d08d88edf0afe04514e",
+          "sha256": "943e81f71234b15169f6c5d4b4ef2a885e84350da6778d6eefe9927a17a8319c",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "grains",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/grains-fill.svg",
+          "sourceSha256": "da70f309bdcef600c259bae09a340f443f32950a40e02f7d18dcf1804e115cce",
+          "sha256": "6acfefc72b0eda936ec04ce2c3cd5ffada0ccf1cf9f76794efd63a143184e863",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "tree-palm",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/tree-palm-fill.svg",
+          "sourceSha256": "cbd50cf565bb4d6741364bfe1f71b5ae7799daf970777ba69c144df3f5707212",
+          "sha256": "303f151781008c12c0837b261b7b8081a5112b5149d88f401a6c368512dfa11e",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "coffee",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/coffee-fill.svg",
+          "sourceSha256": "6ce4e8690b466b14ecd1b1b51dd38b4e4ec12e5ce0b9d244f0038b6570c2fa94",
+          "sha256": "5f09196260602b1643ff7e636425ecac6b89a916921bbffe9c1e293f7b211fdb",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "coffee-bean",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/coffee-bean-fill.svg",
+          "sourceSha256": "fdb2159237ffd9ce172bc3b6227c03c1097ee679e9eb58267ac7d6377d5026b4",
+          "sha256": "53459fc8db98070596054621a49f1acab6aaaf72a9f3d808155c9fff26bc1363",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "hamburger",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/hamburger-fill.svg",
+          "sourceSha256": "6efe100ca03247f00fa1fd0fdb0a1270c5af40b3ad3d51969c67455c3f2b37dd",
+          "sha256": "3df6dfd124843c55b0c943f40466ee04c77d608b86fb6e7c6dcc90f543da86a6",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "bread",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/bread-fill.svg",
+          "sourceSha256": "4deedc73b40677af14ab37ee65d10eabbbc6b269f9f31a215f162ba08c56455a",
+          "sha256": "31899c31576abb9e6e4b79cf932c138b08fca126e6fc7414774863002ae7a2ec",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "cheese",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/cheese-fill.svg",
+          "sourceSha256": "b3920acbfaa3538e22701bab62733e16985db482fa5ad41f8b7588ca094c3e06",
+          "sha256": "5f86b4b7dca04b0e1a020b231c409cff520ef47b7f0f745d039d158155b4eff9",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "cookie",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/cookie-fill.svg",
+          "sourceSha256": "10e903ab29021a3d00a7012c1cab7aa412b44fe4b668f1fa5308b8c0d9345a92",
+          "sha256": "4c9acb9edfc141ce58ea07af817c04e73e02b12a074f29694af2d3c941a06cce",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "cake",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/cake-fill.svg",
+          "sourceSha256": "7be52877654cf5adf587bc08a34be8437b6e3ff31ef0bffa52c863ba315fc639",
+          "sha256": "3efa1138d4eb4de68cdfb9f9512ad4d36997d61ff0636e6cf0e10a0de8f5568b",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "ice-cream",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/ice-cream-fill.svg",
+          "sourceSha256": "7530619ab9f9c941c79a4f32de2dabafab4a3ad2e737520c0d17806ba5518107",
+          "sha256": "a3ceb08906b8fc1987672eded77f526b57458a27949041ff51ec711b1beddc3f",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "avocado",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/avocado-fill.svg",
+          "sourceSha256": "1ac4688f35f53d6b41a8f4eac843d2283c57f2697f4918cf760ef66adbecabde",
+          "sha256": "69be28518af9cc95c797a2e8bbe2a26a94b7f19a0633f5378292d4217c0cbaa5",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "pepper",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/pepper-fill.svg",
+          "sourceSha256": "07d2af32ccef8029607f12192463ed59b43947514a6c2a1e85b7146e35073e44",
+          "sha256": "49c9f1dd84d8e33b1efda64f98f2df6d6161424d5b93c7df4e807cc63b95fc4a",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "planet",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/planet-fill.svg",
+          "sourceSha256": "af11155fd90aaea74253cd084bc4be29b4502c4604095ebe597ed4352c9ff82c",
+          "sha256": "05b745a4f44d8f7092dd066ef0bc492d314982d7830c805754a7b4863af166b3",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "meteor",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/meteor-fill.svg",
+          "sourceSha256": "730528467701d5fce72a3316c382799779dd271057fd0d81fe2cb0f76aff891f",
+          "sha256": "c4a4f4d8c3683456b0b34e6ee7f96e1f47bf2f3c4a7235ecc6114072869bfc06",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "shooting-star",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/shooting-star-fill.svg",
+          "sourceSha256": "57455947016a999c86dd27ace601b320831853778dedbe0a5000a5fd23fbbe27",
+          "sha256": "1cc68e4e482d269d28ebae52c0563d14c80ed416c06942a437fb4cf869e31a82",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "rainbow",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/rainbow-fill.svg",
+          "sourceSha256": "078d129f629819640e673591eb2480df6f021c2944274d5685c9d6617b57d5f6",
+          "sha256": "618a6454cfa351d10edab554666d717d61f06020bdf05696803905bb3cfb38f5",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "tornado",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/tornado-fill.svg",
+          "sourceSha256": "d28bf387f782c08ede19412cc780527de814c460b48bbc8ecea413271b864d33",
+          "sha256": "a35d584218f65afee362cd3408ef0ffee3d595ca878562b6beae0694bc7a2020",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "wind",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/wind-fill.svg",
+          "sourceSha256": "8846cc76adeb51cd26db6066b9a85b40ade9566903bccf9499d98d75604839ef",
+          "sha256": "7efc2df52f57fc87728674a9591a424ce0c283455cea5b778123df786a23389c",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "drop",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/drop-fill.svg",
+          "sourceSha256": "547974bcf9a14a058c7622a2412bdf25700bd83e610128829f96687e7f8499e6",
+          "sha256": "05015c8f4352471a8a89f4d3bbaa43e5bd688f591e2da623273f53e07d8eb2bb",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "waves",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/waves-fill.svg",
+          "sourceSha256": "8d89488693654e8c4966f427c00c91e19f1e28fa1bc09a51f1506a287b7e142a",
+          "sha256": "045a9c5807d0faaed780af0cbf563acbfefd8a95db0c2aa4e40e16f3ce3711aa",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "campfire",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/campfire-fill.svg",
+          "sourceSha256": "5c5085dfa44816e79ef14d00f0a0f38e93765019db64f11eef38d2ea1d4b213d",
+          "sha256": "f672546cc880659f98d0d66f33090b9487e62454c4f047d5bd9f938f2339170d",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "cloud-rain",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/cloud-rain-fill.svg",
+          "sourceSha256": "d2f32ce7bf06a9225f5c466d1f2c683cb729526d67c8b5f4741cd270b01e8cf3",
+          "sha256": "a7a9219ad579b120d0f9278b6e16368c9abafed3e515a29978934e6bc18899ba",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "dice-six",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/dice-six-fill.svg",
+          "sourceSha256": "e89e98d2c96a3d1de7fad82497b0a1c3736bc1d34dcb36817e6a83d0850a09da",
+          "sha256": "534df5b96b1e39510f419136b7f76f0370677496521bbf241300d6763f7f8e8b",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "poker-chip",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/poker-chip-fill.svg",
+          "sourceSha256": "2a0d8c2411f8c4d7038ea183d9b4249be17d2e6e96c71e451c6af706eb15c793",
+          "sha256": "4d73647f035dc559c4e2b644a33619219476f410e81e6c6062624e261554b66c",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "spade",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/spade-fill.svg",
+          "sourceSha256": "e8fd0f8c4c0d6465f7091dc3b9c0135ba17779907968c176c422d29ea105c492",
+          "sha256": "f1e3758812f8c94434a93056dead7e19ef0c2dcb2d4983280da6ffa3d3be1787",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "club",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/club-fill.svg",
+          "sourceSha256": "37b4884b812ddbfb5ce6879a0011817f81ce5e52a88291297269a418d3ba1ca3",
+          "sha256": "5e1bb615de1e0a95e118dc475c70bf7b5bb6199501ce59a0f507a549199f33ed",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "magic-wand",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/magic-wand-fill.svg",
+          "sourceSha256": "ead6a6b83fbae0f8c3bec56a5200c5a3b5cc7f568d19e1b7d44c0c792388ef85",
+          "sha256": "5922b82eb2601fc8a1c74c7acd4f350c713ed56c853d5e6fb5fe0f13fe1bbe2c",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "scroll",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/scroll-fill.svg",
+          "sourceSha256": "a858518b53e8757e9cee94aa4cb806decbc2a77c78a349f8ae70ab7c68ca1dbc",
+          "sha256": "2efa0291591dd49629d70640935482c6c8b6b1346d1c42642ac53e11aeaa541c",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "treasure-chest",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/treasure-chest-fill.svg",
+          "sourceSha256": "6a5abb74ab232589afe67e90fc6facf8d838528b3ea614c7f1a9f7555444ee8e",
+          "sha256": "e31f943af14534c6a526fd4c326e9084dd2cfec11186f1f7c4f70f8eee824633",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "castle-turret",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/castle-turret-fill.svg",
+          "sourceSha256": "f6e506372e87364bb58dfeec8cb599895b2adf3d2149cb3b5f0999bfe62d8781",
+          "sha256": "db60c589ac79760623071427b956857b94807d212b51fb19848c194b18425e20",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "confetti",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/confetti-fill.svg",
+          "sourceSha256": "4a40a0342e48c3e239a68eaf5fc28d6292d0eb48660971e400316fe6577a8c2d",
+          "sha256": "a5642c9d430290502c012dfe5ec39604ce123ff5c43f793cffefcf811891e6f6",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "gift",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/gift-fill.svg",
+          "sourceSha256": "a75154d0e841a2ede50032b4d0e7f1375987367091a3786a36aeb5553626f7c9",
+          "sha256": "48b04acc044daca888f3746a4c9ee492115b497d0d79c63685f8b9de4d47afcb",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "brain",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/brain-fill.svg",
+          "sourceSha256": "084f1324acaa199634182fec64d2594e2725fd52128251de15664ba27dd9da38",
+          "sha256": "759a64bf09e149d81c83cd82ad98b056d4bae22ae5a687f5eeba70c9c76c4e51",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "head-circuit",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/head-circuit-fill.svg",
+          "sourceSha256": "553216c8229f9179122f88c1f8cd54c1beb912d800e9c9632485f9a9317c6862",
+          "sha256": "cfd22cdf97c0c45ea5f05a2ab18596ad857b0772264871216e1b6c71230adb1f",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "atom",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/atom-fill.svg",
+          "sourceSha256": "51f591441c389d14eeba6b0cb02e781949a8da13ce3e26c56121813cb1feecc5",
+          "sha256": "dff3006977c2014e59c54ae8942a5e0c735689647dd227191b3d0cff80c742db",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "dna",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/dna-fill.svg",
+          "sourceSha256": "b4e54eaaacc1666b4a03e88d7230a4669f793e013de5b3a91998bdd6f1c86b72",
+          "sha256": "418bf86fb102e7e5cc4c28b487614fc5c43e0e74a426cd01ce69cc7364f53aae",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "microscope",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/microscope-fill.svg",
+          "sourceSha256": "6e2a65bfc74ffbe4c776b032117453d616bcfea01bff25b59a6341073120e72c",
+          "sha256": "0bd2f3010038f778bb5b6bce2c4b6968cae45ecfd391a631dc024b308d20cbc7",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "test-tube",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/test-tube-fill.svg",
+          "sourceSha256": "cf5c35008fc3f2a285e84e45fa810ccb52a0342d6f93be440f6e6bd4056f1a68",
+          "sha256": "16c6d8410dfcfbc7a7a47504cac274bdf1edf22a06078f3d8b9dde60e4fdb87e",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "magnet",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/magnet-fill.svg",
+          "sourceSha256": "d8e242222295a8f1e008e6d9475bdf62054745537ab26701ab422263c57e21a3",
+          "sha256": "f72cd575420545ceee850a46ccf4f61cf377cc7e466c488f4ff2e54594bc8740",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "circuitry",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/circuitry-fill.svg",
+          "sourceSha256": "9078fb7501635784f47bbdae7ec2b437000d4327dadc6d3a1d13d0e12129031d",
+          "sha256": "c09ecdc490dccfced9581126a07ceb62a40eb60876bc87c78c161a462d7f2bec",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "binary",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/binary-fill.svg",
+          "sourceSha256": "141a7859adb9915772ee935e49bc646d0f30432925d6d164ecedac5a7c3962be",
+          "sha256": "94aeb8ab231c001e3f4ff7c12b26053bf59b4e5495a4633ea1a5e7eae8a447c4",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "calculator",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/calculator-fill.svg",
+          "sourceSha256": "d8df20c80590c485519ae935018af33aac2583271f0f791226ad8fca816fb80a",
+          "sha256": "f68c224bcdf3b86b6ffdd0b1f90a1c1c17ea3ceb0f4fb89c106501a399a11f1a",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "git-fork",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/git-fork-fill.svg",
+          "sourceSha256": "ce3c79f76f8e9af51bcac0a0624c6e8fa95b2778715ae9c784ce308e0be1a79f",
+          "sha256": "98804532cb1664db1e68effccd42e6c6db0fad3d6ce1bec521680bd8e66e0564",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "git-diff",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/git-diff-fill.svg",
+          "sourceSha256": "22f49244f04c176ed4d710026d92c4e58a541744cbda2fcffb7c68c0f52de480",
+          "sha256": "0725b8e99848cd448944b0b8cbef660daca743c7a817483b2f97c8b9599b23ad",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "kanban",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/kanban-fill.svg",
+          "sourceSha256": "62d793b4698171c55f4aed28209e1c0ec9e5cb19cb48e293516114112efc2fa4",
+          "sha256": "b32e47aa5a444e4a198e333494a2ebf3aa085ba03ff5fa029f6f4861420375ee",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "gauge",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/gauge-fill.svg",
+          "sourceSha256": "356e497250225d08fda3b16cdb366ff1844ca6433365fb614d8406612095c8a9",
+          "sha256": "8bdd519d2581f0e63b229ab9f9215df67dbe2fbd31c710810e049a345873d940",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "fingerprint",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/fingerprint-fill.svg",
+          "sourceSha256": "802bd3f3b8e6406f7939fb3df1cb3d1cd26291bbdaa17bf28b932f0770703c37",
+          "sha256": "afa4207a4f1938b4f881b978ed24dc1a744e7579e634704088bccec2b64994ec",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "shipping-container",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/shipping-container-fill.svg",
+          "sourceSha256": "7d73f460ceb64f0e6cdd7ccfbaf12b3f75f7f22eb64f87a54948218ccc8640d7",
+          "sha256": "60f6b390d9352dc36db4d349542e40e26b3b5d3ed8ad8b2fe5c45b92ecb82ddf",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "traffic-cone",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/traffic-cone-fill.svg",
+          "sourceSha256": "bf4e9cf194a36468353d9cf0c830b691094c483af65e288fba490ce1d5e3d119",
+          "sha256": "b565f113ffb237cf2c3e4065982b1385f0ba99b3b833c7cb452eab4060c70e5c",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "toolbox",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/toolbox-fill.svg",
+          "sourceSha256": "c5e1eed87daf35e2b7b110ad79945d9eb1b543bd9a118e7aab1c151b2c71df42",
+          "sha256": "ca6c9a241f3f29f0dded50db7f24a20721ccbd04cf81950e2280fbbeec24bd29",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "broom",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/broom-fill.svg",
+          "sourceSha256": "e6cd873e2cb2251c070902eb3804978c88972918992e19484b065d2dd469178c",
+          "sha256": "74a28bf0fa876dc130a1d67f9efdfe315d18f4ed63518af740cfdbd3850061cd",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "users-three",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/users-three-fill.svg",
+          "sourceSha256": "aca109558096eca83a60ded74a65b5ab9d341857f0c76f7b89bf93e3bd6df971",
+          "sha256": "d9c227b9df40d563c0cc0f2341225c907a47277d7d14e92c46a1d92199868cee",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "graduation-cap",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/graduation-cap-fill.svg",
+          "sourceSha256": "0324f19528344327607dd2ee731d1313f4bb7d40086c81e5c5305c8214a39975",
+          "sha256": "46d09f7234f6b2d739cc9459ccb014a6d5428e1188ebc5199c8308b11fa102f4",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "scales",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/scales-fill.svg",
+          "sourceSha256": "819cda55e5eba2727fe2026b28ef693b9a3c949f7df0908636f62dea9d699592",
+          "sha256": "317fb7a28ef34fee57051c0260f2b41817ff7a6eb80bd1f1d0442a9467eea168",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "bank",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/bank-fill.svg",
+          "sourceSha256": "2c223fc8f62ed7df0f45cdfe47808dda2833a01c23402b134684a3de3857b85f",
+          "sha256": "88b64b7afe495b8ef935427269c2f2e0ea9a2050097086675aef6c4f7d570013",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "credit-card",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/credit-card-fill.svg",
+          "sourceSha256": "65f1fb499538f5743e257c6788afc61ae16af5ec0f405eac2cf5d9bf9b93b768",
+          "sha256": "f5f36dea80221a0c1a8906790b823bf0b884e413858cd5827b56012d23a4fe8b",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "first-aid-kit",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/first-aid-kit-fill.svg",
+          "sourceSha256": "a8377471d33bd7ccc6847495b882ce13987e0c4a70baa77bcc6cb768e9643897",
+          "sha256": "01df3f0c81bf8af84fa07874604d5fc841500e292d25e7f438657146dfc01974",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "shopping-cart",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/shopping-cart-fill.svg",
+          "sourceSha256": "32193c360cbdce38028355bb0b20143e19c351c2ca5c8d7256e42cbe2643c59b",
+          "sha256": "d507364c8c5035b6adcf11c14b393f3e762791855d47fb6375699fec203b4ac4",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "storefront",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/storefront-fill.svg",
+          "sourceSha256": "c4f89c48138eb0e7269cd8286bb5774135cd5cfd6ea10c588c8c62591353dd83",
+          "sha256": "e3de65ff171e2fc66c482631cc83edee9119ab5b4ec22b4c39227547ac1310a1",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "handshake",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/handshake-fill.svg",
+          "sourceSha256": "d9fc30d1f2431296e695a99dfac569aef54785fa32819ca23d960e4374b603b5",
+          "sha256": "a56362214b99d22af3d1bdfd34ea485df10ab108d2cc66799f20381c62f7e99f",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "hourglass",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/hourglass-fill.svg",
+          "sourceSha256": "ad0f3d9f99de1618389ba9c153b4d6b0dab3e619ca2ff0113177aac63f035c32",
+          "sha256": "e29b40164f777a7d7a6870b9d048125bbf5f7eb9faab6eeda3db74cdf0aa06e9",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "cassette-tape",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/cassette-tape-fill.svg",
+          "sourceSha256": "83ec9ce30814ec374af149785804410a27faa87b195564a12d2f083779be4b3d",
+          "sha256": "2c95662c1491b4528190b39ecd1b9b04eab725f9eb1f0de5f660affd09bd61d6",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "guitar",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/guitar-fill.svg",
+          "sourceSha256": "3a166a7b663a549eeec7b2c1a70e9983358420e5f4593061432e4813534b6319",
+          "sha256": "5baebfcc23d14d78eada4c73e2512966801ecea8c8c680a35b26cec268ff95c7",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "piano-keys",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/piano-keys-fill.svg",
+          "sourceSha256": "187e49be17dc3c87e50d09941ca5d7fb350acab3958a1d9c112eb6ad14e25546",
+          "sha256": "a92f4bca6b52d4090cd4847917a85f8634101312165e3d25e71cbdef3b5f41d6",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "vinyl-record",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/vinyl-record-fill.svg",
+          "sourceSha256": "92552f12cb4dd696977bd7fe04e2a7d35f57fb5e265de8091a817d45433e2296",
+          "sha256": "4f2118aa85f674c9f1fc23f3684b852bc86769eb6ab388177bd8bbaaa850df7a",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "film-slate",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/film-slate-fill.svg",
+          "sourceSha256": "43de712a3a2952ed23c6cb2d4d1ff9fb8c91741a20d3b93ad86d7a470d1f0294",
+          "sha256": "2475d06243f7776694397538c7e77acaf2ab978abf743bc9b6b864f14335e312",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "video-camera",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/video-camera-fill.svg",
+          "sourceSha256": "daf72fb4e3f7978254c2ac1959db6d855f12bb0d9b7504309d2e6270b7192933",
+          "sha256": "5a24b06c9577dd07fa0e4562bbb21634f36f84cfe0851a0e873fc7e4b1cd3545",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "palette",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/palette-fill.svg",
+          "sourceSha256": "c8f6bdc5d4ddff5ad039a926e13efe7ceb92f5a57e6a755df516ca05deadba53",
+          "sha256": "1fc394feb27f8d6d70785f95775820bc0659aab38976ae25bfe0e03894a4b1fe",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "paint-brush",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/paint-brush-fill.svg",
+          "sourceSha256": "182a006d86888c3c40f5c9b1707fe0b3e6e6ea3c4c9a12210e6113d182c1a588",
+          "sha256": "d24a7ce32b4816276ca20006ffae02a7f0d137c5703bf30e47fa8a23523c8311",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "pen-nib",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/pen-nib-fill.svg",
+          "sourceSha256": "e72f93917a62e549dbcf1c36ef82d2a16c816974dc2ae631e7d3c83ec0a035b1",
+          "sha256": "06997cf60630a39be7157e7885db19b062f5a9ae2b005eedbd4129a87ca98ad3",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "scissors",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/scissors-fill.svg",
+          "sourceSha256": "c96f347e05fe47d8e55c5adaee8e8e70bcc28e0f2d0ce3af28defcaa76418543",
+          "sha256": "034679fa17f1280113cf489f3d2c7b0b569a061b7b8858e764eda3843d124a88",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "motorcycle",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/motorcycle-fill.svg",
+          "sourceSha256": "11b0e9d1967a0d12101bf3384975f16ed4174b381c32e001bc71f1d8398b74a4",
+          "sha256": "eb621087c17285760e1695c974f020fdc6ac39f96084d588631a2850053fc05b",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "truck",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/truck-fill.svg",
+          "sourceSha256": "90a19738e1b64bb697d0f6d1fc9a506d3d5325c2b173ca08427ba2093bc7d89a",
+          "sha256": "e9b151721ae971de5cbd3172be71d96995a43e3788044f3634cd27546c975a56",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "tractor",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/tractor-fill.svg",
+          "sourceSha256": "1acf32116d30a2d6d860180b62e1f1f882c5c1ddc5e36689435e9b3051f6dc7c",
+          "sha256": "f668b8a21d48ff54933bc6d77ab9b3e896657b287fb7d7e9cd23294020ac90b9",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "parachute",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/parachute-fill.svg",
+          "sourceSha256": "7224150bd1ef87401db54f612e1fd18f00471a37f0be209dd791d6dc8c462ef4",
+          "sha256": "01cd1f0e29b1137169425bd9f6744169e47ff59699420cb1ba26777c328da02d",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "lighthouse",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/lighthouse-fill.svg",
+          "sourceSha256": "8bd0acda1e530a8b2dcf248f1a01f8a7bddb3e111de1ce34b11d0bd70ac51d53",
+          "sha256": "deb6f83010658458eabcc921b2b6dfdd4fa309aad7a8a4cd8b85a43fb43f1340",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "drone",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/drone-fill.svg",
+          "sourceSha256": "f694a080d7f3c78be8bcba894d04960abc2cc50188c03cbb52b3c6218ef9d9ae",
+          "sha256": "8c7ca48bd9ab4b1884986e5d0f25848eacebea7ad42093338a296c537adfeb23",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "backpack",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/backpack-fill.svg",
+          "sourceSha256": "b7cfd484420773d5cdcb87ee0509fed144acea319cce70ea7548aa9f74c9b0b3",
+          "sha256": "426b4288f61c86a81aadf135344239045bb7c8f5941e3052c2111b086c2914a6",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "binoculars",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/binoculars-fill.svg",
+          "sourceSha256": "f35e37e0723537d4c6ec1f906bdaae80c91a652ddaf63c762d63a62148934b02",
+          "sha256": "a627a1e6e14da9aa6ee40a92e605475125420f8310366353decfeae2fe1f2cfe",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "island",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/island-fill.svg",
+          "sourceSha256": "44c1fc7a084b4ebfc8089c49b32965d193204eafec7a8ca6ef1fef974557aa65",
+          "sha256": "aa0d8ee1c459a4a9ba836a4f0867eeb5137ca3864b22f8c75870662606fe5bc0",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
+        },
+        {
+          "id": "sunglasses",
+          "source": "https://raw.githubusercontent.com/phosphor-icons/core/2b75f3ad12b420c9504ef05df8d2564a28f8500e/assets/fill/sunglasses-fill.svg",
+          "sourceSha256": "669f8498885642c06879fbc73a580a1504907b4df50b22ad073e86fbd6cd36e4",
+          "sha256": "d2a39f24271e99c70019597caff0f56e4b78ccdff649dc2ab61341673c7176c9",
+          "modifications": "Filled monochrome silhouette; preserve original 256-unit grid and inset, scale to 24 × 24. No additional details."
         }
       ]
     },
@@ -2332,6 +3004,50 @@
           "sha256": "225f6d1dff0d11dd03bfa3d826d22dffc6a2ec54c0ce2ca1df1faafd315ab324",
           "text": "ς",
           "modifications": "Bold glyph outlines converted to filled SVG paths; centered in a 24×24 viewBox with 2-unit padding. Roman numerals are condensed horizontally to retain a 20-unit height."
+        }
+      ]
+    },
+    {
+      "collection": "Tabler",
+      "commit": "a4ce1404bc6d24d3c365afe7b258d6bf6f48d62d",
+      "license": "https://raw.githubusercontent.com/tabler/tabler-icons/a4ce1404bc6d24d3c365afe7b258d6bf6f48d62d/LICENSE",
+      "licenseSha256": "b740a1d46122672da62833e97f7e7c8a13fa85cbc7445b584b297cc00dde93db",
+      "icons": [
+        {
+          "id": "mushroom",
+          "source": "https://raw.githubusercontent.com/tabler/tabler-icons/a4ce1404bc6d24d3c365afe7b258d6bf6f48d62d/icons/filled/mushroom.svg",
+          "sourceSha256": "82f4b772d12f6456a0d0ba1dab7908b8d469681bf0a25d1863627636665221bc",
+          "sha256": "47138f8d9e9fee8d81a49d741d6b3fb569ef9d901d09983c6aad3d7127852e99",
+          "modifications": "Preserve the approved filled silhouette and 24-unit grid; currentColor, stroke none."
+        },
+        {
+          "id": "crutch",
+          "source": "https://raw.githubusercontent.com/tabler/tabler-icons/a4ce1404bc6d24d3c365afe7b258d6bf6f48d62d/icons/outline/crutches.svg",
+          "sourceSha256": "7b883adbc9b2b5dbed378b1861c76f97b90b5855f660d7ffb62ad6e94396b4b0",
+          "sha256": "18fda8cab599797404b4eca14158f33d00a9b2d7c68834bced855ac868e27646",
+          "modifications": "Approved filled adaptation of the outline crutches concept: one axillary crutch, simplified filled geometry, rotated -28 degrees around (12, 12). Preserve the approved 24-unit grid; currentColor, stroke none."
+        }
+      ]
+    },
+    {
+      "collection": "Microsoft Fluent Emoji",
+      "commit": "1ffb34c752ecf5d402f04cfb4b392c77f57c54bc",
+      "license": "https://raw.githubusercontent.com/microsoft/fluentui-emoji/1ffb34c752ecf5d402f04cfb4b392c77f57c54bc/LICENSE",
+      "licenseSha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "icons": [
+        {
+          "id": "poop",
+          "source": "https://raw.githubusercontent.com/microsoft/fluentui-emoji/1ffb34c752ecf5d402f04cfb4b392c77f57c54bc/assets/Pile%20of%20poo/High%20Contrast/pile_of_poo_high_contrast.svg",
+          "sourceSha256": "da4f9347b1ae3e70298f8ae149c4d6bf9503a2678c6088877812128203b516fd",
+          "sha256": "a6f8802081a72325ebc93f5a49380c9be521ff2dee481989c1a0e762f2ecdb8d",
+          "modifications": "Remove facial subpaths, preserving the outer silhouette. Replace fixed color with currentColor; scale the 32-unit grid to 24 × 24. Preserve nonzero winding."
+        },
+        {
+          "id": "poop-eyes",
+          "source": "https://raw.githubusercontent.com/microsoft/fluentui-emoji/1ffb34c752ecf5d402f04cfb4b392c77f57c54bc/assets/Pile%20of%20poo/High%20Contrast/pile_of_poo_high_contrast.svg",
+          "sourceSha256": "da4f9347b1ae3e70298f8ae149c4d6bf9503a2678c6088877812128203b516fd",
+          "sha256": "088f8f54c01f257bffbce6a71dbb9409234153b0489af411ddf2d5ee713090cc",
+          "modifications": "Preserve the original High Contrast path, including eye cutouts, pupils and smile. Replace fixed color with currentColor; scale the 32-unit grid to 24 × 24. Preserve nonzero winding."
         }
       ]
     }

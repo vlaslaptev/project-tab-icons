@@ -117,7 +117,11 @@ object. Islands uses `JBColor.name` to recognize gradient backgrounds and keep
 background clearing opaque when a window is inactive. Converting an opaque named
 color into a plain RGB Color lost that information and left the old selected-tab
 shape visible behind the inset body. Only actual color mixtures create a new RGB
-value; the plugin does not change the IDE's graphics wrappers or focus behavior.
+value. Since 0.3.107, background clearing still preserves that native behavior,
+while tab and group bodies use the original Graphics2D delegate with an opaque
+base. The inactive-window wrapper is bypassed only for those bodies; caller
+graphics, text, icons and focus behavior are unchanged. Fill intensity blends
+against the base rather than exposing the project gradient through the body.
 
 The fourth appearance card stores group spacing and an optional shared outline in
 `TabAppearanceState`, including preset drafts and JSON style bundles. Missing fields
@@ -143,7 +147,15 @@ events skip layout. A split hides the entire group's line. Only open members in
 that strip count, and merge/Arrange explicitly refresh every synchronized strip.
 Group and tab outline paths/strokes are reused until geometry or style changes;
 group painting shares one Graphics2D copy and border updates coalesce layout
-requests. No performance percentage has been measured.
+requests.
+
+Since 0.3.105, a drag session freezes the source group's geometry and defers the
+final split state until release. Leaving the original bounds previews the split;
+returning before release restores the grouped appearance. Since 0.3.106, source
+drag margins stay transparent and empty slots are painted below tab content.
+The native painter is restored when the session ends. The 0.3.107 body renderer
+adds no image buffers, per-pixel work or extra graphics copies. Local rendering
+measurements and their limits are recorded in [compatibility](COMPATIBILITY.md).
 
 Disposal restores native borders/layouts and removes the painter/listener.
 Settings Preview uses the same group path/track geometry; Frontend and Backend

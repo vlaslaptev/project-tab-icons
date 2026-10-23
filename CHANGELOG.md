@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.107 — 2026-10-24
+
+Changes since the published 0.3.99 release:
+
+- Keep group boundaries, icons, spacing and separators fixed while reordering tabs inside a group.
+- Preview a split only after leaving the original group bounds, and restore the group when the tab returns before release.
+- Limit the dragged background to the visible tab shape; keep empty slots below tab content and drag margins transparent.
+- Draw opaque tab and group bodies above the IDE project gradient, including fill insets, while preserving the gradient outside their contours.
+- Add **Active tab highlight** and **Inactive tab dimming** in Tab layout, both with a 0–100% range and defaults of 25% and 75% respectively.
+- Restore the original preset selection after undoing all manual appearance edits.
+- Expand the 100+ icon library with characters, food, science, games, art, weather and travel, retaining source attribution and English/Russian search terms.
+
 ## 0.3.99 — 2026-10-23
 
 Changes since the published 0.3.85 release:

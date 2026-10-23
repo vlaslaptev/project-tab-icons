@@ -1,6 +1,8 @@
 package dev.vlas.projecttabicons
 
+import com.intellij.openapi.wm.impl.IdeBackgroundUtil
 import com.intellij.ui.ExperimentalUI
+import com.intellij.ui.Graphics2DDelegate
 import com.intellij.ui.IslandsState
 import com.intellij.ui.JBColor
 import com.intellij.ui.mac.WindowTabsComponent
@@ -33,26 +35,30 @@ internal enum class ProjectTabSurfaceState {
     }
 }
 
+/** Выбранная вкладка сохраняет цвет; наведение не отменяет приглушение остальных. */
+internal fun inactiveTabStrength(selected: Boolean, dimming: Double): Float =
+    if (selected) 1f else (1.0 - normalizedInactiveTabDimming(dimming) / 100.0).toFloat()
+
 internal data class ProjectTabPaintColors(val strip: Color, val background: Color, val fill: Color?)
 
 /** Сначала смешиваем цвета, затем один раз сглаживаем внешний контур. */
 internal object ProjectTabSurface {
-    private const val SELECTED_BRIGHTNESS_GAP = 0.08
     private const val HOVER_BRIGHTNESS_GAP = 0.03
     private const val MAX_IDLE_BRIGHTNESS = 0.90
 
     /** Коррекция идёт после заливки: даже непрозрачный цвет не скрывает выбранный таб. */
-    fun resolve(colors: ProjectTabSurfaceColors, tabColor: Color?, fillIntensity: Int): ProjectTabPaintColors {
+    fun resolve(colors: ProjectTabSurfaceColors, tabColor: Color?, fillIntensity: Int,
+                activeTabHighlight: Double = DEFAULT_ACTIVE_TAB_HIGHLIGHT): ProjectTabPaintColors {
         val strip = blend(UIUtil.getPanelBackground(), colors.strip)
         val idle = blend(strip, colors.idleBackground)
         val background = blend(strip, colors.background)
         val opacity = fillIntensity.coerceIn(MIN_TAB_FILL_INTENSITY, MAX_TAB_FILL_INTENSITY) / 100f
-        return ProjectTabPaintColors(strip, stateColor(background, idle, colors.state), tabColor?.let {
-            stateColor(blend(background, it, opacity), blend(idle, it, opacity), colors.state)
+        return ProjectTabPaintColors(strip, stateColor(background, idle, colors.state, activeTabHighlight), tabColor?.let {
+            stateColor(blend(background, it, opacity), blend(idle, it, opacity), colors.state, activeTabHighlight)
         })
     }
 
-    private fun stateColor(native: Color, idle: Color, state: ProjectTabSurfaceState): Color {
+    private fun stateColor(native: Color, idle: Color, state: ProjectTabSurfaceState, activeTabHighlight: Double): Color {
         if (state == ProjectTabSurfaceState.NATIVE) return native
         // У белой заливки и светлых тем тоже должно остаться место для выделения.
         val idleBrightness = brightness(idle)
@@ -60,9 +66,12 @@ internal object ProjectTabSurface {
             blend(idle, Color.BLACK, (1.0 - MAX_IDLE_BRIGHTNESS / idleBrightness).toFloat()) else idle
         if (state == ProjectTabSurfaceState.IDLE) return base
         val baseBrightness = brightness(base)
-        val target = baseBrightness + if (state == ProjectTabSurfaceState.SELECTED)
-            SELECTED_BRIGHTNESS_GAP else HOVER_BRIGHTNESS_GAP
-        // Уже светлый штатный selected сохраняется; hover всегда слабее selected.
+        val selectedGap = normalizedActiveTabHighlight(activeTabHighlight) / 100.0
+        val gap = if (state == ProjectTabSurfaceState.SELECTED) selectedGap
+            else minOf(HOVER_BRIGHTNESS_GAP, selectedGap)
+        val target = (baseBrightness + gap).coerceAtMost(1.0)
+        // Штатный selected может быть ярче; дополнительный hover не превышает выбранный уровень,
+        // в том числе при 0–3%. Ограничение белым сохраняет корректный цвет в светлой теме.
         if (state == ProjectTabSurfaceState.SELECTED && brightness(native) >= target) return native
         val opacity = ((target - baseBrightness) / (1.0 - baseBrightness)).toFloat()
         return blend(base, Color.WHITE, opacity)
@@ -73,25 +82,42 @@ internal object ProjectTabSurface {
 
     fun paint(graphics: Graphics2D, width: Int, height: Int, geometry: ProjectTabGeometry,
               colors: ProjectTabSurfaceColors, tabColor: Color?, fillInset: Int,
-              fillIntensity: Int = DEFAULT_TAB_FILL_INTENSITY) {
+              fillIntensity: Int = DEFAULT_TAB_FILL_INTENSITY,
+              activeTabHighlight: Double = DEFAULT_ACTIVE_TAB_HIGHLIGHT, clearBackground: Boolean = true) {
         if (width <= 0 || height <= 0) return
         val g = graphics.create() as Graphics2D
         try {
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
             // Удаляем также прежние полупрозрачные краевые пиксели нативного фона.
-            val paint = resolve(colors, tabColor, fillIntensity)
-            g.color = paint.strip
-            g.fillRect(0, 0, width, height)
+            val paint = resolve(colors, tabColor, fillIntensity, activeTabHighlight)
+            if (clearBackground) {
+                g.color = paint.strip
+                g.fillRect(0, 0, width, height)
+            }
+            // Градиент нужен только снаружи фигуры. Тело, включая отступ заливки,
+            // рисуем непрозрачно поверх него; именованный фон сохраняем для очистки.
+            val body = solidBodyGraphics(g)
             val inset = JBUI.scale(fillInset.coerceIn(MIN_TAB_FILL_INSET, MAX_TAB_FILL_INSET)).toDouble()
             // При inset=0 фон и заливка попадают в единственную операцию fill с AA.
-            g.color = if (inset == 0.0) paint.fill ?: paint.background else paint.background
-            g.fill(geometry.shape())
+            body.color = if (inset == 0.0) paint.fill ?: paint.background else paint.background
+            body.fill(geometry.shape())
             if (paint.fill != null && inset > 0.0) {
                 // Внутренний край заливки отдельный; он не касается внешней дуги таба.
-                g.color = paint.fill
-                g.fill(geometry.inset(inset).shape())
+                body.color = paint.fill
+                body.fill(geometry.inset(inset).shape())
             }
         } finally { g.dispose() }
+    }
+
+    /** Только для локальной копии Graphics: владелец освобождает её вместе с delegate. */
+    fun solidBodyGraphics(graphics: Graphics2D): Graphics2D {
+        val body = IdeBackgroundUtil.getOriginalGraphics(graphics)
+        // SDK 262 отдельно приглушает заливки неактивного окна. Пропускаем только
+        // эту обёртку, не меняя её состояния и не затрагивая текст/иконки. Класс
+        // Kotlin-internal; сам delegate доступен через публичный Graphics2DDelegate.
+        return if (body is Graphics2DDelegate &&
+            body.javaClass.name == "com.intellij.openapi.application.impl.islands.IslandsInactiveFrameGraphics2D")
+            body.delegate else body
     }
 
     fun blend(background: Color, foreground: Color, opacity: Float = 1f): Color {

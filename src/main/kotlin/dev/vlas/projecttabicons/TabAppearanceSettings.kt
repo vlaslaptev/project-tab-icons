@@ -86,6 +86,16 @@ internal const val DEFAULT_OUTLINE_THICKNESS = 2
 internal const val MIN_TAB_FILL_INTENSITY = 0
 internal const val MAX_TAB_FILL_INTENSITY = 100
 internal const val DEFAULT_TAB_FILL_INTENSITY = 50
+internal const val DEFAULT_INACTIVE_TAB_DIMMING = 60.0
+internal const val MAX_INACTIVE_TAB_DIMMING = 80.0
+internal const val DEFAULT_ACTIVE_TAB_HIGHLIGHT = 5.0
+internal const val MAX_ACTIVE_TAB_HIGHLIGHT = 20.0
+
+internal fun normalizedActiveTabHighlight(value: Double): Double =
+    if (value.isFinite()) value.coerceIn(0.0, MAX_ACTIVE_TAB_HIGHLIGHT) else DEFAULT_ACTIVE_TAB_HIGHLIGHT
+
+internal fun normalizedInactiveTabDimming(value: Double): Double =
+    if (value.isFinite()) value.coerceIn(0.0, MAX_INACTIVE_TAB_DIMMING) else DEFAULT_INACTIVE_TAB_DIMMING
 internal const val MIN_TAB_FILL_INSET = 0
 internal const val MAX_TAB_FILL_INSET = 6
 internal const val MIN_TAB_FONT_SIZE = 10
@@ -135,6 +145,10 @@ internal data class TabAppearanceState(
     @field:OptionTag @JvmField val tabFillInset: Int = 0,
     // Старый XML без этого поля сохраняет прежнюю заливку 50%.
     @field:OptionTag @JvmField val tabFillIntensity: Int = DEFAULT_TAB_FILL_INTENSITY,
+    // В XML остаётся фактическое затемнение; шкала UI пересчитывается отдельно.
+    @field:OptionTag @JvmField val inactiveTabDimming: Double = DEFAULT_INACTIVE_TAB_DIMMING,
+    // В XML остаются реальные п.п. осветления: старые целые значения читаются без смены смысла.
+    @field:OptionTag @JvmField val activeTabHighlight: Double = DEFAULT_ACTIVE_TAB_HIGHLIGHT,
     // Пропущенное поле тоже использует текущий дефолт Ab; явный выбор XML сохраняется.
     @field:OptionTag @JvmField val iconInitials: TabIconInitials = DEFAULT_ICON_INITIALS,
     @field:OptionTag @JvmField val iconLetterWeight: TabIconLetterWeight = TabIconLetterWeight.BOLD,
@@ -175,6 +189,8 @@ internal data class TabAppearanceState(
         groupSeparatorHeight = groupSeparatorHeight.coerceIn(20, 100),
         tabFillInset = tabFillInset.coerceIn(MIN_TAB_FILL_INSET, MAX_TAB_FILL_INSET),
         tabFillIntensity = tabFillIntensity.coerceIn(MIN_TAB_FILL_INTENSITY, MAX_TAB_FILL_INTENSITY),
+        inactiveTabDimming = normalizedInactiveTabDimming(inactiveTabDimming),
+        activeTabHighlight = normalizedActiveTabHighlight(activeTabHighlight),
         // Старый XML мог хранить обе галочки: путь уже имел приоритет при отрисовке.
         // Ветка и счётчик совместимы; путь по-прежнему исключает всю Git-информацию.
         showGitStatus = showGitStatus && !showProjectPath,

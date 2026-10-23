@@ -9,6 +9,8 @@ import kotlin.math.pow
 
 internal enum class ContourLicense(val resourcePath: String) {
     PHOSPHOR("/META-INF/Phosphor-LICENSE.txt"),
+    TABLER("/META-INF/Tabler-LICENSE.txt"),
+    FLUENT_EMOJI("/META-INF/Microsoft-Fluent-Emoji-LICENSE.txt"),
     DEVICON("/META-INF/Devicon-LICENSE.txt"),
     JETBRAINS_MONO("/META-INF/JetBrains-Mono-OFL-1.1.txt"),
     CC0("/META-INF/CC0-1.0.txt"),
@@ -49,7 +51,7 @@ internal object ContourCatalog {
             require(id.matches(Regex("[a-z0-9-]+")))
             Contour(id, title, resource("/icons/contours/$id.svg"), ContourLicense.valueOf(license), category, keywords)
         }.toList().also { entries ->
-            require(entries.isNotEmpty() && entries.size <= 289 && entries.map { it.id }.toSet().size == entries.size)
+            require(entries.isNotEmpty() && entries.map { it.id }.toSet().size == entries.size)
         }
     }
 

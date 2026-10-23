@@ -1,6 +1,6 @@
 # Compatibility
 
-| Area | Scope for release 0.3.99 |
+| Area | Scope for release 0.3.107 |
 | --- | --- |
 | Operating system | macOS |
 | IDE | IntelliJ IDEA 2026.2.3 and later 2026.2 updates within the declared build range |
@@ -26,6 +26,31 @@ The descriptor keeps a strict `262.*` upper bound. Updating it is a compatibilit
 change, not a way to make an unreviewed build install on a newer IDE.
 
 ## Evidence and limits
+
+### Release 0.3.107
+
+Built and installed in IntelliJ IDEA 2026.2.3 / 262.10968.63 with JBR 25. Both
+installed JARs match the release ZIP byte for byte. A publication build completed
+successfully and retained the same ZIP checksum. Descriptor, resources, licenses
+and source hashes were inspected before publication.
+
+Runtime diagnostics inside the installed IDE compared 576 rendering combinations:
+ordinary tabs and both group variants, active/inactive windows, four tab states,
+fill intensities and insets, and Graphics2D scales of 1×, 1.25×, 1.5× and 2×.
+The tab-body samples were independent of the native gradient in every combination.
+Visual inspection covered the first tabs and three strip widths. These graphics
+scales do not claim a change to the IDE's UI-scale setting.
+
+Component events through the IDE drag handler exercised reordering, left/right
+exit and return before release, stable group boundaries/separators, transparent
+source margins and painter restoration. Original tab order and selection were
+restored. The diagnostics did not drive an OS input device.
+
+Comparable local paint measurements showed no regression: p95 was 15–36% lower
+than 0.3.106 across 16 recorded scenarios after warm-up. This is a renderer
+measurement, not a claim about whole-IDE speed; JIT and background work affect it.
+Standalone JVM tests, linters and Plugin Verifier were not run. Existing gallery
+images retain their recorded 0.3.97/0.3.86 provenance and have not been recaptured.
 
 ### Release 0.3.99
 

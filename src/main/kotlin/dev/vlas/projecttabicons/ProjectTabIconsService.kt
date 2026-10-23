@@ -81,6 +81,7 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
     private var connection: MessageBusConnection? = null
     private val observations = IdentityHashMap<IdeFrameImpl, FrameObservation>()
     private val groupLayouts = IdentityHashMap<WindowTabsComponent, ProjectTabGroupLayout>()
+    private val groupDrag = ProjectTabGroupDrag()
     private val groupVisualState by lazy { ApplicationManager.getApplication().getService(ProjectTabGroupVisualState::class.java) }
     private val groupOrdering = ProjectTabGroupOrdering(coroutineScope) { tabs, explicit ->
         if (explicit) groupLayouts[tabs]?.restoreAppearance() else groupLayouts[tabs]?.refreshOrder()
@@ -334,7 +335,7 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
             val groupLayout = if (groups.groups.isNotEmpty() || appearance.groupSpacing > 0 || appearance.showGroupOutline ||
                 appearance.showGroupSeparator || appearance.showGroupIcon) {
                 activeGroupLayouts.add(tabs)
-                groupLayouts.getOrPut(tabs) { ProjectTabGroupLayout(tabs, groupVisualState,
+                groupLayouts.getOrPut(tabs) { ProjectTabGroupLayout(tabs, groupVisualState, groupDrag,
                     { groupOrdering.isOrdering }, { requestRefresh() }) }.also { layout ->
                     val memberships = tabs.tabs.mapNotNull { info ->
                         val project = frames[info.`object`] ?: return@mapNotNull null
@@ -487,13 +488,16 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
             }
             if (applied.outlineColor != color || applied.tabColor != tabColor || applied.outlineThickness != appearance.outlineThickness ||
                 applied.outlineStyle != appearance.outlineStyle || applied.tabFillInset != appearance.tabFillInset ||
-                applied.tabFillIntensity != appearance.tabFillIntensity) {
+                applied.tabFillIntensity != appearance.tabFillIntensity || applied.inactiveTabDimming != appearance.inactiveTabDimming ||
+                applied.activeTabHighlight != appearance.activeTabHighlight) {
                 applied.outlineColor = color
                 applied.tabColor = tabColor
                 applied.outlineThickness = appearance.outlineThickness
                 applied.outlineStyle = appearance.outlineStyle
                 applied.tabFillInset = appearance.tabFillInset
                 applied.tabFillIntensity = appearance.tabFillIntensity
+                applied.inactiveTabDimming = appearance.inactiveTabDimming
+                applied.activeTabHighlight = appearance.activeTabHighlight
                 changed = true
             }
             if (changed) {
@@ -505,7 +509,8 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         // Тема может заменить border при updateUI: в этом случае её border становится новой базой.
         val border = ProjectTabBorder(label.border, icon, color,
             appearance.outlineThickness, appearance.outlineStyle, tabColor, appearance.tabFillInset, appearance.tabFillIntensity,
-            groupLayout = groupLayout, groupTab = info)
+            groupLayout = groupLayout, groupTab = info, inactiveTabDimming = appearance.inactiveTabDimming,
+            activeTabHighlight = appearance.activeTabHighlight)
         label.border = border
         appliedLabelBorders[label] = border
         label.revalidate()

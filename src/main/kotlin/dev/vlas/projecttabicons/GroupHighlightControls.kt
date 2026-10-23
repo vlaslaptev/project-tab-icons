@@ -32,17 +32,15 @@ internal class GroupHighlightControls(style: GroupHighlightStyle, changed: () ->
             value.text = "${control.value}${if (unit == "%") "" else " "}$unit"
         }
     }
-    private val dimming = Slider("Inactive group dimming:", "$style inactive group dimming", 0, 80, defaults.inactiveDimming)
     private val inset = Slider("Card inset:", "Active card inset in pixels", 0, 6, defaults.cardInset, "px")
     private val dividers = JBCheckBox("Show internal dividers", defaults.showDividers)
     private val dividerIntensity = Slider("Divider intensity:", "Internal divider intensity", 0, 100, defaults.dividerIntensity)
     private val dividerHeight = Slider("Divider height:", "Internal divider height", 20, 100, defaults.dividerHeight)
     private val hideAdjacent = JBCheckBox("Hide dividers beside active tab", defaults.hideDividersNearActive)
-    private val sliders = listOf(dimming) + if (joined) listOf(dividerIntensity, dividerHeight) else listOf(inset)
+    private val sliders = if (joined) listOf(dividerIntensity, dividerHeight) else listOf(inset)
     private val checks = if (joined) listOf(dividers, hideAdjacent) else emptyList()
 
     init {
-        dimming.control.toolTipText = "Reduce the group's tint when none of its tabs is selected. 0% disables dimming. Text and icons stay readable. Click Tools in Preview to see it."
         inset.control.toolTipText = "Space around the active card: 0–6 px. 0 px sits flush with the group surface."
         dividers.toolTipText = "Draw thin lines between joined tabs. Does not affect pipes between groups."
         dividerHeight.control.toolTipText = "Line height relative to the capsule: 20–100%."
@@ -55,7 +53,7 @@ internal class GroupHighlightControls(style: GroupHighlightStyle, changed: () ->
     fun labelWidth(): Int = sliders.maxOf { it.label.preferredSize.width }
 
     fun form(controlWidth: Int, rowHeight: Int, labelWidth: () -> Int, availableWidth: () -> Int): JComponent {
-        val fields = listOf(dimming.field(controlWidth, rowHeight)) + if (joined) listOf(
+        val fields = if (joined) listOf(
             AppearanceField(null, dividers), dividerIntensity.field(controlWidth, rowHeight),
             dividerHeight.field(controlWidth, rowHeight), AppearanceField(null, hideAdjacent),
         ) else listOf(inset.field(controlWidth, rowHeight))
@@ -64,13 +62,13 @@ internal class GroupHighlightControls(style: GroupHighlightStyle, changed: () ->
     }
 
     fun value(): GroupHighlightOptions = GroupHighlightOptions(
-        inactiveDimming = dimming.control.value, cardInset = inset.control.value,
+        cardInset = inset.control.value,
         showDividers = dividers.isSelected, dividerIntensity = dividerIntensity.control.value,
         dividerHeight = dividerHeight.control.value, hideDividersNearActive = hideAdjacent.isSelected,
     )
 
     fun setValue(value: GroupHighlightOptions) {
-        dimming.control.value = value.inactiveDimming; inset.control.value = value.cardInset
+        inset.control.value = value.cardInset
         dividers.isSelected = value.showDividers; dividerIntensity.control.value = value.dividerIntensity
         dividerHeight.control.value = value.dividerHeight; hideAdjacent.isSelected = value.hideDividersNearActive
     }
@@ -87,7 +85,6 @@ internal class GroupHighlightControls(style: GroupHighlightStyle, changed: () ->
 
     fun installMarkers(watch: (JComponent, (TabAppearanceState) -> Any?) -> Unit) {
         fun options(value: TabAppearanceState) = if (joined) value.groupJoined else value.groupBackground
-        watch(dimming.label) { options(it).inactiveDimming }
         if (joined) {
             watch(dividers) { options(it).showDividers }
             watch(dividerIntensity.label) { options(it).dividerIntensity }

@@ -46,6 +46,8 @@ internal class AppearancePresetsPanel(
     }
     private var lastCustomAppearance = TabAppearanceState.defaults().asCustomAppearance()
     private var customAppearanceBaseline = lastCustomAppearance
+    private data class EditOrigin(val appearance: TabAppearanceState, val customAppearance: TabAppearanceState)
+    private var editOrigin: EditOrigin? = null
     private var userPresetDraft = emptyList<UserAppearancePreset>()
     private var userPresetBaseline = emptyList<UserAppearancePreset>()
     private var canSaveAsPreset = false
@@ -77,6 +79,7 @@ internal class AppearancePresetsPanel(
             button.addActionListener {
                 if (!syncing) {
                     rememberCurrentCustom()
+                    editOrigin = null
                     editingUserPresetId = null
                     canSaveAsPreset = preset == TabAppearancePreset.CUSTOM
                     val next = if (preset == TabAppearancePreset.CUSTOM) lastCustomAppearance.copy(enabled = currentAppearance().enabled)
@@ -92,6 +95,7 @@ internal class AppearancePresetsPanel(
             val id = editingUserPresetId ?: return@addActionListener
             val current = currentAppearance()
             userPresetDraft = userPresetDraft.map { if (it.id == id) it.copy(appearance = current.asCustomAppearance()) else it }
+            editOrigin = null
             canSaveAsPreset = false
             rebuildUserPresetButtons()
             applyAppearance(current.copy(userPresetId = id))
@@ -153,6 +157,7 @@ internal class AppearancePresetsPanel(
                 addActionListener {
                     if (!syncing) {
                         rememberCurrentCustom()
+                        editOrigin = null
                         canSaveAsPreset = false
                         editingUserPresetId = preset.id
                         applyAppearance(preset.appearance.copy(enabled = currentAppearance().enabled, userPresetId = preset.id))
@@ -184,6 +189,7 @@ internal class AppearancePresetsPanel(
         val current = currentAppearance()
         val preset = UserAppearancePreset(UUID.randomUUID().toString(), name, current.asCustomAppearance())
         userPresetDraft = userPresetDraft + preset
+        editOrigin = null
         editingUserPresetId = preset.id
         canSaveAsPreset = false
         rebuildUserPresetButtons()
@@ -204,6 +210,8 @@ internal class AppearancePresetsPanel(
     private fun deleteUserPreset(id: String) {
         val current = currentAppearance()
         userPresetDraft = userPresetDraft.filterNot { it.id == id }
+        editOrigin = validEditOrigin(editOrigin)
+        if (editingUserPresetId == id) editingUserPresetId = null
         val next = if (current.userPresetId == id) {
             lastCustomAppearance = current.asCustomAppearance()
             canSaveAsPreset = true
@@ -234,6 +242,7 @@ internal class AppearancePresetsPanel(
     fun replaceUserPresets(value: List<UserAppearancePreset>) {
         val current = currentAppearance()
         userPresetDraft = value.toList()
+        editOrigin = validEditOrigin(editOrigin)
         val active = value.firstOrNull { it.id == current.userPresetId }
         if (value.none { it.id == editingUserPresetId }) editingUserPresetId = null
         val next = if (current.userPresetId != null && active == null) {
@@ -261,6 +270,7 @@ internal class AppearancePresetsPanel(
         val keepEditing = preserveEditing && saved == currentAppearance().normalized()
         val previousCanSave = canSaveAsPreset
         val previousEditingId = editingUserPresetId
+        val previousEditOrigin = editOrigin
         userPresetDraft = presets.toList()
         userPresetBaseline = userPresetDraft
         rebuildUserPresetButtons()
@@ -273,11 +283,36 @@ internal class AppearancePresetsPanel(
         canSaveAsPreset = keepEditing && previousCanSave
         editingUserPresetId = if (keepEditing) previousEditingId?.takeIf { id -> presets.any { it.id == id } }
             else baseline.userPresetId
+        // После Apply память Custom уже сохранена: возврат к пресету не должен откатывать её.
+        editOrigin = if (keepEditing) validEditOrigin(previousEditOrigin?.copy(customAppearance = lastCustomAppearance)) else null
         return baseline
     }
 
+    private fun validEditOrigin(origin: EditOrigin?): EditOrigin? = origin?.takeIf {
+        val id = it.appearance.userPresetId
+        id == null || userPresetDraft.firstOrNull { preset -> preset.id == id }?.appearance == it.appearance.asCustomAppearance()
+    }
+
+    private fun appearanceForComparison(value: TabAppearanceState): TabAppearanceState =
+        value.asCustomAppearance().let { it.copy(tabFontSize = it.tabFontSize.takeUnless { size -> size == 0 } ?: defaultTabFontSize()) }
+
     fun edited(current: TabAppearanceState) {
-        displayedAppearance().userPresetId?.let { editingUserPresetId = it }
+        val previous = displayedAppearance()
+        if (previous.userPresetId != null || previous.preset != TabAppearancePreset.CUSTOM) {
+            editOrigin = EditOrigin(previous, lastCustomAppearance)
+        }
+        val origin = validEditOrigin(editOrigin)
+        if (origin != null && appearanceForComparison(current) == appearanceForComparison(origin.appearance)) {
+            // Сравниваем все поля оформления, а не только последний изменённый контрол.
+            lastCustomAppearance = origin.customAppearance
+            editingUserPresetId = origin.appearance.userPresetId
+            canSaveAsPreset = false
+            editOrigin = null
+            // Возвращаем и способ хранения шрифта: фиксированный размер может совпадать с IDE.
+            applyAppearance(origin.appearance.copy(enabled = current.enabled))
+            return
+        }
+        previous.userPresetId?.let { editingUserPresetId = it }
         presetButtons.getValue(TabAppearancePreset.CUSTOM).isSelected = true
         lastCustomAppearance = current.asCustomAppearance()
         canSaveAsPreset = true
@@ -285,6 +320,7 @@ internal class AppearancePresetsPanel(
 
     fun restoreDefaults() {
         rememberCurrentCustom()
+        editOrigin = null
         canSaveAsPreset = false
         editingUserPresetId = null
         applyAppearance(TabAppearanceState.defaults().copy(enabled = currentAppearance().enabled))
