@@ -69,7 +69,7 @@
     "licenses/Gradle-Wrapper-Apache-2.0.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
     "licenses/JetBrains-Mono-OFL-1.1.txt": "30f0c136e3c88e422d0791acd97238870f9054a9729bc34cf2ff0d4ed8cac4ad",
     "licenses/Phosphor-MIT.txt": "b5b1f1da112d18ea2147decfd48ddc1bf2b5aeb6c265381579340e95b15a2bb2",
-    "repository.json": "097d1f2fad98f38d06fbcd20c29cdf3878b3f85c605d7e626146499f2b308eae",
+    "repository.json": "bd5067d6199345b8879824b4432e9428c2a3801060b052119451e5f86dc67ef9",
     "settings.gradle.kts": "c3b88464238fec3884189e003d13691aa86df86ac136565991ad4d83113fd26c",
     "src/main/kotlin/dev/vlas/projecttabicons/AppearancePresetsPanel.kt": "31fee443477bd143555a8918a1f7bac9aabdb14807ffc81a94cbdbfb5cfb0de2",
     "src/main/kotlin/dev/vlas/projecttabicons/AtomicFileWrite.kt": "ea54ebcae333b4a2c6ea199da4465a2bcde4b2e2353378bbb87e5696a32c0a15",
