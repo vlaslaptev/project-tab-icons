@@ -152,14 +152,25 @@ internal data class TabAppearanceState(
     @field:OptionTag @JvmField val showGroupIcon: Boolean = false,
     @field:OptionTag @JvmField val hideGroupedTabIcons: Boolean = false,
 ) {
+    // XMLB может записать null в non-null enum, если значение неизвестно текущему SDK.
+    @Suppress("USELESS_ELVIS", "UNNECESSARY_SAFE_CALL")
     fun normalized(): TabAppearanceState = copy(
+        iconSize = iconSize ?: TabIconSize.LARGE,
+        iconPosition = iconPosition ?: TabIconPosition.RIGHT,
+        outlineStyle = outlineStyle ?: TabOutlineStyle.ROUNDED,
+        closeButtonPosition = closeButtonPosition ?: TabCloseButtonPosition.LEFT,
+        branchPosition = branchPosition ?: TabBranchPosition.RIGHT,
+        preset = preset ?: TabAppearancePreset.CUSTOM,
+        iconInitials = iconInitials ?: DEFAULT_ICON_INITIALS,
+        iconLetterWeight = iconLetterWeight ?: TabIconLetterWeight.BOLD,
+        groupSeparatorColor = groupSeparatorColor ?: GroupSeparatorColor.NEUTRAL,
         userPresetId = userPresetId?.trim()?.takeIf { it.isNotEmpty() && it.length <= 64 },
         outlineThickness = outlineThickness.coerceIn(MIN_OUTLINE_THICKNESS, MAX_OUTLINE_THICKNESS),
         tabHeight = tabHeight.coerceIn(DEFAULT_TAB_HEIGHT, MAX_TAB_HEIGHT),
         groupSpacing = groupSpacing.coerceIn(0, MAX_GROUP_SPACING),
-        groupHighlightStyle = groupHighlightStyle.normalized(),
-        groupBackground = groupBackground.normalized(),
-        groupJoined = groupJoined.normalized(),
+        groupHighlightStyle = groupHighlightStyle?.normalized() ?: GroupHighlightStyle.BACKGROUND,
+        groupBackground = groupBackground?.normalized() ?: GroupHighlightOptions(),
+        groupJoined = groupJoined?.normalized() ?: GroupHighlightOptions(),
         groupSeparatorThickness = groupSeparatorThickness.coerceIn(MIN_OUTLINE_THICKNESS, MAX_OUTLINE_THICKNESS),
         groupSeparatorHeight = groupSeparatorHeight.coerceIn(20, 100),
         tabFillInset = tabFillInset.coerceIn(MIN_TAB_FILL_INSET, MAX_TAB_FILL_INSET),
@@ -168,7 +179,7 @@ internal data class TabAppearanceState(
         // Ветка и счётчик совместимы; путь по-прежнему исключает всю Git-информацию.
         showGitStatus = showGitStatus && !showProjectPath,
         showGitBranch = showGitBranch && !showProjectPath,
-        gitBranchFormat = if (showGitBranch && !showProjectPath) gitBranchFormat else TabGitBranchFormat.FULL,
+        gitBranchFormat = if (showGitBranch && !showProjectPath) gitBranchFormat ?: TabGitBranchFormat.FULL else TabGitBranchFormat.FULL,
         tabFontSize = if (tabFontSize == 0) 0 else tabFontSize.coerceIn(MIN_TAB_FONT_SIZE, MAX_STORED_TAB_FONT_SIZE),
     )
 
@@ -245,18 +256,18 @@ internal class TabAppearanceSettings :
     SerializablePersistentStateComponent<TabAppearanceState>(TabAppearanceState.defaults()) {
 
     fun apply(value: TabAppearanceState) {
-        updateState { value.normalized() }
+        SharedIconSettingsLock.withLock { updateState { value.normalized() } }
         refreshTabs()
     }
 
     override fun loadState(state: TabAppearanceState) {
-        super.loadState(state.normalized())
+        SharedIconSettingsLock.withLock { super.loadState(state.normalized()) }
         // Загрузка XML может происходить во время создания сервиса отрисовки.
         ApplicationManager.getApplication().invokeLater { refreshTabs() }
     }
 
     private fun refreshTabs() {
         ApplicationManager.getApplication().getServiceIfCreated(ProjectTabIconsService::class.java)
-            ?.requestRefresh()
+            ?.requestRefresh(resetTransientFailure = true)
     }
 }

@@ -2,14 +2,7 @@
 
 Project icons, colored outlines, translucent fills and Git context for IntelliJ IDEA's **macOS project window tabs**.
 
-### [↓ Download ZIP 0.3.85](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.85/project-tab-icons-0.3.85.zip)
-
-## 8 IDE themes. Hundreds of appearance combinations.
-
-![Real Preview screenshots across all eight IDE themes, with different tab and group styles](docs/media/appearance-gallery.png)
-
-Choose tab height, text size, icon position, outline, fill and group styling independently.
-The gallery shows ten examples from the installed plugin; they are a small selection of the available combinations.
+### [↓ Download ZIP 0.3.99](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.99/project-tab-icons-0.3.99.zip)
 
 ## Install in a minute
 
@@ -17,9 +10,12 @@ The gallery shows ten examples from the installed plugin; they are a small selec
 2. Open several projects in separate windows, then use **Window → Merge All Project Windows**.
 3. Open **Settings → Appearance & Behavior → Project Tab Icons**, choose a preset, adjust it and click **Apply**.
 
-Requires **macOS** and **IntelliJ IDEA 2026.2.3**, builds `262.10968.63` through `262.*`.
-The plugin customizes project window tabs; editor file tabs use the IDE's normal appearance.
-See the [installation guide](docs/INSTALLATION.md) for updates, missing tabs and removal.
+## Style tabs and groups. Hundreds of combinations. Every IDE theme.
+![Real Preview screenshots across all eight IDE themes, with different tab and group styles](docs/media/appearance-gallery.png)
+
+Choose tab height, text size, icon position, outline, fill and group styling independently.
+The gallery shows ten examples from the plugin's real Preview renderer, with everyday
+tab sizes and readable colors. They are a small selection of the available combinations.
 
 ## Make each project easy to recognize
 
@@ -28,9 +24,40 @@ See the [installation guide](docs/INSTALLATION.md) for updates, missing tabs and
 - Adjust fill intensity and inset, and place project icons on either side of the title.
 - Start with a built-in preset or save up to 10 named presets. Custom remembers your last manual appearance.
 - Preview **three or five tabs** in any of the **eight IDE themes** before applying changes.
+- The active tab stays lighter than its inactive state, including with colored fills and group styling.
 - Click a sample tab to compare active and inactive states. Preview theme and sample count stay local to the example window.
 
 The **Light** preview uses light tab surfaces and readable text while keeping its dark toolbar and light editor.
+
+## Compact controls, a live preview
+
+![Current Settings with presets, live Preview, Style, Tab layout and Group layout](docs/media/appearance-presets.png)
+
+**Tab layout** puts **Info** above paired **Height / Font size** and
+**Close button / Git position** controls. Narrow windows use one column.
+**Style** brings **Icon**, **Outline** and **Fill** together, with sections that wrap
+to fit the window. Switch between **Style**, **Tab layout** and **Group layout**;
+the form fits the selected page, leaving room for the project table.
+**Save as new preset** and **Update preset** sit beside these sections.
+
+## Start with a preset
+
+| Preset | Icons | Outline | Height and extras |
+| --- | --- | --- | --- |
+| **Default** | 24 px | Bottom, 2 px | 33 px; IDE font; Git branch on the right; no fill |
+| **Filled** | 20 px | Full, 1 px | 34 px; 12% fill with a 3 px inset; no extra info |
+| **Bold** | 28 px | Full, 4 px | 38 px; 16 px text; no fill or extra info |
+| **Git** | Hidden | Bottom, 2 px | 33 px; compact branch and line counts on the right |
+| **Relax** | Hidden | Bottom, 1 px | 33 px; 14 px text; no fill or extra info |
+
+Built-in presets keep your **Group layout** settings. Manual edits select **Custom**,
+which remembers your last manual appearance when you try another preset.
+**Apply** saves that memory for the next IDE session.
+
+**Restore defaults** selects Default and resets Group layout too, including group
+highlighting, shared icons, spacing and pipes. Group membership, individual project
+icons and colors, and the global customization switch stay unchanged.
+The reset remains a draft until you click Apply; Cancel discards it.
 
 ## One group. One shared style.
 
@@ -40,15 +67,17 @@ and tab color to the group; members inherit them, including projects added later
 
 Under **Group layout → Group highlight → Variant**, choose **Shared background** or
 **Joined tabs**. Both follow regular tab dimensions, theme corners, fill settings,
-active and hover colors, and **Icon → Size**. Tune inactive-group dimming, active-card
-inset or internal dividers, and show a shared group icon with optional hidden member icons.
+active and hover colors, and **Style → Icon → Size**. Tune inactive-group dimming,
+active-card inset or internal dividers, and show a shared group icon with optional hidden member icons.
 Add spacing and vertical pipes between groups.
 
 Groups are placed on the left in group-table order when windows merge, followed by
 ungrouped projects. Use **↑ / ↓** to reorder groups and optional fixed member positions
 to put a project first within its group. Manual rearrangement remains available;
 **Arrange Tabs by Group** reapplies the saved order. A manually split group's shared
-decoration stays hidden until that action restores its contiguous arrangement.
+decoration stays hidden until **Arrange Tabs by Group** succeeds. Moving the tabs
+back manually, applying settings, merging windows again or restarting the IDE does
+not restore that decoration. Members keep their inherited project styling.
 
 ## 100+ shapes. Your colors.
 
@@ -57,10 +86,17 @@ decoration stays hidden until that action restores its contiguous arrangement.
 Search icons by name or category, choose a color with the native IDE picker, a HEX
 value or one of 14 swatches, and select **20, 24 or 28 px** icon sizes.
 
-Import your own SVG or a folder of SVG categories. Existing custom artwork keeps its
-colors. **Text icon** creates editable 1–6-character labels such as DB, QA or API,
-with four styles, three font families and a custom color. Selected artwork is saved
-in IDEA's native project icon storage and remains a project icon after removing the plugin.
+Import an SVG or add a folder of SVGs, including subfolders, as a library category.
+Existing custom artwork keeps its colors. **Text icon** creates editable 1–6-character
+labels such as DB, QA or API, with four styles, three font families and a custom color.
+Individual project artwork is saved in IDEA's native project icon storage and remains
+a project icon after removing the plugin.
+
+Each imported icon can be up to **2 MiB**. A folder import or category can contain
+up to **500 SVGs**; the imported library holds up to **50 categories** and **16 MiB**.
+The plugin stores copies, so moving the source folder keeps the icons available.
+Invalid SVGs are skipped with a report, and duplicates within a folder are combined.
+Use self-contained, static SVGs without scripts, foreignObject, DOCTYPE or external resources.
 
 ## Git context beside the project name
 
@@ -70,13 +106,44 @@ Counts cover saved tracked changes against HEAD, including staged and unstaged
 changes. Git4Idea supplies branches; local background diffs supply counts without
 fetching from remotes.
 
+**Show Git status** adds line counts to either branch format; **Git status** in Info
+shows counts on their own. Background diffs run only while counts are requested.
+Untracked files, binary files and unsaved editor text are excluded. Compact branches
+use the part after the final `/`, keeping at most **13 Unicode characters**, including
+a leading ellipsis. The full branch remains available in the tooltip.
+
 ## Quick actions and portable styles
 
 Use **Tools → Project Tab Icons** or **Find Action** for current-project styling,
-preset switching and Settings. Shortcuts are configurable. **Manage…** updates,
-duplicates and reorders saved presets. **Import styles… / Export styles…** shares
-selected presets, SVG categories and editable text icons as JSON, with name-conflict
-choices. Project paths and group memberships stay local.
+preset switching and Settings. View or change shortcuts in **Settings → Keymap**.
+For a grouped project, edit its inherited icon and colors in **Project groups**.
+
+**Save as new preset** creates a named style; **Update preset** replaces the user
+preset you edited. **Manage user presets…** renames, duplicates, deletes and reorders
+saved presets. Use unique names of up to **32 characters**. Preset changes are saved
+with Apply; Cancel discards the draft.
+
+**Import styles… / Export styles…** shares selected presets, SVG categories and
+editable text icons as JSON, up to **24 MiB**, with **Keep both / Replace matching
+names / Skip matching names** choices. Names are trimmed before conflicts are
+resolved. An invalid import leaves the draft unchanged. Project paths and group
+memberships stay local.
+
+## Save changes and handle conflicts
+
+Unsaved settings, icons and colors are marked with a dot. **Apply** saves them;
+**Cancel** discards pending changes. **Revert** on a project row discards that row's
+edits; **Reload** loads an icon changed outside the page.
+
+Apply saves only the shared settings sections you edited. If another window changed
+the same section, it reports a conflict and keeps your draft. Use the settings page's
+**Revert changes** action to load the latest values, then repeat your edits.
+
+## Requirements and installation help
+
+Requires **macOS** and **IntelliJ IDEA 2026.2.3**, builds `262.10968.63` through `262.*`.
+The plugin customizes project window tabs; editor file tabs use the IDE's normal appearance.
+See the [installation guide](docs/INSTALLATION.md) for updates, missing tabs and removal.
 
 ## Local by design
 

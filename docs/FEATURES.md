@@ -14,11 +14,20 @@ immediately; changes to real project windows are applied through **Apply**.
 | Close button | Left or right, independently of the icon |
 | Outline | Bottom only, Rounded corners, Full outline |
 | Outline thickness | 1–6 px |
-| Tab height | 30–60 px |
+| Height | 30–60 px |
 | Tab fill | 0–100% intensity, in one-percent steps; an independent project color |
 | Fill inset | 0–6 px |
-| Extra information | None, Project path, Git branch, Git Branch Compact, Git status |
-| Git information position | Before or after the project name |
+| Info | None, Project path, Git branch, Git Branch Compact, Git status |
+| Git position | Before or after the project name |
+
+The active tab is lighter than its inactive state. Brightness is adjusted after
+compositing the fill, including at 100% intensity; a sufficiently light native
+selected color is preserved. The same rule applies to regular tabs, both group
+variants and Preview. Disabling customization restores native state colors.
+
+**Tab layout** uses a compact **Info** row, then **Height / Font size** and
+**Close button / Git position** pairs. Narrow windows use one column. Switching
+**Icon / Color / Tab layout / Group layout** resizes the block to the visible page.
 
 Choose a preset, then adjust any appearance value to switch to **Custom**.
 Click **Custom** to return to the last manual appearance. Apply remembers it across

@@ -69,7 +69,8 @@ internal class ProjectTabBorder(
             val colors = surfaceColors?.invoke(component)
             val sharedSurface = sharedGroupSurfacePreview || (colors != null &&
                 groupTab?.let { groupLayout?.paintTabSurface(it, g, width, height, colors) } == true)
-            if (!sharedSurface && (tabColor != null || margins.left + margins.right > 0)) {
+            // Состояния выделяются и при выключенной цветной заливке.
+            if (!sharedSurface) {
                 colors?.let {
                     ProjectTabSurface.paint(g, width, height, geometry, colors, tabColor, tabFillInset, tabFillIntensity)
                     val edges = g.create(margins.left, 0, bodyWidth, height) as Graphics2D

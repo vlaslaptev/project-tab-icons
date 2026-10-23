@@ -17,11 +17,11 @@ internal class LastCustomAppearanceSettings :
     SerializablePersistentStateComponent<LastCustomAppearanceState>(LastCustomAppearanceState()) {
 
     fun remember(value: TabAppearanceState) {
-        updateState { LastCustomAppearanceState(value.asCustomAppearance()) }
+        SharedIconSettingsLock.withLock { updateState { LastCustomAppearanceState(value.asCustomAppearance()) } }
     }
 
     override fun loadState(state: LastCustomAppearanceState) {
-        super.loadState(LastCustomAppearanceState(state.appearance?.asCustomAppearance()))
+        SharedIconSettingsLock.withLock { super.loadState(LastCustomAppearanceState(state.appearance?.asCustomAppearance())) }
     }
 }
 

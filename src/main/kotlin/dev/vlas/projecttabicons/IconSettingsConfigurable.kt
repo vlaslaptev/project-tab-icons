@@ -23,20 +23,19 @@ import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.ui.JBColor
 import java.nio.file.Path
-import java.util.concurrent.Future
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.JComponent
 
 /** Контекст текущего окна нужен диалогам; таблица содержит все открытые проекты. */
 class IconSettingsConfigurable(private val project: Project) : Configurable, Configurable.NoScroll, Configurable.NoMargin {
     private var panel: IconSettingsPanel? = null
     private var lifetime: Disposable? = null
-    private var worker: Future<*>? = null
-    private var generation = 0
+    private val loadingTask = LatestTask()
     @Volatile private var disposed = true
     @Volatile private var iconDirectories = emptySet<String>()
     private var applying = false
-    private val reloadQueued = AtomicBoolean()
+    private val reloadQueue = ScopedUiRefresh { task ->
+        ApplicationManager.getApplication().invokeLater(Runnable(task), ModalityState.any())
+    }
     private val models = linkedMapOf<String, ProjectIconSettingsRow>()
     private var gallery = emptyList<IconChoice>()
     private var iconSets = emptyList<ImportedIconSet>()
@@ -53,7 +52,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
         val view = IconSettingsPanel(::chooseIcon, ::chooseColor, ::reloadRow, ::refreshSettingsState,
             ::importStyles, ::exportStyles, ::chooseGroupIcon, ::chooseGroupColor)
         panel = view
-        Disposer.register(scope, Disposable { worker?.cancel(true) })
+        Disposer.register(scope, Disposable { loadingTask.cancel() })
         val bus = ApplicationManager.getApplication().messageBus.connect(scope)
         bus.subscribe(LafManagerListener.TOPIC, LafManagerListener {
             ApplicationManager.getApplication().invokeLater({
@@ -70,11 +69,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
         })
         bus.subscribe(VirtualFileManager.VFS_CHANGES, object : BulkFileListener {
             override fun after(events: List<VFileEvent>) {
-                if (events.any { event ->
-                    val path = event.path.replace('\\', '/')
-                    path.substringAfterLast('/') in PROJECT_ICON_FILES &&
-                        (path.contains("/.idea/") || path.substringBeforeLast('/') in iconDirectories)
-                }) scheduleReload()
+                if (events.any { isObservedIconConfiguration(it.path, iconDirectories) }) scheduleReload()
             }
         })
         reset()
@@ -82,11 +77,8 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
     }
 
     private fun scheduleReload() {
-        if (!reloadQueued.compareAndSet(false, true)) return
-        ApplicationManager.getApplication().invokeLater({
-            reloadQueued.set(false)
-            if (!disposed && !project.isDisposed) reload(keepDraft = true)
-        }, ModalityState.any())
+        val scope = lifetime ?: return
+        reloadQueue.request(scope, { !disposed && lifetime === scope && !project.isDisposed }) { reload(keepDraft = true) }
     }
 
     override fun getPreferredFocusedComponent(): JComponent? = panel?.preferredFocus
@@ -116,11 +108,10 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
         val groupKeys = view.projectGroups().groups.map { "group:${it.id}" }.toSet()
         dialogs.filterValues { it != "styles" && it !in keys && it !in groupKeys }.keys.toList().forEach { it.close(DialogWrapper.CANCEL_EXIT_CODE) }
         val dark = !JBColor.isBright()
-        val token = ++generation
+        val token = loadingTask.begin()
         val groupDraft = view.projectGroups()
-        worker?.cancel(true)
         if (!keepDraft || models.isEmpty()) view.loading()
-        worker = ApplicationManager.getApplication().executeOnPooledThread {
+        loadingTask.attach(token, ApplicationManager.getApplication().executeOnPooledThread {
             val result = try {
                 ContourCatalog.entries
                 ContourCatalog.licenses
@@ -149,7 +140,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
                 Result.failure(error)
             }
             ApplicationManager.getApplication().invokeLater({
-                if (disposed || token != generation || lifetime !== scope || project.isDisposed) return@invokeLater
+                if (disposed || !loadingTask.accepts(token) || lifetime !== scope || project.isDisposed) return@invokeLater
                 result.fold(onSuccess = { loaded ->
                     val colors = ApplicationManager.getApplication().getService(ProjectOutlineColors::class.java)
                     val active = loaded.rows.filterNot { it.target.project.isDisposed }.map { row ->
@@ -176,7 +167,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
                     view.failed(error.message ?: "Cannot load open project icons.")
                 })
             }, ModalityState.any())
-        }
+        })
     }
 
     private fun stillOpen(row: ProjectIconSettingsRow): Boolean =
@@ -365,6 +356,9 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
     override fun apply() {
         val view = panel ?: return
         if (!isModified()) return
+        val sharedSettings = SharedIconSettingsStore()
+        val sharedChanges = view.sharedSettingsChanges()
+        sharedChanges.validate(sharedSettings.snapshot())
         val pending = view.rows.filter { it.modified }
         pending.forEach { row ->
             if (!stillOpen(row)) throw ConfigurationException("${row.target.name} has been closed.")
@@ -380,8 +374,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
         val colors = pending.filter { it.colorModified }.associate { row ->
             (row.target.path ?: throw ConfigurationException("A local project directory is required.")) to row.colorOverrides
         }
-        generation++
-        worker?.cancel(true)
+        loadingTask.cancel()
         applying = true
         try {
             var installed: Map<Path, IconSnapshot> = emptyMap()
@@ -391,13 +384,15 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
                 try {
                     if (pendingIconSets.isNotEmpty()) preparedLibrary = ApplicationManager.getApplication()
                         .getService(IconSetLibrary::class.java).prepare(pendingIconSets)
-                    installed = ProjectIconStore.installAll(writes)
+                    installed = ProjectIconStore.installAll(writes) { sharedChanges.saveTo(sharedSettings) }
                 } catch (error: Exception) {
                     failure = error
                 }
             }, "Saving project icons", false, project, view.component)
+            else sharedChanges.saveTo(sharedSettings)
             failure?.let { error ->
                 writes.forEach { ProjectIconStore.refreshUi(it.project, it.path, it.expected) }
+                if (error is ConfigurationException && error.suppressed.isEmpty()) throw error
                 LOG.warn("Cannot save project SVG icons", error)
                 val recovery = if (error.suppressed.isEmpty()) "" else
                     " Some previous icon variants could not be restored. See the IDE log for details."
@@ -405,10 +400,6 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
             }
             val app = ApplicationManager.getApplication()
             app.getService(ProjectOutlineColors::class.java).apply(colors)
-            app.getService(TabAppearanceSettings::class.java).apply(view.appearance())
-            app.getService(LastCustomAppearanceSettings::class.java).remember(view.customAppearance())
-            app.getService(UserAppearancePresets::class.java).apply(view.userPresets())
-            app.getService(ProjectGroups::class.java).apply(view.projectGroups())
             preparedLibrary?.let { app.getService(IconSetLibrary::class.java).apply(it) }
             iconSets = effectiveIconSets()
             pendingIconSets = emptyList()
@@ -426,15 +417,13 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
 
     override fun disposeUIResources() {
         disposed = true
-        generation++
-        worker?.cancel(true)
+        loadingTask.cancel()
         dialogs.keys.toList().forEach { it.close(DialogWrapper.CANCEL_EXIT_CODE) }
         dialogs.clear()
         panel?.disposeDialogs()
         lifetime?.let(Disposer::dispose)
         lifetime = null
         panel = null
-        worker = null
         models.clear()
         iconDirectories = emptySet()
         gallery = emptyList()

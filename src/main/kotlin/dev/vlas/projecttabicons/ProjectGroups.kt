@@ -54,6 +54,6 @@ internal fun groupNameError(name: String): String? = when {
 @Service(Service.Level.APP)
 @State(name = "ProjectTabIconsGroups", storages = [Storage("projectTabIconsGroups.xml")])
 internal class ProjectGroups : SerializablePersistentStateComponent<ProjectGroupsState>(ProjectGroupsState()) {
-    fun apply(value: ProjectGroupsState) = updateState { value.normalized() }
-    override fun loadState(state: ProjectGroupsState) = super.loadState(state.normalized())
+    fun apply(value: ProjectGroupsState) = SharedIconSettingsLock.withLock { updateState { value.normalized() } }
+    override fun loadState(state: ProjectGroupsState) = SharedIconSettingsLock.withLock { super.loadState(state.normalized()) }
 }

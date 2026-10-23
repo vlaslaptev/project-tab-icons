@@ -15,11 +15,12 @@ internal const val WINDOW_TABS_CONTAINER_KEY = "WINDOW_TABS_CONTAINER_KEY"
 
 /** Наблюдает только дерево верхних вкладок; редактор и tool windows не обходятся. */
 internal class FrameObservation(
-    private val frame: IdeFrameImpl,
+    private val frame: IdeFrameImpl?,
     val rootPane: JRootPane,
     private val changed: () -> Unit,
     private val titleChanged: () -> Unit,
 ) : AutoCloseable {
+    private var closed = false
     private val containers = identitySet<Container>()
     private val titleListener = PropertyChangeListener { titleChanged() }
     private val tabsListener = PropertyChangeListener { changed() }
@@ -33,12 +34,13 @@ internal class FrameObservation(
     }
 
     init {
-        frame.addPropertyChangeListener("title", titleListener)
-        frame.addWindowListener(activationListener)
+        frame?.addPropertyChangeListener("title", titleListener)
+        frame?.addWindowListener(activationListener)
         rootPane.addPropertyChangeListener(WINDOW_TABS_CONTAINER_KEY, tabsListener)
     }
 
     fun update() {
+        if (closed) return
         val present = identitySet<Container>()
         fun collect(container: Container) {
             if (!present.add(container)) return
@@ -53,8 +55,9 @@ internal class FrameObservation(
     }
 
     override fun close() {
-        frame.removePropertyChangeListener("title", titleListener)
-        frame.removeWindowListener(activationListener)
+        closed = true
+        frame?.removePropertyChangeListener("title", titleListener)
+        frame?.removeWindowListener(activationListener)
         rootPane.removePropertyChangeListener(WINDOW_TABS_CONTAINER_KEY, tabsListener)
         containers.forEach { it.removeContainerListener(childListener) }
         containers.clear()

@@ -14,7 +14,7 @@ internal data class ProjectGroupIcon(
     @field:OptionTag @JvmField val color: String = "#60A5FA",
 ) {
     fun normalized(): ProjectGroupIcon = if (svg.length > MAX_ICON_BYTES * 4 / 3 + 8) ProjectGroupIcon() else copy(
-        name = name.filterNot { it.isISOControl() }.take(128).ifBlank { "Group icon" },
+        name = name.filterNot { it.isISOControl() }.takeCodePoints(128).ifBlank { "Group icon" },
         color = parseIconColor(color)?.hex().orEmpty(),
     )
 }

@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.3.99 — 2026-10-23
+
+Changes since the published 0.3.85 release:
+
+- Combine icon, outline and fill controls in responsive **Style** sections; use compact segmented choices and pixel inputs.
+- Keep **Save as new preset** and **Update preset** beside the three-section switcher, and clarify **Manage user presets…**.
+- Keep active tabs lighter with fills and group styling; compact Tab layout and Group layout.
+- Preserve concurrent settings edits when applying unrelated changes; report conflicts without discarding the draft.
+- Normalize imported preset/category names before conflict resolution and keep category names within import limits.
+- Recover tab decoration after temporary refresh errors and release cancelled icon reads so they can be retried.
+- Keep Git counts updating during continuous file events; refresh affected icons without reloading other projects' artwork.
+- Support style export without atomic file moves, preserve newer external icon changes on rollback, and recover unknown saved appearance values.
+- Preserve emoji when duplicating presets and display user-provided names literally.
+- Refresh the English README, installation flow, theme gallery and Settings screenshot. The gallery has four three-tab examples and a consistent seven-row editor crop.
+
+## 0.3.86 — Local snapshot, 2026-10-21
+
+- Keep active tabs lighter after applying fills, including both group variants and Preview.
+- Compact Tab layout into an Info row and paired controls; size the settings block to the selected page.
+- Refresh all ten theme examples and the appearance/Git screenshot slides from the installed build.
+- Built and installed locally; not published.
+
 ## 0.3.85 — 2026-10-21
 
 Changes since the published 0.3.62 release:

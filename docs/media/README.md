@@ -1,44 +1,58 @@
 # GitHub media
 
-The README's main gallery, `appearance-gallery.png`, contains **ten real Preview
-frames** from installed **0.3.84/0.3.85**, captured on **21 October 2026**. All eight
-IDE themes are represented. Each window is 1594 × 179 px; the slide is 1598 × 2481 px
-in one column, with 2 px outer margins and no Project Tab Icons title. Captions contain only theme names. The header describes hundreds of
-possible combinations; ten screenshots illustrate a selection. The first frame uses
-the current custom appearance, High Contrast uses larger text and right-side icons,
-and Light includes the corrected tab palette. Three recaptures were normalized in
-width from 1658 to 1594 px without changing their 179 px height. UI content was not
-redrawn. The 50 original captures remain local and excluded from Git.
+The main README gallery, `appearance-gallery.png`, contains **ten real Preview
+frames** from installed **0.3.97**, captured on **23 October 2026**. All eight IDE
+themes are represented, with six dark and four light examples and three/five tabs.
+Six frames have five tabs and four have three tabs. The first three appearance
+setups are preserved; High Contrast has its icons on the right.
+The slide is 1411 × 3380 px in one column with 2 px outer margins. All frames fill
+the available width; captions contain only theme names. The README supplies the
+gallery heading, so the image has no duplicate title.
+
+Every editor fragment contains seven rows. Each frame ends after the seventh
+line's descender, followed by the native 8 px window bottom. Five-tab windows are
+1407 × 249–250 logical pixels. Three-tab windows are physically narrower, at
+1110 × 245 logical pixels, and are scaled uniformly to 1407 × 311 px. Their
+displayed tabs are about 38 px high with 15 px text, compared with 34–35 px tabs
+and 14 px text in five-tab frames. Bold, rounded lower outlines,
+maximum tab heights and strong fills are excluded; Filled uses 12% fill.
+
+The installed plugin's own WindowTabsPreview component was hosted in visible native
+Swing windows at these dimensions. The capture host appends five gallery-only
+editor rows to the renderer's two built-in rows, using the same native font,
+line spacing and theme palette. Production plugin code is unchanged. The native
+host contents were exported at Retina 2× scale without a mouse pointer, then
+uniformly reduced to the display width with integer pixel rounding. Controls,
+icons and UI colors were not redrawn or retouched.
 [Gallery metadata](appearance-gallery.json) records dimensions and hashes.
 
-The other preserved assets combine illustrations and real Settings crops from installed
-**Project Tab Icons 0.3.62**, captured in IntelliJ IDEA 2026.2.3 on **20 October 2026**.
-Frontend, Backend, Tools, editor text, branches and line counts are built-in fixtures.
-
-| Asset | Purpose |
+| Asset | Source and purpose |
 | --- | --- |
-| `appearance-gallery.png` | Current README gallery: ten previews across eight IDE themes |
-| `appearance-presets.png` | Real Settings crop: Custom appearance, Icon controls and separate User presets |
-| `git-context.png` | A second crop from the same capture, focusing on Preview, Git context and presets |
-| `captures/groups-settings.png` | Projects / Project groups switcher, group columns and Add group row |
+| `appearance-gallery.png` | 0.3.97: ten Preview frames across eight themes, four three-tab examples, all ending after editor row seven |
+| `appearance-presets.png` | 0.3.97: presets, Preview, current Tab layout and preset actions beside Style / Tab layout / Group layout |
+| `git-context.png` | 0.3.86: Preview branches/counts and their Tab layout controls |
+| `captures/groups-settings.png` | 0.3.86: table switcher, current Projects column and Add group row |
 | `icon-library.png` | Unchanged approved illustration with a fixed selection of 100+ bundled SVGs |
-| `hero-dark.png` / `hero-light.png` | Illustrated covers |
-| `social-preview.png` | Repository social preview |
+| `hero-dark.png` / `hero-light.png` | Preserved illustrated covers, not screenshots |
+| `social-preview.png` | Preserved repository social preview |
 | `logo-512.png` | Transparent export of the existing logo |
 
-The crops come from the installation-verification session for the installed 0.3.62
-artifact. The appearance crop includes the Custom radio button, generic Git-with-icons
-user preset, Manage button, icon sizes and initials controls. The Git crop focuses
-on the demo project captions. The group crop deliberately ends after the Add group
-row; it does not imply that the user's saved group list is empty.
+The Appearance slide was recaptured from installed 0.3.97 in IntelliJ IDEA
+2026.2.3 on 23 October 2026. It shows the current three-section switcher and
+preset actions. The Git slide and group-table crop remain from 0.3.86, captured
+on 21 October 2026. Frontend, Backend, Tools, editor text, branches and counts
+are built-in demo fixtures. The screenshot crops use the saved generic `group_git`
+appearance. The group-table crop shows the Projects heading and ends after Add
+group; it does not imply an empty saved group list.
 
-Window titles, Settings navigation, saved group rows, real project names and paths
-are excluded. UI pixels and labels were not redrawn, renamed, blurred or retouched.
-Only rectangular cropping and lossless PNG encoding were used. The screenshot slides
-add an illustrated background, frame and captions outside the original UI pixels.
-[Capture provenance](captures/provenance.json) records the version, date, SHA-256,
-dimensions and crop scope. The screenshots do not change saved settings.
+For the Settings captures, window titles, navigation, saved group rows, real project names and paths are
+excluded. UI pixels and labels were not redrawn, renamed, blurred or retouched.
+Only rectangular cropping, uniform display scaling and PNG encoding were used.
+The slides add an illustrated background, frame and captions outside UI pixels.
+[Capture provenance](captures/provenance.json) records version, date, SHA-256,
+dimensions and crop scope. All plugin and theme settings were preserved byte for byte.
 
-SVG files are the slide sources. `manifest.json` describes the generated gallery;
-`preview.html` displays it locally. The icon-library composition remains fixed when
-the catalog grows. Attribution is in [third-party notices](../../THIRD_PARTY_NOTICES.md).
+SVG files are the illustration and Settings slide sources; the themes gallery uses
+the frame sizes and source hashes in its JSON metadata. `manifest.json` describes the generated slides;
+`preview.html` displays them locally. The icon-library composition remains fixed.
+Attribution is in [third-party notices](../../THIRD_PARTY_NOTICES.md).

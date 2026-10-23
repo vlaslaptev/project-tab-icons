@@ -7,10 +7,8 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.ui.IconDeferrer
-import java.nio.file.AtomicMoveNotSupportedException
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.StandardCopyOption
 
 internal data class IconSnapshot(val directory: Path, val files: Map<String, ByteArray>) {
     val fingerprint: String = PROJECT_ICON_FILES.joinToString("|") { name ->
@@ -36,7 +34,8 @@ internal data class ProjectIconWrite(val project: Project, val path: Path, val e
 /** Файловые операции выполняются в фоне; refreshUi вызывается на EDT. */
 internal object ProjectIconStore {
     /** Проверяем весь набор до первой записи; при отказе возвращаем уже изменённые проекты. */
-    fun installAll(changes: List<ProjectIconWrite>): Map<Path, IconSnapshot> {
+    fun installAll(changes: List<ProjectIconWrite>, files: IconFileOperations = IconFileOperations(),
+                   commitSettings: () -> Unit = {}): Map<Path, IconSnapshot> {
         require(changes.map { it.expected.directory.toAbsolutePath().normalize() }.distinct().size == changes.size) {
             "Two projects share the same icon storage directory. Apply their icons separately."
         }
@@ -51,8 +50,10 @@ internal object ProjectIconStore {
         try {
             changes.forEach { change ->
                 require(!change.project.isDisposed) { "A selected project has been closed." }
-                installed[change.path] = install(change.path, change.expected, change.asset)
+                installed[change.path] = install(change.path, change.expected, change.asset, files)
             }
+            // Поздний конфликт общих настроек откатывает SVG тем же путём, что и ошибка записи.
+            commitSettings()
             return installed
         } catch (error: Exception) {
             changes.asReversed().forEach { change ->
@@ -133,17 +134,21 @@ internal object ProjectIconStore {
         return SvgGallery(byDigest.values.toList(), skipped)
     }
 
-    fun install(projectPath: Path, expected: IconSnapshot, asset: SvgAsset): IconSnapshot {
+    fun install(projectPath: Path, expected: IconSnapshot, asset: SvgAsset,
+                files: IconFileOperations = IconFileOperations()): IconSnapshot {
         val before = snapshot(projectPath)
         require(before.fingerprint == expected.fingerprint && before.directory == expected.directory) {
             "The project icon changed outside these settings. Reload the current icon before applying your selection."
         }
         Files.createDirectories(before.directory)
+        val written = before.files.toMutableMap()
         try {
-            writeAtomically(before.directory.resolve("icon.svg"), asset.bytes)
+            writeFileAtomically(before.directory.resolve("icon.svg"), asset.bytes, files)
+            written["icon.svg"] = asset.bytes
             // Старые PNG и dark-варианты не должны перекрывать явно выбранный SVG.
             PROJECT_ICON_FILES.filter { it != "icon.svg" }.forEach { name ->
-                Files.deleteIfExists(before.directory.resolve(name))
+                written.remove(name)
+                files.delete(before.directory.resolve(name))
             }
             return snapshot(projectPath)
         } catch (error: Exception) {
@@ -152,10 +157,12 @@ internal object ProjectIconStore {
                 try {
                     val old = before.files[name]
                     val file = before.directory.resolve(name)
-                    if (old == null) {
-                        Files.deleteIfExists(file)
-                    } else if (!Files.exists(file) || !readIconBytes(file).contentEquals(old)) {
-                        writeAtomically(file, old)
+                    val current = if (Files.exists(file)) readIconBytes(file) else null
+                    if (!sameIconBytes(current, old)) {
+                        require(sameIconBytes(current, written[name])) {
+                            "A project icon changed during saving; automatic recovery did not overwrite the newer file."
+                        }
+                        if (old == null) Files.deleteIfExists(file) else writeAtomically(file, old)
                     }
                 } catch (rollbackError: Exception) {
                     error.addSuppressed(rollbackError)
@@ -166,17 +173,7 @@ internal object ProjectIconStore {
     }
 
     private fun writeAtomically(target: Path, bytes: ByteArray) {
-        val temporary = Files.createTempFile(target.parent, ".project-tab-icons-", ".tmp")
-        try {
-            Files.write(temporary, bytes)
-            try {
-                Files.move(temporary, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
-            } catch (_: AtomicMoveNotSupportedException) {
-                Files.move(temporary, target, StandardCopyOption.REPLACE_EXISTING)
-            }
-        } finally {
-            Files.deleteIfExists(temporary)
-        }
+        writeFileAtomically(target, bytes)
     }
 
     fun refreshUi(project: Project, projectPath: Path, snapshot: IconSnapshot) {
@@ -190,3 +187,6 @@ internal object ProjectIconStore {
         service<ProjectTabIconsService>().requestRefresh(invalidate = true)
     }
 }
+
+private fun sameIconBytes(first: ByteArray?, second: ByteArray?): Boolean =
+    if (first == null || second == null) first == null && second == null else first.contentEquals(second)

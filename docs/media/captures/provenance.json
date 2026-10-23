@@ -2,45 +2,57 @@
   "plugin": "Project Tab Icons",
   "application": "IntelliJ IDEA 2026.2.3",
   "previewTheme": "Current \u00b7 Islands Darcula",
-  "source": "Native screenshot of the installed 0.3.62 Settings page, captured during installation verification on 20 October 2026.",
-  "sourceCaptureSha256": "eca0be67a342ad78e3e8139eee29c4e6ce92522df9bc7718f84065166ca5f231",
-  "crop": "Appearance and Git crops contain only built-in Preview fixtures, presets and Icon controls. The groups crop contains the table switcher, column header and Add group row only. Window title, navigation, real project names, paths and saved group rows are excluded.",
-  "demoData": "Frontend, Backend, Tools, example editor text, branches and line counts are built-in demo fixtures. The generic user-preset name is Git with icons.",
-  "processing": "Three rectangular crops of the same native capture, lossless PNG encoding; UI labels and pixels were not redrawn or retouched.",
-  "settings": "Custom appearance; capture did not change saved appearance. Temporary group verification settings were subsequently restored.",
+  "source": "Native Settings screenshots from installed Project Tab Icons. Appearance: 0.3.97 on 23 October 2026. Git and groups: 0.3.86 on 21 October 2026. IntelliJ IDEA 2026.2.3.",
+  "crop": "Appearance: presets, built-in Preview and current Tab layout with Style / Tab layout / Group layout and preset actions. Git: built-in Preview and Tab layout. Groups: table switcher, header and Add group only. No real project names, paths or saved group rows.",
+  "demoData": "Frontend, Backend and Tools, editor text, branches and line counts are built-in fixtures. User-preset names are generic appearance labels.",
+  "processing": "Rectangular crops; lossless PNG encoding. UI pixels and labels were not redrawn or retouched.",
+  "settings": "Saved group_git appearance. Settings closed with Cancel after capture; all four plugin settings files and two theme settings files remain byte-identical.",
   "files": [
     {
       "file": "appearance-settings.png",
-      "sha256": "44816edbfd39c84dc7ecfa33c0f0956d6bb11756c38c9144a6efc7a6f408073b",
-      "width": 2777,
-      "height": 1362,
-      "preset": "Custom",
-      "section": "Icon",
-      "pluginVersion": "0.3.62",
-      "capturedOn": "2026-10-20",
-      "userPresetRow": true
+      "sha256": "c76ad10ab17ed8d457318acd6ca71cf0c3d48bbe92306cec91b0b43b7b42f499",
+      "width": 2382,
+      "height": 1140,
+      "preset": "group_git",
+      "section": "current Tab layout, Style / Tab layout / Group layout switcher and preset actions",
+      "pluginVersion": "0.3.97",
+      "capturedOn": "2026-10-23",
+      "userPresetRow": true,
+      "sourceCaptureSha256": "a6919394a0adc31b342aa550a23e09fcc2b31ccbe36171b08a7adcec3e0d5480",
+      "sourceSize": [
+        3060,
+        2066
+      ],
+      "crop": [
+        646,
+        172,
+        3028,
+        1312
+      ]
     },
     {
       "file": "git-settings.png",
-      "sha256": "26fc6654ef08aa5ee4d8833694f9d1ec63eea7c3dfab6ec60b84b0d047feb76f",
-      "width": 2777,
-      "height": 736,
-      "preset": "Custom",
-      "section": "Preview and presets",
-      "pluginVersion": "0.3.62",
-      "capturedOn": "2026-10-20",
-      "userPresetRow": true
+      "sha256": "3e4c5ee6256ff46403107b98ed7f64b7772d662b1c5fce6da94545cb750225c5",
+      "width": 2788,
+      "height": 980,
+      "preset": "group_git",
+      "section": "Preview and Git controls in Tab layout",
+      "pluginVersion": "0.3.86",
+      "capturedOn": "2026-10-21",
+      "userPresetRow": false,
+      "sourceCaptureSha256": "986f16f013e9273dd3023828a3413e03ba27b89f637768ad1d09de2fa65b9748"
     },
     {
       "file": "groups-settings.png",
-      "sha256": "a42351cbfa76d0764b025218f19797c7a217c93dd2471bdff43461ec45fa2c78",
-      "width": 2777,
-      "height": 270,
-      "preset": "Custom",
+      "sha256": "d7b4930aa7de1548e318098ea896e3584a47947ac79f2d3dcaf420a25f9548cf",
+      "width": 2788,
+      "height": 290,
+      "preset": "group_git",
       "section": "Project groups table header and Add group",
-      "pluginVersion": "0.3.62",
-      "capturedOn": "2026-10-20",
-      "userPresetRow": false
+      "pluginVersion": "0.3.86",
+      "capturedOn": "2026-10-21",
+      "userPresetRow": false,
+      "sourceCaptureSha256": "c9ca07c0717ac531f6c087d507f9686d2fd71c4fba39c9dfcf8c951a048c2c70"
     }
   ],
   "pixelScale": 2

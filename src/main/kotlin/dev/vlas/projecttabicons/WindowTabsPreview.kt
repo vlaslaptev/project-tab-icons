@@ -65,7 +65,7 @@ internal class WindowTabsPreview : JPanel(null) {
     private val groupTabCount get() = samples.count { it.groupMember }
     private val activeGroup get() = samples[selectedIndex].groupMember
 
-    val groupDescription: String get() {
+    private val groupDescription: String get() {
         val grouped = samples.filter { it.groupMember }.joinToString(" + ") { it.title }
         val ungrouped = samples.filterNot { it.groupMember }
         return "$grouped are grouped; ${ungrouped.joinToString(" + ") { it.title }} ${if (ungrouped.size == 1) "is" else "are"} ungrouped."
@@ -277,6 +277,7 @@ private class PreviewTab(
 ) : JPanel(BorderLayout()) {
     private var groupSurface: ProjectTabGroupSurfaceState? = null
     private var hovered = false
+    private var customizationEnabled = true
     private var palette = PreviewIdeTheme.CURRENT.palette()
     private var tabFillColor: Color? = null
     private var tabFillInset = 0
@@ -343,6 +344,7 @@ private class PreviewTab(
     }
 
     fun showAppearance(appearance: TabAppearanceState, theme: PreviewThemePalette) {
+        customizationEnabled = appearance.enabled
         palette = theme
         tabFillColor = color.takeIf { appearance.enabled && appearance.showTabBackground }
         tabFillInset = appearance.tabFillInset
@@ -407,7 +409,8 @@ private class PreviewTab(
 
     fun surfaceColors(): ProjectTabSurfaceColors = ProjectTabSurfaceColors(palette.stripBackground,
         when { selected -> palette.selectedBackground; hovered -> palette.hoverBackground; else -> palette.background },
-        palette.background)
+        palette.background, if (customizationEnabled) ProjectTabSurfaceState.of(selected, hovered)
+        else ProjectTabSurfaceState.NATIVE)
 
     override fun paintComponent(graphics: Graphics) {
         super.paintComponent(graphics)

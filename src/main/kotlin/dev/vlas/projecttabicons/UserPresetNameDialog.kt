@@ -27,7 +27,7 @@ internal class UserPresetNameDialog(
         add(JBLabel("Preset name:").apply { labelFor = nameField }, BorderLayout.NORTH)
         nameField.accessibleContext.accessibleName = "Preset name"
         add(nameField, BorderLayout.CENTER)
-        add(settingsHint("Icon, Color and Tab layout · Saved with Apply"), BorderLayout.SOUTH)
+        add(settingsHint("Style, Tab layout and Group layout · Saved with Apply"), BorderLayout.SOUTH)
     }
 
     override fun getPreferredFocusedComponent(): JComponent = nameField
@@ -39,5 +39,5 @@ internal class UserPresetNameDialog(
         return userPresetNameError(nameField.text, presets, existing?.id)?.let { ValidationInfo(it, nameField) }
     }
 
-    fun presetName(): String = nameField.text.trim()
+    fun presetName(): String = normalizeUserPresetName(nameField.text)
 }

@@ -16,6 +16,7 @@ import java.util.UUID
 internal const val MAX_SET_ICONS = 500
 internal const val MAX_LIBRARY_BYTES = 16 * 1024 * 1024
 internal const val MAX_LIBRARY_SETS = 50
+internal const val MAX_ICON_SET_NAME_LENGTH = 64
 
 internal data class ImportedIconSet(val id: String, val name: String, val icons: List<IconChoice>)
 internal data class IconSetImport(val set: ImportedIconSet, val skipped: List<String>, val duplicates: Int)
@@ -84,10 +85,8 @@ internal fun importIconSet(folder: Path, names: Set<String>): IconSetImport {
         }
     }
     require(files.isNotEmpty()) { "No SVG files found. Choose a folder containing .svg files." }
-    val base = folder.fileName?.toString().orEmpty().filterNot { it.isISOControl() }.trim().take(64).ifBlank { "My icons" }
-    var name = base
-    var suffix = 2
-    while (names.any { it.equals(name, true) }) name = "$base (${suffix++})"
+    val base = folder.fileName?.toString().orEmpty().filterNot { it.isISOControl() }.trim().ifBlank { "My icons" }
+    val name = uniqueStyleName(base, names, MAX_ICON_SET_NAME_LENGTH)
     val icons = linkedMapOf<String, IconChoice>()
     val skipped = mutableListOf<String>()
     var duplicates = 0

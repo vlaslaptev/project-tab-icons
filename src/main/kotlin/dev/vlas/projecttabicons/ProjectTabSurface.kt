@@ -18,10 +18,59 @@ internal data class ProjectTabSurfaceColors(
     val strip: Color,
     val background: Color,
     val idleBackground: Color = strip,
+    val state: ProjectTabSurfaceState = ProjectTabSurfaceState.NATIVE,
 )
+
+internal enum class ProjectTabSurfaceState {
+    NATIVE, IDLE, HOVERED, SELECTED;
+
+    companion object {
+        fun of(selected: Boolean, hovered: Boolean): ProjectTabSurfaceState = when {
+            selected -> SELECTED
+            hovered -> HOVERED
+            else -> IDLE
+        }
+    }
+}
+
+internal data class ProjectTabPaintColors(val strip: Color, val background: Color, val fill: Color?)
 
 /** Сначала смешиваем цвета, затем один раз сглаживаем внешний контур. */
 internal object ProjectTabSurface {
+    private const val SELECTED_BRIGHTNESS_GAP = 0.08
+    private const val HOVER_BRIGHTNESS_GAP = 0.03
+    private const val MAX_IDLE_BRIGHTNESS = 0.90
+
+    /** Коррекция идёт после заливки: даже непрозрачный цвет не скрывает выбранный таб. */
+    fun resolve(colors: ProjectTabSurfaceColors, tabColor: Color?, fillIntensity: Int): ProjectTabPaintColors {
+        val strip = blend(UIUtil.getPanelBackground(), colors.strip)
+        val idle = blend(strip, colors.idleBackground)
+        val background = blend(strip, colors.background)
+        val opacity = fillIntensity.coerceIn(MIN_TAB_FILL_INTENSITY, MAX_TAB_FILL_INTENSITY) / 100f
+        return ProjectTabPaintColors(strip, stateColor(background, idle, colors.state), tabColor?.let {
+            stateColor(blend(background, it, opacity), blend(idle, it, opacity), colors.state)
+        })
+    }
+
+    private fun stateColor(native: Color, idle: Color, state: ProjectTabSurfaceState): Color {
+        if (state == ProjectTabSurfaceState.NATIVE) return native
+        // У белой заливки и светлых тем тоже должно остаться место для выделения.
+        val idleBrightness = brightness(idle)
+        val base = if (idleBrightness > MAX_IDLE_BRIGHTNESS)
+            blend(idle, Color.BLACK, (1.0 - MAX_IDLE_BRIGHTNESS / idleBrightness).toFloat()) else idle
+        if (state == ProjectTabSurfaceState.IDLE) return base
+        val baseBrightness = brightness(base)
+        val target = baseBrightness + if (state == ProjectTabSurfaceState.SELECTED)
+            SELECTED_BRIGHTNESS_GAP else HOVER_BRIGHTNESS_GAP
+        // Уже светлый штатный selected сохраняется; hover всегда слабее selected.
+        if (state == ProjectTabSurfaceState.SELECTED && brightness(native) >= target) return native
+        val opacity = ((target - baseBrightness) / (1.0 - baseBrightness)).toFloat()
+        return blend(base, Color.WHITE, opacity)
+    }
+
+    private fun brightness(color: Color): Double =
+        (color.red * 0.2126 + color.green * 0.7152 + color.blue * 0.0722) / 255.0
+
     fun paint(graphics: Graphics2D, width: Int, height: Int, geometry: ProjectTabGeometry,
               colors: ProjectTabSurfaceColors, tabColor: Color?, fillInset: Int,
               fillIntensity: Int = DEFAULT_TAB_FILL_INTENSITY) {
@@ -30,19 +79,16 @@ internal object ProjectTabSurface {
         try {
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
             // Удаляем также прежние полупрозрачные краевые пиксели нативного фона.
-            val strip = blend(UIUtil.getPanelBackground(), colors.strip)
-            val base = blend(strip, colors.background)
-            g.color = strip
+            val paint = resolve(colors, tabColor, fillIntensity)
+            g.color = paint.strip
             g.fillRect(0, 0, width, height)
             val inset = JBUI.scale(fillInset.coerceIn(MIN_TAB_FILL_INSET, MAX_TAB_FILL_INSET)).toDouble()
-            val opacity = fillIntensity.coerceIn(MIN_TAB_FILL_INTENSITY, MAX_TAB_FILL_INTENSITY) / 100f
-            val filled = tabColor?.let { blend(base, it, opacity) }
             // При inset=0 фон и заливка попадают в единственную операцию fill с AA.
-            g.color = if (inset == 0.0) filled ?: base else base
+            g.color = if (inset == 0.0) paint.fill ?: paint.background else paint.background
             g.fill(geometry.shape())
-            if (filled != null && inset > 0.0) {
+            if (paint.fill != null && inset > 0.0) {
                 // Внутренний край заливки отдельный; он не касается внешней дуги таба.
-                g.color = filled
+                g.color = paint.fill
                 g.fill(geometry.inset(inset).shape())
             }
         } finally { g.dispose() }
@@ -68,6 +114,7 @@ internal fun nativeProjectTabSurfaceColors(component: Component): ProjectTabSurf
     val tabs = SwingUtilities.getAncestorOfClass(WindowTabsComponent::class.java, label) as? WindowTabsComponent ?: return null
     val window = SwingUtilities.getWindowAncestor(tabs)
     val selected = label.info.`object` === window
+    val hovered = tabs.isHoveredOrWithPopup(label)
     val strip = tabs.tabPainter.getBackgroundColor()
     val islands = ExperimentalUI.isNewUI() && IslandsState.isEnabled()
     val inactive = window != null && !window.isActive
@@ -76,12 +123,12 @@ internal fun nativeProjectTabSurfaceColors(component: Component): ProjectTabSurf
         // В SDK 262 Islands обычный таб прозрачен, выбранный/hover имеют свою подложку.
         when {
             selected -> JBColor.namedColor("MainWindow.Tab.selectedBackground", JBUI.CurrentTheme.ToolWindow.background())
-            tabs.isHoveredOrWithPopup(label) -> JBColor.namedColor("MainWindow.Tab.hoverBackground",
+            hovered -> JBColor.namedColor("MainWindow.Tab.hoverBackground",
                 JBColor.namedColor("MainToolbar.Dropdown.transparentHoverBackground"))
             else -> strip
         }
     } else JBUI.CurrentTheme.MainWindow.Tab.background(selected, inactive, label.isHovered)
-    return ProjectTabSurfaceColors(strip, background, idle)
+    return ProjectTabSurfaceColors(strip, background, idle, ProjectTabSurfaceState.of(selected, hovered))
 }
 
 /** Возвращаем линии Classic UI поверх собранной подложки, до пользовательской обводки. */

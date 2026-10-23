@@ -20,3 +20,7 @@ private-evidence/
 
 # Original screenshots and local selection sheets for the README gallery.
 /screenshots/preview-gallery-*/
+
+# Python test runner caches.
+__pycache__/
+*.py[cod]

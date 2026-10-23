@@ -10,7 +10,6 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
 import com.intellij.util.ui.JBUI
-import com.intellij.util.ui.UIUtil
 import java.awt.BasicStroke
 import java.awt.BorderLayout
 import java.awt.Color
@@ -144,7 +143,7 @@ internal class ProjectColorDialog(
             ProjectColorTarget.ICON -> "Automatic outline and tab colors follow this icon."
             ProjectColorTarget.OUTLINE -> "Changes only the outline. Match icon color keeps it in sync."
             ProjectColorTarget.TAB -> if (appearance.showTabBackground) "Tab fill intensity: ${appearance.tabFillIntensity}%. Icon and outline colors stay unchanged."
-                else "Fill intensity: ${appearance.tabFillIntensity}%. Enable Fill tab in Color to show it on window tabs."
+                else "Fill intensity: ${appearance.tabFillIntensity}%. Enable Fill tab in Style to show it on window tabs."
         }), BorderLayout.SOUTH)
         autoColor.addActionListener { updateControls() }
         customColor.addActionListener { updateControls() }
@@ -251,8 +250,10 @@ internal class ProjectColorPreview(projectName: String, private val appearance: 
 
     override fun paintComponent(graphics: Graphics) {
         super.paintComponent(graphics)
+        val palette = PreviewIdeTheme.CURRENT.palette()
         ProjectTabSurface.paint(graphics as Graphics2D, width, height, projectTabGeometry(width, height),
-            ProjectTabSurfaceColors(UIUtil.getPanelBackground(), JBUI.CurrentTheme.MainWindow.Tab.background(true, false, false)),
+            ProjectTabSurfaceColors(palette.stripBackground, palette.selectedBackground, palette.background,
+                ProjectTabSurfaceState.SELECTED),
             tabColor, appearance.tabFillInset, appearance.tabFillIntensity)
     }
 }

@@ -19,10 +19,7 @@ internal class UserPresetManagerDialog(parent: JComponent, presets: List<UserApp
     private val list = JBList(model).apply {
         selectionMode = javax.swing.ListSelectionModel.SINGLE_SELECTION
         accessibleContext.accessibleName = "User presets in display order"
-        cellRenderer = object : DefaultListCellRenderer() {
-            override fun getListCellRendererComponent(list: JList<*>?, value: Any?, index: Int, selected: Boolean, focus: Boolean) =
-                super.getListCellRendererComponent(list, (value as? UserAppearancePreset)?.name, index, selected, focus)
-        }
+        cellRenderer = UserPresetListRenderer()
     }
     private val rename = JButton("Rename…")
     private val duplicate = JButton("Duplicate")
@@ -41,10 +38,7 @@ internal class UserPresetManagerDialog(parent: JComponent, presets: List<UserApp
         }
         duplicate.addActionListener {
             val preset = list.selectedValue ?: return@addActionListener
-            val names = result()
-            var suffix = 2
-            var name = preset.name.take(24) + " copy"
-            while (userPresetNameError(name, names) != null) name = preset.name.take(22) + " copy ${suffix++}"
+            val name = duplicateUserPresetName(preset.name, result())
             model.add(list.selectedIndex + 1, preset.copy(id = UUID.randomUUID().toString(), name = name))
             list.selectedIndex += 1
             updateButtons()
@@ -82,4 +76,10 @@ internal class UserPresetManagerDialog(parent: JComponent, presets: List<UserApp
     }
     override fun getPreferredFocusedComponent(): JComponent = list
     fun result(): List<UserAppearancePreset> = (0 until model.size()).map(model::get)
+}
+
+internal class UserPresetListRenderer : DefaultListCellRenderer() {
+    init { putClientProperty("html.disable", true) }
+    override fun getListCellRendererComponent(list: JList<*>?, value: Any?, index: Int, selected: Boolean, focus: Boolean) =
+        super.getListCellRendererComponent(list, (value as? UserAppearancePreset)?.name, index, selected, focus)
 }

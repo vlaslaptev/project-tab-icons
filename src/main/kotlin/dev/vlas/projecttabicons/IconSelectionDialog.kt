@@ -31,7 +31,6 @@ import java.awt.event.ActionEvent
 import java.awt.event.HierarchyEvent
 import java.awt.event.KeyEvent
 import java.util.Locale
-import java.util.concurrent.Future
 import javax.swing.AbstractAction
 import javax.swing.Icon
 import javax.swing.JButton
@@ -101,8 +100,7 @@ internal class IconSelectionDialog(
     private var shapeId = initial?.asset?.builder?.contourId?.let { "builtin:$it" }
         ?: library.firstOrNull { it.imported?.asset?.digest == initial?.asset?.digest }?.id
     private var filtering = false
-    private var worker: Future<*>? = null
-    private var importGeneration = 0
+    private val importTask = LatestTask()
     private var closed = false
     private var busy = false
 
@@ -227,8 +225,7 @@ internal class IconSelectionDialog(
         initValidation()
         Disposer.register(disposable, Disposable {
             closed = true
-            importGeneration++
-            worker?.cancel(true)
+            importTask.cancel()
         })
     }
 
@@ -318,12 +315,11 @@ internal class IconSelectionDialog(
         val descriptor = FileChooserDescriptorFactory.createSingleFileDescriptor("svg")
         val file = FileChooser.chooseFile(descriptor, body, project, null) ?: return
         val path = file.toNioPath()
-        val token = ++importGeneration
-        worker?.cancel(true)
+        val token = importTask.begin()
         status.foreground = UIUtil.getContextHelpForeground()
         status.text = "Loading SVG…"
         setLoading(true)
-        worker = ApplicationManager.getApplication().executeOnPooledThread {
+        importTask.attach(token, ApplicationManager.getApplication().executeOnPooledThread {
             val result = try {
                 val asset = SvgAsset.read(path, "Imported · ${path.fileName}")
                 Result.success(IconChoice(asset, svgIconColor(asset)))
@@ -333,7 +329,7 @@ internal class IconSelectionDialog(
                 Result.failure(error)
             }
             ApplicationManager.getApplication().invokeLater({
-                if (closed || token != importGeneration) return@invokeLater
+                if (closed || !importTask.accepts(token)) return@invokeLater
                 setLoading(false)
                 result.fold(onSuccess = { choice ->
                     gallery = (gallery + choice).distinctBy { it.asset.digest }
@@ -351,7 +347,7 @@ internal class IconSelectionDialog(
                     showSelection(clearImportError = false)
                 })
             }, ModalityState.any())
-        }
+        })
     }
 
     private fun importFolder() {
@@ -361,18 +357,17 @@ internal class IconSelectionDialog(
             isForcedToUseIdeaFileChooser = true
         }
         val folder = FileChooser.chooseFile(descriptor, body, project, null)?.toNioPath() ?: return
-        val token = ++importGeneration
-        worker?.cancel(true)
+        val token = importTask.begin()
         val names = iconSets.map { it.name }.toSet() + ContourCatalog.entries.map { it.category }
         status.foreground = UIUtil.getContextHelpForeground()
         status.text = "Importing icon folder…"
         setLoading(true)
-        worker = ApplicationManager.getApplication().executeOnPooledThread {
+        importTask.attach(token, ApplicationManager.getApplication().executeOnPooledThread {
             val result = try { Result.success(importIconSet(folder, names)) }
             catch (error: ProcessCanceledException) { throw error }
             catch (error: Exception) { Result.failure(error) }
             ApplicationManager.getApplication().invokeLater({
-                if (closed || token != importGeneration) return@invokeLater
+                if (closed || !importTask.accepts(token)) return@invokeLater
                 setLoading(false)
                 result.fold(onSuccess = { imported ->
                     iconSets = iconSets + imported.set
@@ -398,7 +393,7 @@ internal class IconSelectionDialog(
                     showSelection(clearImportError = false)
                 })
             }, ModalityState.any())
-        }
+        })
     }
 
     fun selection(): IconChoice? {

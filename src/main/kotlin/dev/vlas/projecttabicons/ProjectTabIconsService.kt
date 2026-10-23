@@ -36,6 +36,7 @@ import com.intellij.util.messages.MessageBusConnection
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -53,10 +54,30 @@ import javax.swing.SwingUtilities
 class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Disposable {
     @Volatile
     private var disposed = false
-    @Volatile
-    private var failed = false
-    private val queued = AtomicBoolean()
+    private var retryJob: Job? = null
+    private val recovery = ProjectTabRefreshRecovery(
+        restore = { incompatible ->
+            invalidateIcons.set(true)
+            cleanup(keepRefreshListeners = !incompatible)
+        },
+        scheduleRetry = { delayMillis, resume ->
+            retryJob?.cancel()
+            retryJob = coroutineScope.launch {
+                delay(delayMillis)
+                withContext(Dispatchers.EDT) { if (!disposed) resume() }
+            }
+        },
+        requestRefresh = { requestRefresh() },
+        report = { error, incompatible ->
+            LOG.warn(if (incompatible) "Project window tab API is incompatible; decoration is disabled"
+                else "Cannot refresh project window tabs; original appearance restored, retrying", error)
+        },
+    )
+    private val refreshQueue = CoalescingRefreshQueue(coroutineScope, Dispatchers.Default, Dispatchers.EDT)
     private val invalidateIcons = AtomicBoolean()
+    private val iconFileEvents = java.util.concurrent.ConcurrentLinkedQueue<String>()
+    private data class ProjectIconDelegate(val path: java.nio.file.Path, val size: Int, val name: String, val icon: Icon)
+    private val projectDelegates = IdentityHashMap<Project, ProjectIconDelegate>()
     private var connection: MessageBusConnection? = null
     private val observations = IdentityHashMap<IdeFrameImpl, FrameObservation>()
     private val groupLayouts = IdentityHashMap<WindowTabsComponent, ProjectTabGroupLayout>()
@@ -80,11 +101,17 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
     private val appliedLabelFonts = IdentityHashMap<JComponent, ProjectTabFont>()
     private val appliedContainerLayouts = IdentityHashMap<JComponent, ProjectTabsContainerLayout>()
     private val projectNames = IdentityHashMap<Project, String>()
-    private val iconReads = IdentityHashMap<Icon, IconColorRead?>()
     // Только очищенные изображения, независимо от смены DeferredIcon и сброса его кеша.
     private val lastPreparedArtwork = IdentityHashMap<Project, MutableMap<Int, Icon>>()
-    private val loadingColors = identitySet<Icon>()
-    private var colorGeneration = 0L
+    private val iconReadQueue = ProjectIconReadQueue(
+        coroutineScope, Dispatchers.IO, Dispatchers.UI,
+        postToUi = { SwingUtilities.invokeLater(it) },
+        canPublish = { !disposed && !recovery.blocked },
+    )
+    private val iconReads = ProjectIconReadCache(iconReadQueue, ::projectIconColor,
+        resolve = { it.copy(color = it.avatar?.presentation?.color1 ?: it.color) },
+        changed = { delegate, ready -> if (ready) iconWrappers.remove(delegate); requestRefresh() },
+        report = { LOG.debug("Cannot determine the project icon color", it) })
     private var previousAppearance: TabAppearanceState? = null
     private var previousGroups: ProjectGroupsState? = null
     private val groupIconWrappers = mutableMapOf<Pair<ProjectGroupIcon, Int>, CenteredProjectIcon>()
@@ -95,51 +122,52 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         ProjectTabBranchProvider.EP_NAME.addChangeListener(coroutineScope, Runnable { requestRefresh() })
     }
 
-    fun requestRefresh(invalidate: Boolean = false) {
-        if (disposed || failed || !SystemInfoRt.isMac) return
+    fun requestRefresh(invalidate: Boolean = false, resetTransientFailure: Boolean = false) {
+        if (disposed || !SystemInfoRt.isMac) return
+        if (resetTransientFailure) {
+            if (!SwingUtilities.isEventDispatchThread()) {
+                ApplicationManager.getApplication().invokeLater { requestRefresh(invalidate, resetTransientFailure = true) }
+                return
+            }
+            retryJob?.cancel()
+            retryJob = null
+            recovery.resetTransientFailures()
+        }
         if (invalidate) invalidateIcons.set(true)
-        if (!queued.compareAndSet(false, true)) return
-
-        // Scope принадлежит сервису и отменяется платформой при отключении плагина.
-        coroutineScope.launch(Dispatchers.Default) {
-            val groupsService = ApplicationManager.getApplication().getService(ProjectGroups::class.java)
-            val groups = groupsService.state
-            val groupIcons = try { Result.success(GroupAppearanceIcons.prepare(groups)) }
-                catch (error: ProcessCanceledException) { queued.set(false); throw error }
-                catch (error: CancellationException) { queued.set(false); throw error }
-                catch (error: Exception) { Result.failure(error) }
-                catch (error: LinkageError) { Result.failure(error) }
+        if (recovery.blocked) return
+        refreshQueue.submit(prepare = {
+            try {
+                val groups = ApplicationManager.getApplication().getService(ProjectGroups::class.java).state
+                Result.success(groups to GroupAppearanceIcons.prepare(groups))
+            }
+            catch (error: ProcessCanceledException) { throw error }
+            catch (error: CancellationException) { throw error }
+            catch (error: Exception) { Result.failure(error) }
+            catch (error: LinkageError) { Result.failure(error) }
             // Git-виджет может читать VFS при выборе репозитория: нужен EDT с разрешённым
             // read lock, а не Dispatchers.UI, который запрещает доступ к модели.
             // Отложенный переход также даёт Swing завершить перестройку панели.
-            withContext(Dispatchers.EDT) {
-                queued.set(false)
-                if (disposed || failed) return@withContext
-                // Подготовка SVG не блокирует EDT. Если за это время был Apply,
-                // следующий проход подготовит именно новую версию группы.
-                if (groups != groupsService.state) { requestRefresh(); return@withContext }
-                try {
-                    val appearance = ApplicationManager.getApplication().getService(TabAppearanceSettings::class.java).state
-                    if (!appearance.enabled) {
-                        // Возвращаем штатные значки, layout, высоту и отступы крестика.
-                        // Сервис остаётся доступен для повторного включения через Apply.
-                        cleanup()
-                        invalidateIcons.set(true)
-                        return@withContext
-                    }
-                    connectIfNeeded()
-                    refresh(appearance, groups, groupIcons.getOrThrow())
-                } catch (error: ProcessCanceledException) {
-                    throw error
-                } catch (error: CancellationException) {
-                    throw error
-                } catch (error: Exception) {
-                    stopAfterFailure(error)
-                } catch (error: LinkageError) {
-                    stopAfterFailure(error)
+        }, apply = apply@{ prepared ->
+            if (disposed) return@apply
+            recovery.run {
+                val appearance = ApplicationManager.getApplication().getService(TabAppearanceSettings::class.java).state
+                if (!appearance.enabled) {
+                    // Возвращаем штатные значки, layout, высоту и отступы крестика.
+                    // Сервис остаётся доступен для повторного включения через Apply.
+                    cleanup()
+                    invalidateIcons.set(true)
+                    return@run
                 }
+                connectIfNeeded()
+                val (groups, groupIcons) = prepared.getOrThrow()
+                // Подготовка SVG не блокирует EDT. После Apply готовим новую версию.
+                if (groups != ApplicationManager.getApplication().getService(ProjectGroups::class.java).state) {
+                    requestRefresh()
+                    return@run
+                }
+                refresh(appearance, groups, groupIcons)
             }
-        }
+        })
     }
 
     private fun connectIfNeeded() {
@@ -164,7 +192,8 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
             )
             bus.subscribe(VirtualFileManager.VFS_CHANGES, object : BulkFileListener {
                 override fun after(events: List<VFileEvent>) {
-                    if (events.any { isIconConfiguration(it.path) }) requestRefresh(invalidate = true)
+                    val paths = events.map { it.path }.filter(::isIconConfiguration)
+                    if (paths.isNotEmpty()) { iconFileEvents.addAll(paths); requestRefresh() }
                 }
             })
         }
@@ -179,12 +208,17 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
                 frames[helper.frame] = project
             }
         }
+        val recentProjects = RecentProjectsManagerBase.getInstanceEx()
+        val projectPaths = frames.values.mapNotNull { project -> recentProjects.getProjectPath(project)?.let { project to it } }.toMap()
+        val fileEvents = generateSequence { iconFileEvents.poll() }.toList()
+        val changedProjects = affectedIconProjects(projectPaths, fileEvents).toMutableSet()
         frames.values.forEach { project ->
             val previousName = projectNames.put(project, project.name)
-            if (previousName != null && previousName != project.name) invalidateIcons.set(true)
+            if (previousName != null && previousName != project.name) changedProjects.add(project)
         }
         projectNames.keys.retainAll(frames.values.toSet())
         lastPreparedArtwork.keys.retainAll(frames.values.toSet())
+        projectDelegates.keys.retainAll(frames.values.toSet())
 
         observations.keys.filter { it !in frames }.forEach { frame -> observations.remove(frame)?.close() }
         groupVisualState.retain(groups.groups.map { it.id }.toSet())
@@ -206,17 +240,19 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         }
 
         val branches = projectExtraInfo(frames.values.toSet(), appearance)
-        val recentProjects = RecentProjectsManagerBase.getInstanceEx()
         if (invalidateIcons.getAndSet(false)) {
-            colorGeneration++
             iconReads.clear()
-            loadingColors.clear()
             iconWrappers.clear()
+            projectDelegates.clear()
             IconDeferrer.getInstance().clearCache()
-            frames.values.mapNotNull(recentProjects::getProjectPath).toSet().forEach {
-                RecentProjectIconHelper.refreshProjectIcon(it)
-            }
-            frames.forEach { (frame, project) ->
+            changedProjects.addAll(frames.values)
+        }
+        changedProjects.forEach { project ->
+            projectDelegates.remove(project)?.icon?.let { delegate -> iconReads.invalidate(delegate); iconWrappers.remove(delegate) }
+            projectPaths[project]?.let(RecentProjectIconHelper::refreshProjectIcon)
+        }
+        frames.forEach { (frame, project) ->
+            if (project in changedProjects) {
                 ProjectWindowCustomizerService.getInstance().dropProjectIconCache(project)
                 frame.repaint()
             }
@@ -266,7 +302,13 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
             }
             // Каждое окно содержит копию всей полосы; данные проекта вычисляем один раз за проход.
             // Поля провайдера по 2px: запрос 24/28/32px даёт изображение 20/24/28px.
-            val delegate = recentProjects.getProjectIcon(path, true, appearance.iconSize.pixels + 4, project.name)
+            // IconDeferrer сбрасывается платформой даже при нерелевантных VFS-событиях.
+            // Сохраняем свой delegate до изменения данных именно этого проекта/темы/размера.
+            val size = appearance.iconSize.pixels
+            val cached = projectDelegates[project]?.takeIf { it.path == path && it.size == size && it.name == project.name }
+                ?: ProjectIconDelegate(path, size, project.name, recentProjects.getProjectIcon(path, true, size + 4, project.name))
+                    .also { projectDelegates[project] = it }
+            val delegate = cached.icon
             activeDelegates.add(delegate)
             val read = if (appearance.showOutline || appearance.showIcons || appearance.showTabBackground) {
                 readIcon(delegate, label, appearance.iconSize.pixels)
@@ -337,7 +379,7 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         tabOwners.keys.retainAll(activeTabs)
         originalIcons.keys.retainAll(activeTabs)
         iconWrappers.keys.retainAll(activeDelegates)
-        iconReads.keys.retainAll(activeDelegates)
+        iconReads.retain(activeDelegates)
         branchCaptions.keys.filter { it !in activeLabels }.toList().forEach { branchCaptions.remove(it)?.restore() }
         appliedLabelBorders.keys.filter { it !in activeLabels }.forEach(::restoreTabLabelBorder)
         appliedLabelLayouts.keys.filter { it !in activeLabels }.forEach(::restoreTabLabelLayout)
@@ -429,10 +471,8 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
             tabs.revalidateAndRepaint()
         }
         decorateTabLayout(label, tabs, icon, appearance)
-        if (icon == null && !appearance.showOutline && !appearance.showTabBackground && groupLayout == null) {
-            restoreTabLabelBorder(label)
-            return
-        }
+        // Выделение активного таба работает и без иконок, обводки и цветной заливки.
+        // Полное отключение плагина восстанавливает border через cleanup().
         val applied = appliedLabelBorders[label]
         if (applied != null && label.border === applied) {
             var changed = false
@@ -542,7 +582,7 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
     }
 
     private fun preparedArtwork(delegate: Icon, project: Project, size: Int): Icon? {
-        val current = iconReads[delegate]
+        val current = iconReads.get(delegate, size)
         if (current?.avatar != null) {
             lastPreparedArtwork[project]?.remove(size)
             return null
@@ -554,43 +594,10 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         return lastPreparedArtwork[project]?.get(size)
     }
 
-    private fun readIcon(delegate: Icon, label: JComponent?, unscaledSize: Int): IconColorRead? {
-        if (iconReads.containsKey(delegate)) return iconReads[delegate]
-        if (!loadingColors.add(delegate)) return null
-        if (delegate is DeferredIconImpl<*> && !delegate.isDone) {
-            loadProjectIconWithoutPainting(delegate, label)
+    private fun readIcon(delegate: Icon, label: JComponent?, unscaledSize: Int): IconColorRead? =
+        iconReads.request(delegate, unscaledSize) {
+            if (delegate is DeferredIconImpl<*> && !delegate.isDone) loadProjectIconWithoutPainting(delegate, label)
         }
-        val generation = colorGeneration
-        coroutineScope.launch(Dispatchers.IO) {
-            var pending = false
-            val result = try {
-                projectIconColor(delegate, unscaledSize)
-            } catch (_: IconColorNotReady) {
-                pending = true
-                null
-            } catch (error: ProcessCanceledException) {
-                throw error
-            } catch (error: CancellationException) {
-                throw error
-            } catch (error: Exception) {
-                LOG.debug("Cannot determine the project icon color", error)
-                null
-            }
-            if (pending) delay(200)
-            withContext(Dispatchers.UI) {
-                if (disposed || failed || generation != colorGeneration) return@withContext
-                loadingColors.remove(delegate)
-                val ready = result?.let { it.copy(color = it.avatar?.presentation?.color1 ?: it.color) }
-                if (!pending) {
-                    iconReads[delegate] = ready
-                    // Новая SVG-версия меняет рисунок без изменения TabInfo.icon.
-                    iconWrappers.remove(delegate)
-                }
-                requestRefresh()
-            }
-        }
-        return null
-    }
 
     private fun restoreTabLabelBorder(label: JComponent) {
         val applied = appliedLabelBorders.remove(label) ?: return
@@ -602,24 +609,22 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         }
     }
 
-    private fun stopAfterFailure(error: Throwable) {
-        failed = true
-        LOG.warn("Cannot decorate macOS project window tabs; original icons will be restored", error)
-        cleanup()
-    }
-
     override fun dispose() {
         disposed = true
+        retryJob?.cancel()
+        recovery.dispose()
         if (SwingUtilities.isEventDispatchThread()) { groupOrdering.dispose(); cleanup() }
         else SwingUtilities.invokeLater { groupOrdering.dispose(); cleanup() }
     }
 
-    private fun cleanup() {
-        connection?.disconnect()
-        connection = null
-        observations.values.forEach(FrameObservation::close)
+    private fun cleanup(keepRefreshListeners: Boolean = false) {
+        if (!keepRefreshListeners) {
+            connection?.disconnect()
+            connection = null
+            observations.values.forEach(FrameObservation::close)
+            observations.clear()
+        }
         groupOrdering.reset()
-        observations.clear()
         groupLayouts.values.forEach(ProjectTabGroupLayout::close)
         groupLayouts.clear()
         originalIcons.forEach { (info, original) ->
@@ -642,9 +647,9 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         appliedLabelLayouts.keys.toList().forEach(::restoreTabLabelLayout)
         appliedContainerLayouts.keys.toList().forEach(::restoreTabsContainer)
         projectNames.clear()
-        colorGeneration++
         iconReads.clear()
-        loadingColors.clear()
+        projectDelegates.clear()
+        iconFileEvents.clear()
         lastPreparedArtwork.clear()
         previousAppearance = null
         previousGroups = null
@@ -661,9 +666,4 @@ internal fun findWindowTabs(component: Component?): WindowTabsComponent? {
     if (component !is Container) return null
     component.components.forEach { child -> findWindowTabs(child)?.let { return it } }
     return null
-}
-
-private fun isIconConfiguration(path: String): Boolean {
-    if (!path.replace('\\', '/').contains("/.idea/")) return false
-    return path.substringAfterLast('/') in setOf("icon.svg", "icon.png", "icon_dark.svg", "icon_dark.png", ".name")
 }

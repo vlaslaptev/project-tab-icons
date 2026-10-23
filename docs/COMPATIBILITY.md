@@ -1,6 +1,6 @@
 # Compatibility
 
-| Area | Scope for 0.3.85 |
+| Area | Scope for release 0.3.99 |
 | --- | --- |
 | Operating system | macOS |
 | IDE | IntelliJ IDEA 2026.2.3 and later 2026.2 updates within the declared build range |
@@ -26,6 +26,31 @@ The descriptor keeps a strict `262.*` upper bound. Updating it is a compatibilit
 change, not a way to make an unreviewed build install on a newer IDE.
 
 ## Evidence and limits
+
+### Release 0.3.99
+
+Packaged against IntelliJ IDEA 2026.2.3 / 262.10968.63 with JBR 25. The release
+changes the version, embedded change notes and documentation; production Kotlin
+sources are unchanged from the previously built local 0.3.98 snapshot. ZIP
+contents, plugin descriptor, source hashes and release checksum are inspected
+before publication. No new installation, standalone JVM tests, linters or Plugin
+Verifier run is claimed for 0.3.99.
+
+The updated README gallery and Settings image were captured from installed
+0.3.97. The gallery uses the native Preview renderer, with five additional
+gallery-only editor rows. Four plugin settings files and two theme settings files
+remain byte-identical after capture. The earlier Git and group-table images
+remain explicitly labelled as 0.3.86. These images do not claim a new 0.3.99
+runtime validation pass.
+
+### Local 0.3.86
+
+Built and installed in IDEA 2026.2.3 / 262.10968.63. Installed JARs match the ZIP.
+Visual checks cover shrinking settings pages, compact Tab layout, active grouped
+and ungrouped native tabs, Shared background in Preview, and ten fresh captures
+across all eight Preview themes. Four plugin settings files and two theme settings
+files remain byte-identical after cancelling capture drafts. This is an unpublished
+local update. No standalone JVM tests, linters or Plugin Verifier were run.
 
 ### Release 0.3.85
 

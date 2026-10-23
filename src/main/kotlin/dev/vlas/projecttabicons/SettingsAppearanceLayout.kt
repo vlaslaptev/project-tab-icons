@@ -44,31 +44,31 @@ internal class SettingsPageBody : JPanel(BorderLayout(0, JBUI.scale(20))), Scrol
         (visible.height - JBUI.scale(32)).coerceAtLeast(JBUI.scale(32))
 }
 
-internal data class AppearanceField(val label: JBLabel?, val control: JComponent)
+internal data class AppearanceField(val label: JBLabel?, val control: JComponent, val stretch: Boolean = true)
 
-/** Иконка/обводка рядом с разделителями; в узком Settings блоки идут друг под другом. */
+/** Секции переносятся на следующую строку, когда их контролы перестают помещаться. */
 internal class SettingsAppearanceColumns(
     private val availableWidth: () -> Int,
     private val minimumColumnWidth: () -> Int,
+    private val maximumColumns: Int = 2,
 ) : JPanel(null) {
     private val gap = JBUI.scale(20)
     init { isOpaque = false; border = JBUI.Borders.empty(12, 0, 0, 0) }
-    private fun twoColumns(): Boolean = availableWidth() >= minimumColumnWidth() * 2 + gap
-    fun columnWidth(): Int = if (twoColumns()) (availableWidth() - gap) / 2 else availableWidth()
+    private fun columnCount(): Int = ((availableWidth() + gap) / (minimumColumnWidth() + gap))
+        .coerceIn(1, minOf(maximumColumns, componentCount.coerceAtLeast(1)))
+    fun columnWidth(): Int = (availableWidth() - gap * (columnCount() - 1)).coerceAtLeast(1) / columnCount()
     override fun getPreferredSize(): Dimension {
-        val heights = components.map { it.preferredSize.height }
-        val height = if (twoColumns()) heights.maxOrNull() ?: 0 else heights.sum() + gap * (heights.size - 1).coerceAtLeast(0)
+        val rows = components.toList().chunked(columnCount())
+        val height = rows.sumOf { row -> row.maxOf { it.preferredSize.height } } + gap * (rows.size - 1).coerceAtLeast(0)
         return Dimension(availableWidth(), height + insets.top + insets.bottom)
     }
     override fun doLayout() {
         var y = insets.top
-        components.forEachIndexed { index, child ->
-            val childHeight = child.preferredSize.height
-            if (twoColumns()) child.setBounds(index * (columnWidth() + gap), y, columnWidth(), childHeight)
-            else {
-                child.setBounds(0, y, width, childHeight)
-                y += childHeight + gap
+        components.toList().chunked(columnCount()).forEach { row ->
+            row.forEachIndexed { index, child ->
+                child.setBounds(index * (columnWidth() + gap), y, columnWidth(), child.preferredSize.height)
             }
+            y += row.maxOf { it.preferredSize.height } + gap
         }
     }
 }
@@ -133,8 +133,9 @@ internal class SettingsAppearanceForm(
             val y = insets.top + topHeight + JBUI.scale(12) + index / columns * (rowHeight + rowGap)
             field.label?.let { label ->
                 label.setBounds(x, y, labelWidth.coerceAtMost(cellWidth), rowHeight)
+                val available = (cellWidth - labelWidth - fieldGap).coerceAtLeast(0)
                 field.control.setBounds(x + labelWidth + fieldGap, y,
-                    (cellWidth - labelWidth - fieldGap).coerceAtLeast(0), rowHeight)
+                    if (field.stretch) available else minOf(available, field.control.preferredSize.width), rowHeight)
             } ?: field.control.setBounds(x, y, cellWidth, rowHeight)
         }
     }
@@ -233,11 +234,26 @@ internal class SettingsPreviewHeader(
 }
 
 /** Штатные состояния IDEA, просторные сегменты и общая граница переключаемой формы. */
-internal class SettingsGroupSwitcher(selectorName: String = "Appearance settings group") : JPanel(BorderLayout(0, JBUI.scale(8))) {
-    private val cardLayout = CardLayout()
+internal class SettingsGroupSwitcher(
+    selectorName: String = "Appearance settings group",
+    availableWidth: (() -> Int)? = null,
+) : JPanel(BorderLayout(0, JBUI.scale(8))) {
+    private val cardLayout = object : CardLayout() {
+        // Обычный CardLayout резервирует высоту самой большой, в том числе скрытой, вкладки.
+        override fun preferredLayoutSize(parent: Container): Dimension = visibleCardSize(parent) { it.preferredSize }
+        override fun minimumLayoutSize(parent: Container): Dimension = visibleCardSize(parent) { it.minimumSize }
+
+        private fun visibleCardSize(parent: Container, size: (Component) -> Dimension): Dimension {
+            val content = parent.components.firstOrNull { it.isVisible }?.let(size) ?: Dimension()
+            val insets = parent.insets
+            return Dimension(content.width + insets.left + insets.right + hgap * 2,
+                content.height + insets.top + insets.bottom + vgap * 2)
+        }
+    }
     private val cards = JPanel(cardLayout).apply { isOpaque = false }
     private val titles = mutableListOf<String>()
     private val listeners = mutableListOf<ChangeListener>()
+    private val headerActions = JPanel(BorderLayout()).apply { isOpaque = false; isVisible = false }
     private val selector = SegmentedButtonComponent<String> { title ->
         SegmentedButton.createPresentation(title)
     }.apply {
@@ -272,11 +288,10 @@ internal class SettingsGroupSwitcher(selectorName: String = "Appearance settings
                 } finally { g.dispose() }
             }
         }
-        add(object : JPanel(BorderLayout()) {
+        add(object : SettingsActionRow(selector, headerActions,
+            availableWidth ?: { width }, stretchContent = false) {
             init {
-                isOpaque = false
                 border = JBUI.Borders.empty(12, 12, 0, 12)
-                add(selector, BorderLayout.WEST)
             }
 
             override fun paintChildren(graphics: Graphics) {
@@ -302,6 +317,9 @@ internal class SettingsGroupSwitcher(selectorName: String = "Appearance settings
         selector.addChangeListener {
             val selected = selector.selectedItem ?: return@addChangeListener
             cardLayout.show(cards, selected)
+            cards.revalidate()
+            revalidate()
+            repaint()
             val event = ChangeEvent(this)
             listeners.forEach { it.stateChanged(event) }
         }
@@ -313,6 +331,14 @@ internal class SettingsGroupSwitcher(selectorName: String = "Appearance settings
         titles += title
         selector.items = titles.toList()
         selector.selectedItem = selected ?: titles.first()
+    }
+
+    fun setHeaderActions(actions: JComponent) {
+        headerActions.removeAll()
+        headerActions.add(actions, BorderLayout.CENTER)
+        headerActions.isVisible = true
+        revalidate()
+        repaint()
     }
 
     fun addChangeListener(listener: ChangeListener) {

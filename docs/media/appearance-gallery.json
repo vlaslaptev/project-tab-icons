@@ -1,21 +1,21 @@
 {
-  "capturedOn": "2026-10-21",
-  "kind": "composition of real installed Settings Preview screenshots",
+  "capturedOn": "2026-10-23",
+  "kind": "composition of native Preview host exports from visible Swing windows",
   "pluginVersions": [
-    "0.3.84",
-    "0.3.85"
+    "0.3.97"
   ],
-  "captureCount": 50,
+  "captureCount": 10,
   "selectedCount": 10,
-  "layout": "one column",
+  "threeTabFrameCount": 4,
+  "layout": "one column, full width",
   "canvasSize": [
-    1598,
-    2481
+    1411,
+    3380
   ],
-  "windowSize": [
-    1594,
-    179
-  ],
+  "editorLineCount": 7,
+  "cropRule": "End after the seventh line descender, followed by the native 8 px window bottom",
+  "header": false,
+  "outerPaddingPx": 2,
   "themes": [
     "Islands Dark",
     "Islands Light",
@@ -26,49 +26,221 @@
     "Darcula",
     "High Contrast"
   ],
-  "normalization": "Three recaptured windows were resized horizontally from 1658 to 1594 px; height remained 179 px. Other windows were cropped without resizing.",
-  "sha256": "b914f0f8fb431af30b13a09df937c14662c8af229d775a937772c495c8ea8678",
+  "normalization": "Native Preview host exported from visible Swing windows at Retina 2x, then uniformly scaled to the common width with integer pixel rounding.",
+  "demoContent": "The installed Preview renderer supplies all controls and the first two editor rows. The capture host appends five demo editor rows using the same native font, spacing and theme palette before export. Production plugin code is unchanged.",
+  "selectionPolicy": "Moderate tab heights and readable theme colors; no Bold preset, oversized tabs, rounded lower outlines or strong fills. The first three appearance setups are preserved.",
+  "settingsPreserved": true,
+  "sha256": "11c53a69e0038dc8db429b58a264b6c161a0ac33483c36a04392fe077e3e4fd0",
   "frames": [
     {
       "theme": "Islands Dark",
-      "captureSha256": "63e0a7e2433239df9af39e53ab76b18cec5be4ebf19b5bb85245263b8fe40445"
+      "tabs": 5,
+      "captureSha256": "eee77293ef5075b3da30be4220ff21f5192dc9677d798438ba410ee3c3124fc8",
+      "rawSha256": "150cf0f035ac0797e743430f09e88d8858bf5503ea0db5192c2cf7368d5e844c",
+      "sourceWindowSize": [
+        1407,
+        250
+      ],
+      "displaySize": [
+        1407,
+        250
+      ],
+      "tabHeightPx": 35,
+      "fontSizePx": 14,
+      "iconPosition": "LEFT",
+      "editorLineCount": 7,
+      "seventhLineBaseline": 239,
+      "displayedTabHeightPx": 35.0,
+      "displayedFontSizePx": 14.0
     },
     {
       "theme": "Islands Light",
-      "captureSha256": "ceca2167600a277b443013a259638201cf04c8ce5d7f26406891c46a7dfdb5a9"
+      "tabs": 5,
+      "captureSha256": "5fd6fa6f66d7c90c3933d1da0c0d065a53b7c7ac2da0e01353ef5727a407640c",
+      "rawSha256": "7705b73aedf4ce062126becd8ac32500d87b7822593f9f3c13d0f33c77eec75b",
+      "sourceWindowSize": [
+        1407,
+        249
+      ],
+      "displaySize": [
+        1407,
+        249
+      ],
+      "tabHeightPx": 34,
+      "fontSizePx": 14,
+      "iconPosition": "LEFT",
+      "editorLineCount": 7,
+      "seventhLineBaseline": 238,
+      "displayedTabHeightPx": 34.0,
+      "displayedFontSizePx": 14.0
     },
     {
       "theme": "Islands Dark",
-      "captureSha256": "ea75fa3e605c7f9bd380999fc3ff41bf9d6193d41c0acf169976c503ee9bc500"
+      "tabs": 5,
+      "captureSha256": "ee5d3e0873ae6b719650ac66b4e099ff4576baf67dd0ae5cd10c318a7ffd8482",
+      "rawSha256": "5b796da6709feb057e67699899cf424942a259d89df3f99f72a32f1586bf59ea",
+      "sourceWindowSize": [
+        1407,
+        249
+      ],
+      "displaySize": [
+        1407,
+        249
+      ],
+      "tabHeightPx": 34,
+      "fontSizePx": 14,
+      "iconPosition": "LEFT",
+      "editorLineCount": 7,
+      "seventhLineBaseline": 238,
+      "displayedTabHeightPx": 34.0,
+      "displayedFontSizePx": 14.0
     },
     {
       "theme": "Islands Light",
-      "captureSha256": "0c0b305307c9c72ad0873dbc91916d9e0043b28abc49ebc3f91e45a8b3a608e8"
+      "tabs": 3,
+      "captureSha256": "aa7266ad3885cfa720f0062df1430040f212239874536f2b09c54d5143fda027",
+      "rawSha256": "68b9ef5126ed2f49f969d0fb1822bf92274f8a6f41ea3fae43974c1f7bf8f2b7",
+      "sourceWindowSize": [
+        1110,
+        245
+      ],
+      "displaySize": [
+        1407,
+        311
+      ],
+      "tabHeightPx": 30,
+      "fontSizePx": 12,
+      "iconPosition": "LEFT",
+      "editorLineCount": 7,
+      "seventhLineBaseline": 234,
+      "displayedTabHeightPx": 38.03,
+      "displayedFontSizePx": 15.21
     },
     {
       "theme": "Dark",
-      "captureSha256": "812f779214a1482a1aecf8f98b93c3f1584555116f1eb7d30958767e8d6893a4"
+      "tabs": 5,
+      "captureSha256": "6805c650e0a86a10a217c8021744eae912acccecd9b9691dddbab9b42a404daa",
+      "rawSha256": "988f74e3032ad1709dc89725e141ce8235d2edc994602c9211e59d4e21ceec4d",
+      "sourceWindowSize": [
+        1407,
+        249
+      ],
+      "displaySize": [
+        1407,
+        249
+      ],
+      "tabHeightPx": 34,
+      "fontSizePx": 14,
+      "iconPosition": "LEFT",
+      "editorLineCount": 7,
+      "seventhLineBaseline": 238,
+      "displayedTabHeightPx": 34.0,
+      "displayedFontSizePx": 14.0
     },
     {
       "theme": "High Contrast",
-      "captureSha256": "c00a860b7609c3171610454a6746d60d228901034154f0ef776ad116fdd4fdbd"
+      "tabs": 3,
+      "captureSha256": "686c4f6b89419968079c02480809cc3210e67f01699e7cddbefff4575da913cc",
+      "rawSha256": "2631a8e8a666199a9d6857665218f6a66474122616702c53557ca21613a13010",
+      "sourceWindowSize": [
+        1110,
+        245
+      ],
+      "displaySize": [
+        1407,
+        311
+      ],
+      "tabHeightPx": 30,
+      "fontSizePx": 12,
+      "iconPosition": "RIGHT",
+      "editorLineCount": 7,
+      "seventhLineBaseline": 234,
+      "displayedTabHeightPx": 38.03,
+      "displayedFontSizePx": 15.21
     },
     {
       "theme": "Darcula",
-      "captureSha256": "3a895b7a49a207a0375408b6b04bd4006d46303fefd6de8c346d23a43f5c2c5f"
+      "tabs": 5,
+      "captureSha256": "f0a6a356292df9b2645d611b915673d832bc75e9ca8be7658584c9da2b3ef7ae",
+      "rawSha256": "2660dc6c7e045f21b08f9655c8a98629bee557e212b84ef4124a83fac7fc425a",
+      "sourceWindowSize": [
+        1407,
+        249
+      ],
+      "displaySize": [
+        1407,
+        249
+      ],
+      "tabHeightPx": 34,
+      "fontSizePx": 14,
+      "iconPosition": "LEFT",
+      "editorLineCount": 7,
+      "seventhLineBaseline": 238,
+      "displayedTabHeightPx": 34.0,
+      "displayedFontSizePx": 14.0
     },
     {
       "theme": "Light with Light Header",
-      "captureSha256": "070b3099ac9d7fb14bfab619c1e7a6b61e13c783e2814d72cdd1cf8a0171fb22"
+      "tabs": 3,
+      "captureSha256": "86969a61f6ccffbff250237f2ba23bc7efbfe56156fc4b5130a5494211d81823",
+      "rawSha256": "8250227d7dc14900c97090560e93cea9a2f356a053afae37755b1e62c0092bad",
+      "sourceWindowSize": [
+        1110,
+        245
+      ],
+      "displaySize": [
+        1407,
+        311
+      ],
+      "tabHeightPx": 30,
+      "fontSizePx": 12,
+      "iconPosition": "LEFT",
+      "editorLineCount": 7,
+      "seventhLineBaseline": 234,
+      "displayedTabHeightPx": 38.03,
+      "displayedFontSizePx": 15.21
     },
     {
       "theme": "Light",
-      "captureSha256": "0250b8874ef27af10028d04263172891f23c9bd6d557c1de01db9bb999d4beb3"
+      "tabs": 5,
+      "captureSha256": "b83aca32e0e92a4c9d648ae5848885ad86d30b2a980ae2a5681606674e522d4b",
+      "rawSha256": "4f9c9d62a64ae072ddc0521a9f78a5d5ef12194b441c7e593b828ce417799a55",
+      "sourceWindowSize": [
+        1407,
+        249
+      ],
+      "displaySize": [
+        1407,
+        249
+      ],
+      "tabHeightPx": 34,
+      "fontSizePx": 14,
+      "iconPosition": "LEFT",
+      "editorLineCount": 7,
+      "seventhLineBaseline": 238,
+      "displayedTabHeightPx": 34.0,
+      "displayedFontSizePx": 14.0
     },
     {
       "theme": "Islands Darcula",
-      "captureSha256": "a1cf19946f6c0fadaefb81820700e2ad9b2375b9f760f9b897cd7ad748dc9b8f"
+      "tabs": 3,
+      "captureSha256": "6996dd1fb9181151a06609fb8067438f2621fa81df11bc22b9430fb2a63e9255",
+      "rawSha256": "d4a5ea2f18a86704047276c52525d4c6c241a84546d58f35db6ee0186b477777",
+      "sourceWindowSize": [
+        1110,
+        245
+      ],
+      "displaySize": [
+        1407,
+        311
+      ],
+      "tabHeightPx": 30,
+      "fontSizePx": 12,
+      "iconPosition": "LEFT",
+      "editorLineCount": 7,
+      "seventhLineBaseline": 234,
+      "displayedTabHeightPx": 38.03,
+      "displayedFontSizePx": 15.21
     }
-  ],
-  "outerPaddingPx": 2
+  ]
 }

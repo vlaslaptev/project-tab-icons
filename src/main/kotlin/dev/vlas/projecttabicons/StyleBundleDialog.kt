@@ -13,8 +13,8 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 
 internal class StyleBundleDialog(parent: JComponent, private val bundle: StyleBundle, importing: Boolean) : DialogWrapper(parent, true) {
-    private val presets = bundle.presets.map { it to JBCheckBox(it.name, true) }
-    private val categories = bundle.categories.map { it to JBCheckBox("${it.name} · ${it.icons.size} icons", true) }
+    private val presets = bundle.presets.map { it to styleBundleCheckBox(it.name) }
+    private val categories = bundle.categories.map { it to styleBundleCheckBox("${it.name} · ${it.icons.size} icons") }
     private val conflicts = ComboBox(StyleConflict.entries.toTypedArray()).apply { accessibleContext.accessibleName = "Import name conflicts" }
     private val importing = importing
     init {

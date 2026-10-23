@@ -6,7 +6,6 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.StandardCopyOption
 import java.util.Base64
 import java.util.UUID
 
@@ -20,7 +19,7 @@ internal enum class StyleConflict(val title: String) {
 private const val MAX_BUNDLE_BYTES = 24 * 1024 * 1024
 
 /** Переносимый формат не содержит ID проектов, путей или назначений иконок. */
-internal fun writeStyleBundle(path: Path, bundle: StyleBundle) {
+internal fun writeStyleBundle(path: Path, bundle: StyleBundle, files: IconFileOperations = IconFileOperations()) {
     val json = JsonObject().apply {
         addProperty("format", "project-tab-icons"); addProperty("version", 1)
         add("presets", JsonArray().apply { bundle.presets.forEach { preset -> add(JsonObject().apply {
@@ -29,19 +28,14 @@ internal fun writeStyleBundle(path: Path, bundle: StyleBundle) {
         add("categories", JsonArray().apply { bundle.categories.forEach { category -> add(JsonObject().apply {
             addProperty("name", category.name)
             add("icons", JsonArray().apply { category.icons.forEach { icon -> add(JsonObject().apply {
-                addProperty("name", icon.asset.label.substringBeforeLast(" · ").take(128))
+                addProperty("name", icon.asset.label.substringBeforeLast(" · ").takeCodePoints(128))
                 addProperty("svg", Base64.getEncoder().encodeToString(icon.asset.bytes))
             }) } })
         }) } })
     }
     val bytes = json.toString().toByteArray(Charsets.UTF_8)
     require(bytes.size <= MAX_BUNDLE_BYTES) { "This style bundle is too large (24 MiB maximum)." }
-    val destination = path.toAbsolutePath()
-    val temporary = Files.createTempFile(destination.parent, ".project-tab-styles-", ".tmp")
-    try {
-        Files.write(temporary, bytes)
-        Files.move(temporary, destination, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
-    } finally { Files.deleteIfExists(temporary) }
+    writeFileAtomically(path, bytes, files)
 }
 
 internal fun readStyleBundle(path: Path): StyleBundle {
@@ -60,7 +54,7 @@ internal fun readStyleBundle(path: Path): StyleBundle {
     require(presetsJson.size() <= MAX_USER_APPEARANCE_PRESETS) { "A bundle can contain up to $MAX_USER_APPEARANCE_PRESETS presets." }
     val presets = presetsJson.map { item ->
         val value = item.objectValue()
-        val name = value.name(32)
+        val name = normalizeUserPresetName(value.string("name"))
         require(userPresetNameError(name, emptyList()) == null) { "Invalid preset name: $name" }
         UserAppearancePreset(UUID.randomUUID().toString(), name, decodeAppearance(value.getAsJsonObject("appearance")))
     }
@@ -68,7 +62,7 @@ internal fun readStyleBundle(path: Path): StyleBundle {
     require(categoriesJson.size() <= MAX_LIBRARY_SETS) { "A bundle can contain up to $MAX_LIBRARY_SETS categories." }
     var total = 0L
     val categories = categoriesJson.map { item ->
-        val value = item.objectValue(); val name = value.name(64); val icons = value.array("icons")
+        val value = item.objectValue(); val name = value.name(MAX_ICON_SET_NAME_LENGTH); val icons = value.array("icons")
         require(icons.size() in 1..MAX_SET_ICONS) { "A category must contain 1–$MAX_SET_ICONS icons." }
         ImportedIconSet(UUID.randomUUID().toString(), name, icons.map { element ->
             val icon = element.objectValue(); val label = icon.name(128); val svg = icon.string("svg")
@@ -84,42 +78,52 @@ internal fun readStyleBundle(path: Path): StyleBundle {
 }
 
 internal fun mergeStyleBundle(current: StyleBundle, incoming: StyleBundle, conflict: StyleConflict): StyleBundle {
-    val presets = current.presets.toMutableList()
-    incoming.presets.forEach { preset ->
+    val presets = current.presets.map { it.copy(name = normalizeUserPresetName(it.name)) }.toMutableList()
+    incoming.presets.forEach { incomingPreset ->
+        // Конфликт разрешается по тому же имени, которое останется после сохранения.
+        val preset = incomingPreset.copy(name = normalizeUserPresetName(incomingPreset.name))
+        require(userPresetNameError(preset.name, emptyList()) == null) { "Invalid preset name: ${preset.name}" }
         val index = presets.indexOfFirst { it.name.equals(preset.name, true) }
         when {
             index < 0 -> presets += preset
             conflict == StyleConflict.REPLACE -> presets[index] = preset.copy(id = presets[index].id)
-            conflict == StyleConflict.KEEP_BOTH -> presets += preset.copy(name = uniqueStyleName(preset.name, presets.map { it.name }, 32))
+            conflict == StyleConflict.KEEP_BOTH -> presets += preset.copy(name = uniqueStyleName(preset.name, presets.map { it.name }, MAX_USER_PRESET_NAME_LENGTH))
         }
     }
     require(presets.size <= MAX_USER_APPEARANCE_PRESETS) { "Import would exceed $MAX_USER_APPEARANCE_PRESETS user presets. Select fewer presets or replace matching names." }
-    val sets = current.categories.toMutableList()
-    incoming.categories.forEach { category ->
+    val sets = current.categories.map { it.copy(name = it.name.trim()) }.toMutableList()
+    incoming.categories.forEach { incomingCategory ->
+        val category = incomingCategory.copy(name = incomingCategory.name.trim())
+        require(category.name.isNotEmpty() && category.name.codePointCount(0, category.name.length) <= MAX_ICON_SET_NAME_LENGTH &&
+            category.name.none(Char::isISOControl)) { "Invalid category name." }
         val index = sets.indexOfFirst { it.name.equals(category.name, true) }
         when {
             index < 0 -> sets += category
             conflict == StyleConflict.REPLACE -> sets[index] = category.copy(id = sets[index].id)
-            conflict == StyleConflict.KEEP_BOTH -> sets += category.copy(name = uniqueStyleName(category.name, sets.map { it.name }, 64))
+            conflict == StyleConflict.KEEP_BOTH -> sets += category.copy(name = uniqueStyleName(category.name, sets.map { it.name }, MAX_ICON_SET_NAME_LENGTH))
         }
     }
     require(sets.size <= MAX_LIBRARY_SETS) { "Import would exceed $MAX_LIBRARY_SETS icon categories." }
     return StyleBundle(presets, sets)
 }
-private fun uniqueStyleName(base: String, names: List<String>, max: Int): String {
+/** Лимит включает суффикс; обрезаем только между Unicode code points. */
+internal fun uniqueStyleName(base: String, names: Collection<String>, max: Int): String {
+    fun candidate(ending: String): String = base.takeCodePoints(max - ending.length) + ending
+    fun available(name: String): Boolean = names.none { it.equals(name, true) } &&
+        (max != MAX_USER_PRESET_NAME_LENGTH || userPresetNameError(name, emptyList()) == null)
+    candidate("").let { if (available(it)) return it }
     var suffix = 2
     while (true) {
         val ending = " ($suffix)"
-        val points = base.codePoints().toArray().take(max - ending.length).toIntArray()
-        val name = String(points, 0, points.size) + ending
-        if (names.none { it.equals(name, true) } && (max != 32 || userPresetNameError(name, emptyList()) == null)) return name
+        val name = candidate(ending)
+        if (available(name)) return name
         suffix++
     }
 }
 private fun JsonElement.objectValue(): JsonObject { require(isJsonObject) { "Expected a JSON object." }; return asJsonObject }
 private fun JsonObject.array(key: String): JsonArray = get(key)?.also { require(it.isJsonArray) { "Expected $key to be a list." } }?.asJsonArray ?: JsonArray()
 private fun JsonObject.string(key: String): String = get(key)?.also { require(it.isJsonPrimitive && it.asJsonPrimitive.isString) { "Invalid $key." } }?.asString ?: error("Missing $key.")
-private fun JsonObject.name(max: Int): String = string("name").also { require(it.isNotBlank() && it.codePointCount(0, it.length) <= max && it.none(Char::isISOControl)) { "Invalid style name." } }
+private fun JsonObject.name(max: Int): String = string("name").trim().also { require(it.isNotBlank() && it.codePointCount(0, it.length) <= max && it.none(Char::isISOControl)) { "Invalid style name." } }
 private fun JsonObject.bool(key: String, default: Boolean): Boolean = get(key)?.let { require(it.isJsonPrimitive && it.asJsonPrimitive.isBoolean) { "Invalid $key." }; it.asBoolean } ?: default
 private fun JsonObject.integer(key: String, default: Int): Int = get(key)?.let { require(it.isJsonPrimitive && it.asJsonPrimitive.isNumber) { "Invalid $key." }; it.asString.toIntOrNull() ?: error("Invalid $key.") } ?: default
 private inline fun <reified T : Enum<T>> JsonObject.enum(key: String, default: T): T = if (!has(key)) default else enumValues<T>().firstOrNull { it.name == string(key) } ?: error("Unknown $key.")

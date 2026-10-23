@@ -14,6 +14,7 @@ import javax.swing.JPanel
 
 internal class ProjectGroupsPanel(
     width: () -> Int,
+    // Родитель синхронно обновляет обе таблицы через updateRows(), сохраняя один проход.
     private val changed: () -> Unit,
     showProjects: () -> Unit,
     chooseGroupIcon: (String) -> Unit,
@@ -85,7 +86,7 @@ internal class ProjectGroupsPanel(
             if (editingEnabled && !table.isEditing) {
                 val keys = selectedRows().map { it.key }.toSet()
                 draft = draft.copy(memberships = draft.memberships.filterKeys { it !in keys }).normalized()
-                refreshTable(); changed()
+                changed()
             }
         }
         refreshTable()
@@ -113,19 +114,19 @@ internal class ProjectGroupsPanel(
         draft = draft.copy(groups = if (id == null) draft.groups + group else draft.groups.map { if (it.id == id) group else it },
             memberships = memberships).normalized()
         selected.clear()
-        refreshTable(); changed()
+        changed()
         return null
     }
     private fun deleteGroup(id: String) {
         if (!editingEnabled || disposed) return
         draft = draft.copy(groups = draft.groups.filterNot { it.id == id }, memberships = draft.memberships.filterValues { it != id })
         if (filterId == id) filterId = null
-        refreshTable(); changed()
+        changed()
     }
     private fun assignSelected(id: String) {
         if (!editingEnabled || disposed || draft.groups.none { it.id == id }) return
         draft = draft.copy(memberships = draft.memberships.toMutableMap().apply { selectedRows().forEach { put(it.key, id) } }).normalized()
-        refreshTable(); changed()
+        changed()
     }
     private fun moveGroup(id: String, direction: Int) {
         if (!editingEnabled || disposed || table.isEditing) return
@@ -135,7 +136,7 @@ internal class ProjectGroupsPanel(
         val groups = draft.groups.toMutableList()
         java.util.Collections.swap(groups, index, target)
         draft = draft.copy(groups = groups)
-        refreshTable(); changed()
+        changed()
     }
     private fun refreshTable() {
         GroupAppearanceIcons.touch(draft)
@@ -171,7 +172,7 @@ internal class ProjectGroupsPanel(
             "Group icons can use up to 16 MiB in total. Choose a smaller SVG."
         }
         draft = draft.copy(groups = groups)
-        refreshTable(); changed()
+        changed()
     }
     fun updateRows(rows: List<ProjectIconSettingsRow>) {
         allRows = rows

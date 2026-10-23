@@ -1,5 +1,5 @@
 {
-  "version": "0.3.85",
+  "version": "0.3.97",
   "kind": "illustrations and compositions of real Settings screenshots",
   "iconCountLabel": "100+",
   "files": [
@@ -19,12 +19,12 @@
     },
     {
       "name": "appearance-presets",
-      "title": "Preview it. Make it yours.",
+      "title": "Compact settings. Clear selection.",
       "width": 1600,
       "height": 1000,
       "kind": "screenshot composition",
-      "pluginVersion": "0.3.62",
-      "description": "Real screenshot of Project Tab Icons 0.3.62 Settings in IntelliJ IDEA. Custom preset, Icon controls, built-in Preview demo data. Cropped without redrawing UI pixels; presented on an illustrated frame.",
+      "pluginVersion": "0.3.97",
+      "description": "Real screenshot of Project Tab Icons 0.3.97 Settings in IntelliJ IDEA. group_git preset, current Tab layout, Style / Tab layout / Group layout switcher and preset actions, built-in Preview demo data. Cropped without redrawing UI pixels; presented on an illustrated frame.",
       "capture": "captures/appearance-settings.png",
       "provenance": "captures/provenance.json"
     },
@@ -42,8 +42,8 @@
       "width": 1600,
       "height": 1000,
       "kind": "screenshot composition",
-      "pluginVersion": "0.3.62",
-      "description": "Real screenshot of Project Tab Icons 0.3.62 Settings in IntelliJ IDEA. Custom preset, Preview and presets controls, built-in Preview demo data. Cropped without redrawing UI pixels; presented on an illustrated frame.",
+      "pluginVersion": "0.3.86",
+      "description": "Real screenshot of Project Tab Icons 0.3.86 Settings in IntelliJ IDEA. group_git preset, Preview and Git controls in Tab layout, built-in Preview demo data. Cropped without redrawing UI pixels; presented on an illustrated frame.",
       "capture": "captures/git-settings.png",
       "provenance": "captures/provenance.json"
     },
@@ -57,12 +57,14 @@
     {
       "name": "appearance-gallery",
       "title": "8 IDE themes · Hundreds of appearance combinations",
-      "width": 1598,
-      "height": 2481,
+      "width": 1411,
+      "height": 3380,
       "kind": "screenshot composition",
       "provenance": "appearance-gallery.json",
-      "description": "Ten real Preview frames in one column, all with the same window dimensions.",
-      "outerPaddingPx": 2
+      "description": "Ten native Preview frames across eight themes. Six five-tab and four three-tab examples; all fill the width and end after editor line seven.",
+      "outerPaddingPx": 2,
+      "pluginVersion": "0.3.97",
+      "header": false
     }
   ]
 }

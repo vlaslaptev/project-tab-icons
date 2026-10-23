@@ -95,9 +95,7 @@ internal class ProjectGroupsTable(
         if (input != null) { input = null; memberScroll = null; refresh(); editingChanged() }
     }
     fun setEditingEnabled(enabled: Boolean, selected: Boolean) {
-        val selectionChanged = canAssign != selected
         editingEnabled = enabled; canAssign = selected
-        if (selectionChanged) refresh()
         availability.forEach { (control, allowed) ->
             control.isEnabled = enabled && allowed()
             if (control is SettingsValueButton) control.muteDisabledIcon = !enabled || control.getClientProperty("preserveGroupIcon") != true
@@ -130,9 +128,14 @@ internal class ProjectGroupsTable(
         input = null
         val error = save(pending.id, pending.nameField.text.trim(), pending.projects.toSet(),
             pending.positions.toMap())
-        if (error != null) { pending.error = error; input = pending }
-        else memberScroll = null
-        refresh(focusName = error != null)
+        if (error != null) {
+            pending.error = error
+            input = pending
+            refresh(focusName = true)
+        } else {
+            // save уже обновил таблицу через родительский showGroups().
+            memberScroll = null
+        }
         editingChanged()
     }
     private fun register(control: JComponent, enabled: Boolean = true): JComponent = registerWhen(control) { enabled }
@@ -207,20 +210,20 @@ internal class ProjectGroupsTable(
         addAppearance(this, group, enabled = true)
         add(JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)).apply {
             isOpaque = false
-            fun action(name: String, icon: javax.swing.Icon, allowed: Boolean, run: () -> Unit) {
-                add(register(SettingsValueButton("", icon).apply {
+            fun action(name: String, icon: javax.swing.Icon, allowed: () -> Boolean, run: () -> Unit) {
+                add(registerWhen(SettingsValueButton("", icon).apply {
                     preferredSize = JBUI.size(32, 32)
                     toolTipText = name; accessibleContext.accessibleName = name
                     putClientProperty("projectGroupControl", "${group.id}/$name")
                     addActionListener { if (editingEnabled) run() }
                 }, allowed))
             }
-            action("Assign selected projects to ${group.name}", AllIcons.Actions.Checked, input == null && canAssign) { assign(group.id) }
-            action("Edit project group ${group.name}", AllIcons.Actions.Edit, input == null) { begin(group.id) }
-            action("Delete project group ${group.name}", AllIcons.General.Remove, input == null) { delete(group.id) }
+            action("Assign selected projects to ${group.name}", AllIcons.Actions.Checked, { input == null && canAssign }) { assign(group.id) }
+            action("Edit project group ${group.name}", AllIcons.Actions.Edit, { input == null }) { begin(group.id) }
+            action("Delete project group ${group.name}", AllIcons.General.Remove, { input == null }) { delete(group.id) }
             val index = state.groups.indexOfFirst { it.id == group.id }
-            action("Move group ${group.name} up", AllIcons.Actions.MoveUp, input == null && index > 0) { move(group.id, -1) }
-            action("Move group ${group.name} down", AllIcons.Actions.MoveDown, input == null && index < state.groups.lastIndex) { move(group.id, 1) }
+            action("Move group ${group.name} up", AllIcons.Actions.MoveUp, { input == null && index > 0 }) { move(group.id, -1) }
+            action("Move group ${group.name} down", AllIcons.Actions.MoveDown, { input == null && index < state.groups.lastIndex }) { move(group.id, 1) }
         })
         trackHover()
     }
