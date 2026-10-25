@@ -1,6 +1,7 @@
 package dev.vlas.projecttabicons
 
 import com.intellij.openapi.ui.ComboBox
+import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.util.ui.JBUI
@@ -39,13 +40,13 @@ internal class ProjectGroupsPanel(
     private var syncingFilter = false
     private var editingEnabled = true
     private var disposed = false
+    private var memberDialog: Pair<String, ProjectGroupMembersDialog>? = null
     private val table = ProjectGroupsTable(
-        selectedProjects = { selected.toSet() },
         save = ::saveGroup,
         delete = ::deleteGroup,
-        assign = ::assignSelected,
         move = ::moveGroup,
         showProjects = { id -> filterId = id; changed(); showProjects() },
+        addProjects = ::addProjects,
         chooseIcon = chooseGroupIcon,
         chooseColor = chooseGroupColor,
         editingChanged = ::refreshControls,
@@ -123,10 +124,34 @@ internal class ProjectGroupsPanel(
         if (filterId == id) filterId = null
         changed()
     }
-    private fun assignSelected(id: String) {
+    private fun assignProjects(id: String, keys: Set<String>) {
         if (!editingEnabled || disposed || draft.groups.none { it.id == id }) return
-        draft = draft.copy(memberships = draft.memberships.toMutableMap().apply { selectedRows().forEach { put(it.key, id) } }).normalized()
+        val available = allRows.filter { it.target.path != null && !it.target.project.isDisposed && it.key in keys }
+        if (available.isEmpty()) return
+        draft = draft.copy(memberships = draft.memberships.toMutableMap().apply { available.forEach { put(it.key, id) } }).normalized()
         changed()
+    }
+    private fun memberOptions(id: String): List<ProjectGroupMemberOption> = allRows
+        .filter { it.target.path != null && !it.target.project.isDisposed && draft.memberships[it.key] != id }
+        .distinctBy { it.key }
+        .map { row -> ProjectGroupMemberOption(row.key, row.target.name, row.target.path.toString(), draft.groupFor(row.key)?.name) }
+        .sortedWith(compareBy<ProjectGroupMemberOption> { it.group != null }
+            .thenBy(String.CASE_INSENSITIVE_ORDER) { it.name }.thenBy { it.path })
+
+    private fun addProjects(id: String) {
+        if (!editingEnabled || disposed || table.isEditing || memberDialog != null) return
+        val group = draft.groups.firstOrNull { it.id == id } ?: return
+        val dialog = ProjectGroupMembersDialog(this, group.name, memberOptions(id))
+        memberDialog = id to dialog
+        try {
+            val accepted = dialog.showAndGet()
+            memberDialog = null
+            if (accepted) assignProjects(id, dialog.selectedProjects())
+        } finally { memberDialog = null }
+    }
+    private fun closeMemberDialog() {
+        memberDialog?.second?.close(DialogWrapper.CANCEL_EXIT_CODE)
+        memberDialog = null
     }
     private fun moveGroup(id: String, direction: Int) {
         if (!editingEnabled || disposed || table.isEditing) return
@@ -147,6 +172,10 @@ internal class ProjectGroupsPanel(
                 group?.outlineColor != saved?.outlineColor || group?.tabColor != saved?.tabColor)
         }
         table.showGroups(draft, baseline, allRows)
+        memberDialog?.let { (id, dialog) ->
+            val group = draft.groups.firstOrNull { it.id == id }
+            if (group == null) closeMemberDialog() else dialog.updateProjects(group.name, memberOptions(id))
+        }
         syncingFilter = true
         try {
             val choices = listOf(Filter(null, "All projects (${allRows.size})"),
@@ -159,6 +188,7 @@ internal class ProjectGroupsPanel(
         refreshControls()
     }
     fun reset(value: ProjectGroupsState) {
+        closeMemberDialog()
         table.cancelInput()
         baseline = value; draft = value; selected.clear(); filterId = null; refreshTable()
     }
@@ -190,17 +220,21 @@ internal class ProjectGroupsPanel(
         accessibleContext.accessibleName = "Select project ${row.target.name} · ${row.target.path}"
         addItemListener { if (isSelected) selected += row.key else selected -= row.key; refreshControls() }
     }
-    fun setEditingEnabled(value: Boolean) { editingEnabled = value; refreshControls() }
-    fun disposeDialogs() { disposed = true; table.cancelInput() }
+    fun setEditingEnabled(value: Boolean) {
+        editingEnabled = value
+        if (!value) closeMemberDialog()
+        refreshControls()
+    }
+    fun disposeDialogs() { disposed = true; closeMemberDialog(); table.cancelInput() }
+    fun focusGroup(id: String) = table.focusGroup(id)
     private fun refreshControls() {
         val rows = selectedRows()
         val visible = visibleRows()
         val visibleKeys = visible.map { it.key }.toSet()
         val hidden = rows.count { it.key !in visibleKeys }
         selection.text = "${rows.size} selected" + if (hidden > 0) " · $hidden hidden" else ""
-        selection.toolTipText = "Assign or ungroup selected projects, including those hidden by the filter."
-        groupHint.text = if (rows.isEmpty()) "Projects inherit their group's icon and colors, including new members · Save with Apply"
-            else "${rows.size} project(s) selected in Projects · Use Assign to change their group"
+        selection.toolTipText = "Use Ungroup to remove selected projects from their groups."
+        groupHint.text = "Use + in Actions to choose projects to add · Save with Apply"
         groupHint.foreground = com.intellij.util.ui.UIUtil.getContextHelpForeground()
         groupHint.toolTipText = groupHint.text
         val local = visible.filter { it.target.path != null }
@@ -211,6 +245,6 @@ internal class ProjectGroupsPanel(
         clear.isEnabled = editingEnabled && rows.isNotEmpty()
         ungroup.isEnabled = editingEnabled && !table.isEditing && rows.any { it.key in draft.memberships }
         filter.isEnabled = editingEnabled
-        table.setEditingEnabled(editingEnabled, rows.isNotEmpty())
+        table.setEditingEnabled(editingEnabled)
     }
 }

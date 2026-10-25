@@ -1,8 +1,12 @@
 # Feature guide
 
+This guide describes **0.3.120** and its current Settings layout.
+
 Open **Settings → Appearance & Behavior → Project Tab Icons**.
 The preview uses three or five fictional projects: Frontend, Backend, MobileApp, Tools and pet_projects. It updates
 immediately; changes to real project windows are applied through **Apply**.
+The page applies at IDE level. The enable switch, **Presets** and **User presets**
+stay above **Appearance / Projects / Project groups**, outside section scrolling.
 
 ## Appearance
 
@@ -19,8 +23,8 @@ immediately; changes to real project windows are applied through **Apply**.
 | Fill inset | 0–6 px |
 | Active tab highlight | 0–100%, default 25% |
 | Inactive tab dimming | 0–100%, default 75% |
-| Info | None, Project path, Git branch, Git Branch Compact, Git status |
-| Git position | Before or after the project name |
+| Content → Show | Name only, Project path, Branch, Compact branch, Changed lines |
+| Git info position | Before or after the project name |
 
 Active highlight and inactive dimming apply to regular tabs, both group variants
 and Preview. Hover highlighting stays at or below the selected level. Inactive
@@ -32,10 +36,12 @@ project gradient. Fill intensity mixes the chosen color with that base; the nati
 gradient remains outside the tab contours. Disabling customization restores native
 state colors.
 
-**Tab layout** uses a compact **Info** row, then **Height / Font size** and
-**Close button / Git position** pairs and the two brightness sliders. Narrow windows
-use one column. Switching **Style / Tab layout / Group layout** resizes the block
-to the visible page.
+**Tab layout** places **Content** and **Selection** in the left column and
+**Size & position** on the right. **Use IDE font size** selects automatic sizing;
+clear it for a fixed value. Pixel dimensions use compact numeric fields. Percentage
+sliders have synchronized exact numeric inputs. Narrow windows use one column.
+Within **Appearance**, switch between **Style / Tab layout / Group layout**;
+each top-level section retains its own scrolling position.
 
 Choose a preset, then adjust any appearance value to switch to **Custom**.
 Click **Custom** to return to the last manual appearance. Apply remembers it across
@@ -46,7 +52,7 @@ Changing the preview theme or a project's icon assignment does not change the pr
 Undoing all manual appearance edits restores the original preset selection and
 disables **Save as new preset** again.
 After a manual appearance edit, **Save as new preset** lets you name the current
-Icon, Color and Tab layout settings. Names must be unique and at most 32 characters.
+Style, Tab layout and Group layout settings. Names must be unique and at most 32 characters.
 User presets appear in a separate **User presets** row with the standard text color.
 Both rows share one radio-button group, so only one preset can be selected at a time.
 Right-click one, or press **Shift+F10** while focused, to rename or delete it.
@@ -57,22 +63,25 @@ The enable switch, preview theme and individual project assignments are excluded
 **Restore defaults** changes the draft and takes effect after Apply; Cancel abandons
 the draft. The enable switch and project icon assignments are preserved by a reset.
 
-**Manage…** can update a named preset from the current appearance, duplicate it
-or move it in the user-preset row. **Import styles… / Export styles…** transfers
+**Save as new preset** and **Update preset** remain beside the Appearance sub-tabs.
+**Manage user presets…** in the shared header renames, duplicates, deletes and
+reorders user presets. **Import styles… / Export styles…** transfers
 selected presets, SVG categories and editable text icons in portable JSON bundles.
 Import resolves matching names explicitly; project memberships and paths are not exported.
 
 ## Project groups
 
-Switch between **Projects** and **Project groups** above a single visible table.
-Both use matching icon and color columns. The Projects table shows the path below
-each project name and its group in a separate column (**—** when ungrouped).
-Select projects to **Assign** them to a group or **Ungroup** them. Appearance is
-edited in project rows or shared through the group; bulk appearance controls are removed.
+Open **Projects** or **Project groups** using the top-level selector. Both use
+matching icon and color columns and independent section scrolling. Projects shows
+the path below each name and its group in a separate column (**—** when ungrouped).
+Grouped rows show **Inherited from …** and readable values; **Edit group** opens
+the matching group. Use **Ungroup** to remove selected projects from their groups.
+The **+** in a group's **Actions** opens a searchable multi-project chooser. It starts
+with an empty selection on every opening, independent of checkboxes in Projects.
 
 The first group row is **+ Add group**. Edit a name, select members and set
 optional positions directly in the table, then use **Add / Save**.
-Paths appear under member names; long lists scroll within the form. **Cancel**
+Paths appear under member names; long lists use the section scrollbar. **Cancel**
 closes the inline draft. Group changes are persisted with Settings **Apply**.
 Groups have their own icon and three colors. Members inherit them dynamically,
 including newly assigned and reopened projects. Removing a member or deleting its
@@ -89,8 +98,8 @@ Order is applied on merge. Later manual rearrangements remain available.
 **Arrange Tabs by Group** in a window tab's context menu reapplies the saved order.
 
 Under **Group layout → Group highlight → Variant**, choose **Shared background**
-or **Joined tabs**. Both inherit regular tab dimensions, theme corners, Color
-settings, active/hover colors and **Icon → Size**. Group controls cover
+or **Joined tabs**. Both inherit regular tab dimensions, theme corners, Style
+settings, active/hover colors and **Style → Icon → Size**. Group controls cover
 active-card inset, internal dividers, shared-icon visibility, hiding member
 icons, group spacing and boundary pipes. Group Tab color supplies the fill; Outline
 color supplies the contour, with icon color as the Automatic fallback. A split group's
@@ -155,11 +164,16 @@ custom artwork separately if you want to restore it later.
 The optional Git4Idea integration supplies the branch for the relevant project
 and repository. It follows the current file's repository when possible.
 
-- **Git branch:** displays the branch name and preserves the end of a long name.
-- **Git Branch Compact:** keeps the part after the last `/`, limited to 13 Unicode
+Choose these modes in **Tab layout → Content → Show**:
+
+- **Branch:** displays the branch name and preserves the end of a long name.
+- **Compact branch:** keeps the part after the last `/`, limited to 13 Unicode
   characters including a leading ellipsis. The full branch stays in the tooltip.
-- **Git status:** shows added/removed-line counts such as `+128 -16`.
-- **Show Git status:** combines counts with either branch display mode.
+- **Changed lines:** shows added/removed-line counts such as `+128 -16`.
+- **Also show changed lines** combines counts with either branch display mode.
+
+**Git info position** places the branch and counters to the left or right of the name.
+Outside a Git repository, tabs show **[No repo!]** without counters.
 
 Counts cover saved tracked changes against `HEAD`, including staged and unstaged
 changes. Untracked files, binary changes and unsaved editor text are excluded.
@@ -171,6 +185,7 @@ with cancellation, a delay and a timeout. This does not fetch or contact remotes
 
 ## Preview and persistence
 
+Preview starts compact. **Full window** adds file tabs and an editor fragment.
 Choose **3 tabs** or **5 tabs** beside Preview and switch among eight IDE themes.
 Click a sample tab, or use Space/Enter while it has focus, to compare active states.
 The sample count never changes real windows, presets or Apply. Light uses light tab

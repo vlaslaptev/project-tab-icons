@@ -1,7 +1,6 @@
 package dev.vlas.projecttabicons
 
 import com.intellij.icons.AllIcons
-import com.intellij.ide.RecentProjectIconHelper
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.scale.JBUIScale
 import com.intellij.util.ui.AvatarUtils
@@ -58,6 +57,7 @@ internal class WindowTabsPreview : JPanel(null) {
     private var groupIcon: Icon? = null
     private var groupIconSlot = 0
     private var tabCount = PreviewTabCount.THREE
+    private var fullWindow = false
     private var samples = PREVIEW_SAMPLES.filterNot { it.extendedOnly }
     private var artwork: PreviewArtwork = emptyMap()
     private var selectedIndex = 1
@@ -84,7 +84,14 @@ internal class WindowTabsPreview : JPanel(null) {
     }
 
     private fun updateAccessibleDescription() {
-        getAccessibleContext().accessibleDescription = "Decorative macOS window with traffic lights, toolbar, ${samples.size} project tabs and an editor fragment. $groupDescription Click a project tab to preview activation and inactive tab dimming. Toolbar and file tabs are not interactive."
+        getAccessibleContext().accessibleDescription = "Decorative macOS window with traffic lights, toolbar and ${samples.size} project tabs${if (fullWindow) ", file tabs and an editor fragment" else ""}. $groupDescription Click a project tab to preview activation and inactive tab dimming. Window decorations are not interactive."
+    }
+
+    fun showFullWindow(value: Boolean) {
+        fullWindow = value
+        updateAccessibleDescription()
+        revalidate()
+        repaint()
     }
 
     fun showTabCount(value: PreviewTabCount) {
@@ -109,12 +116,13 @@ internal class WindowTabsPreview : JPanel(null) {
     private fun contentHeight(): Int = maxOf(sampleTabs.maxOf { it.minimumContentHeight() },
         if (groupIcon != null) groupIconMinimumHeight(appearance) else 0)
 
-    override fun getPreferredSize(): Dimension = Dimension(JBUI.scale(400), JBUI.scale(180))
+    override fun getPreferredSize(): Dimension = Dimension(JBUI.scale(400), if (fullWindow) JBUI.scale(180)
+        else JBUI.scale(PreviewWindowChrome.TOOLBAR_HEIGHT + 12) + maxOf(JBUI.scale(tabHeight), contentHeight()))
 
     override fun getMinimumSize(): Dimension = Dimension(0, preferredSize.height)
 
     override fun doLayout() {
-        // Высота всего окна постоянна. Растут только табы; фрагмент редактора сокращается.
+        // Полное окно имеет постоянную высоту; компактное вмещает только toolbar и табы.
         val top = JBUI.scale(PreviewWindowChrome.TOOLBAR_HEIGHT)
         val availableHeight = (height - top).coerceAtLeast(0)
         val edge = JBUI.scale(8)
@@ -168,7 +176,7 @@ internal class WindowTabsPreview : JPanel(null) {
             g.clip(windowShape())
             val bottom = sampleTabs.first().let { it.y + it.height }
             val active = samples[selectedIndex]
-            PreviewWindowChrome.paint(g, width, height, bottom, palette, active.title, active.branch, samples.size)
+            PreviewWindowChrome.paint(g, width, height, bottom, palette, active.title, active.branch, samples.size, fullWindow)
             if (appearance.enabled && appearance.showGroupOutline) {
                 // Префикс общей иконки принадлежит первому сегменту, включая его активную заливку.
                 val first = sampleTabs[0]
@@ -254,12 +262,12 @@ internal class WindowTabsPreview : JPanel(null) {
             sample.contourId?.let { id ->
                 val svg = ContourCatalog.entries.first { it.id == id }.svg(sample.color)
                 id to TabIconSize.entries.associateWith { size ->
-                    RecentProjectIconHelper.createIcon(svg, true, size.pixels)
+                    projectSvgIcon(SvgAsset(svg, "Preview"), size.pixels)
                 }
             }
         }.toMap() + (PREVIEW_GROUP_ARTWORK to TabIconSize.entries.associateWith { size ->
             val svg = ContourCatalog.entries.first { it.id == "folder" }.svg(PREVIEW_GROUP_COLOR)
-            RecentProjectIconHelper.createIcon(svg, true, size.pixels)
+            projectSvgIcon(SvgAsset(svg, "Preview"), size.pixels)
         })
     }
 }

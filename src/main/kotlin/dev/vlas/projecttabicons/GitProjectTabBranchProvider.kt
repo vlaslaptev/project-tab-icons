@@ -21,8 +21,8 @@ import java.util.concurrent.ConcurrentHashMap
 internal class GitProjectTabBranchProvider : ProjectTabBranchProvider {
     private val statuses = ConcurrentHashMap<Project, GitTabStatusWatch>()
 
-    override fun currentBranch(project: Project): String? =
-        GitBranchUtil.getCurrentRepository(project)?.currentBranch?.name
+    override fun currentRepository(project: Project): ProjectTabRepositoryInfo? =
+        GitBranchUtil.getCurrentRepository(project)?.let { ProjectTabRepositoryInfo(it.currentBranch?.name) }
 
     override fun currentStatus(project: Project): GitTabDiffStatus? = statuses[project]?.snapshot()
 

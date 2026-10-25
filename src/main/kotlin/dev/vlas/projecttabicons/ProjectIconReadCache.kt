@@ -9,7 +9,7 @@ import javax.swing.Icon
 /** Ключ включает размер: один delegate может обслуживать несколько представлений. Все методы — UI. */
 internal class ProjectIconReadCache(
     private val queue: ProjectIconReadQueue,
-    private val read: (Icon, Int) -> IconColorRead,
+    private val read: ((Icon, Int) -> IconColorRead)? = null,
     private val resolve: (IconColorRead) -> IconColorRead,
     private val changed: (Icon, Boolean) -> Unit,
     private val report: (Exception) -> Unit,
@@ -20,12 +20,13 @@ internal class ProjectIconReadCache(
 
     fun get(delegate: Icon, size: Int): IconColorRead? = entries[delegate]?.get(size)?.result
 
-    fun request(delegate: Icon, size: Int, prepare: () -> Unit = {}): IconColorRead? {
+    fun request(delegate: Icon, size: Int, readCurrent: (() -> IconColorRead)? = null,
+                prepare: () -> Unit = {}): IconColorRead? {
         val entry = entries.getOrPut(delegate) { mutableMapOf() }.getOrPut(size) { Entry() }
         if (entry.ready) return entry.result
         queue.launch(entry, prepare, read = {
             var pending = false
-            val result = try { read(delegate, size) }
+            val result = try { readCurrent?.invoke() ?: requireNotNull(read)(delegate, size) }
             catch (_: IconColorNotReady) { pending = true; null }
             catch (error: ProcessCanceledException) { throw error }
             catch (error: CancellationException) { throw error }

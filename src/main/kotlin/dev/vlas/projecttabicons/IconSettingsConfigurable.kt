@@ -25,8 +25,10 @@ import com.intellij.ui.JBColor
 import java.nio.file.Path
 import javax.swing.JComponent
 
-/** Контекст текущего окна нужен диалогам; таблица содержит все открытые проекты. */
-class IconSettingsConfigurable(private val project: Project) : Configurable, Configurable.NoScroll, Configurable.NoMargin {
+/** Общая страница IDE; диалоги строк получают контекст соответствующего проекта. */
+class IconSettingsConfigurable : Configurable, Configurable.NoScroll, Configurable.NoMargin {
+    // Общим диалогам импорта и групп нужен только нейтральный контекст IDE.
+    private val project: Project get() = ProjectManager.getInstance().defaultProject
     private var panel: IconSettingsPanel? = null
     private var lifetime: Disposable? = null
     private val loadingTask = LatestTask()
@@ -69,7 +71,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
         })
         bus.subscribe(VirtualFileManager.VFS_CHANGES, object : BulkFileListener {
             override fun after(events: List<VFileEvent>) {
-                if (events.any { isObservedIconConfiguration(it.path, iconDirectories) }) scheduleReload()
+                if (iconConfigurationEvents(events).affects(iconDirectories)) scheduleReload()
             }
         })
         reset()
@@ -78,7 +80,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
 
     private fun scheduleReload() {
         val scope = lifetime ?: return
-        reloadQueue.request(scope, { !disposed && lifetime === scope && !project.isDisposed }) { reload(keepDraft = true) }
+        reloadQueue.request(scope, { !disposed && lifetime === scope }) { reload(keepDraft = true) }
     }
 
     override fun getPreferredFocusedComponent(): JComponent? = panel?.preferredFocus
@@ -140,7 +142,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
                 Result.failure(error)
             }
             ApplicationManager.getApplication().invokeLater({
-                if (disposed || !loadingTask.accepts(token) || lifetime !== scope || project.isDisposed) return@invokeLater
+                if (disposed || !loadingTask.accepts(token) || lifetime !== scope) return@invokeLater
                 result.fold(onSuccess = { loaded ->
                     val colors = ApplicationManager.getApplication().getService(ProjectOutlineColors::class.java)
                     val active = loaded.rows.filterNot { it.target.project.isDisposed }.map { row ->
@@ -159,7 +161,8 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
                         if (existing == null) models[row.target.key] = ProjectIconSettingsRow(row, overrides)
                         else existing.reload(row, overrides, keepDraft)
                     }
-                    iconDirectories = active.mapNotNull { it.snapshot?.directory?.toString()?.replace('\\', '/') }.toSet()
+                    iconDirectories = active.flatMap { row -> row.target.path?.let(::projectIconDirectories).orEmpty() +
+                        listOfNotNull(row.snapshot?.directory?.toString()?.replace('\\', '/')) }.toSet()
                     gallery = loaded.gallery
                     iconSets = loaded.iconSets
                     view.loaded(active.mapNotNull { models[it.target.key] }, loaded.previewArtwork)
@@ -179,7 +182,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
         if (!stillOpen(row) || row.inheritedGroup != null || !row.ready || row.conflicted) return
         val initialColor = row.builder?.colorHex?.let(::parseIconColor) ?: row.color ?: COLOR_PRESETS.first().bright
         val expected = row.snapshot
-        val dialog = IconSelectionDialog(view.component, project, row.target.name, initialColor,
+        val dialog = IconSelectionDialog(view.component, row.target.project, row.target.name, initialColor,
             row.activeChoice, gallery + models.values.mapNotNull { it.activeChoice }, effectiveIconSets())
         dialogs[dialog] = row.key
         try {
@@ -202,7 +205,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
         if (!stillOpen(row) || row.inheritedGroup != null || !row.ready || row.conflicted) return
         val expected = row.snapshot
         if (target == ProjectColorTarget.ICON && !row.editableIconColor) return
-        val dialog = ProjectColorDialog(view.component, project, row, target, view.appearance())
+        val dialog = ProjectColorDialog(view.component, row.target.project, row, target, view.appearance())
         dialogs[dialog] = row.key
         try {
             if (dialog.showAndGet() && stillOpen(row) && row.inheritedGroup == null) {
@@ -219,15 +222,18 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
     private fun transferWork(title: String, action: () -> Unit): Boolean {
         val view = panel ?: return false
         var failure: Exception? = null
-        ProgressManager.getInstance().runProcessWithProgressSynchronously(Runnable {
-            try { action() } catch (error: Exception) { failure = error }
+        val completed = ProgressManager.getInstance().runProcessWithProgressSynchronously(Runnable {
+            try { action() }
+            catch (error: ProcessCanceledException) { throw error }
+            catch (error: Exception) { failure = error }
         }, title, false, project, view.component)
+        if (!completed) return false
         failure?.let {
             LOG.warn(title, it)
             com.intellij.openapi.ui.Messages.showErrorDialog(view.component, it.message ?: "Cannot transfer styles.", title)
             return false
         }
-        return !disposed && !project.isDisposed
+        return !disposed
     }
 
     private fun importStyles() {
@@ -243,17 +249,23 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
             if (!dialog.showAndGet() || disposed) return
             val selected = dialog.selected()
             val conflict = dialog.conflict()
-            var merged: StyleBundle? = null
+            var merged: StyleBundleMerge? = null
+            var additions = emptyList<ImportedIconSet>()
             val current = StyleBundle(view.userPresets(), effectiveIconSets())
+            val savedSets = iconSets
+            val existingPending = pendingIconSets
             if (!transferWork("Preparing imported styles") {
                 val result = mergeStyleBundle(current, selected, conflict)
-                ApplicationManager.getApplication().getService(IconSetLibrary::class.java).prepare(result.categories)
+                additions = pendingIconCategories(savedSets, existingPending, result.changedCategories)
+                // Импорт пресетов не декодирует/перекодирует сохранённую библиотеку.
+                if (result.changedCategories.isNotEmpty() && additions.isNotEmpty())
+                    ApplicationManager.getApplication().getService(IconSetLibrary::class.java).prepare(additions)
                 merged = result
             }) return
             val result = merged ?: return
             // Обе коллекции меняются вместе только после полной проверки размеров и SVG.
-            pendingIconSets = result.categories.filter { incoming -> iconSets.none { it === incoming } }
-            view.replaceUserPresets(result.presets)
+            pendingIconSets = additions
+            view.replaceUserPresets(result.bundle.presets)
             view.showImportedCategories(pendingIconSets.size)
         } finally { dialogs.remove(dialog) }
     }
@@ -303,7 +315,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
             gallery + models.values.mapNotNull { it.activeChoice }, effectiveIconSets())
         dialogs[dialog] = "group:$id"
         try {
-            if (!dialog.showAndGet() || disposed || project.isDisposed) return
+            if (!dialog.showAndGet() || disposed) return
             val selected = dialog.selection() ?: return
             try {
                 val stored = GroupAppearanceIcons.store(selected)
@@ -328,7 +340,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
             label = "${target.title} · Group: ${group.name}", allowAutomatic = target != ProjectColorTarget.ICON)
         dialogs[dialog] = "group:$id"
         try {
-            if (!dialog.showAndGet() || disposed || project.isDisposed) return
+            if (!dialog.showAndGet() || disposed) return
             val color = dialog.selection()
             try {
                 val storedIcon = if (target == ProjectColorTarget.ICON) {
@@ -357,6 +369,7 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
         val view = panel ?: return
         if (!isModified()) return
         val sharedSettings = SharedIconSettingsStore()
+        val colorStore = ApplicationManager.getApplication().getService(ProjectOutlineColors::class.java)
         val sharedChanges = view.sharedSettingsChanges()
         sharedChanges.validate(sharedSettings.snapshot())
         val pending = view.rows.filter { it.modified }
@@ -372,39 +385,42 @@ class IconSettingsConfigurable(private val project: Project) : Configurable, Con
                 row.ownChoice?.asset ?: throw ConfigurationException("Choose a project icon."))
         }
         val colors = pending.filter { it.colorModified }.associate { row ->
-            (row.target.path ?: throw ConfigurationException("A local project directory is required.")) to row.colorOverrides
+            (row.target.path ?: throw ConfigurationException("A local project directory is required.")) to row.colorChanges()
         }
+        fun commitSettings() = colorStore.apply(colors) { sharedChanges.saveTo(sharedSettings) }
         loadingTask.cancel()
         applying = true
         try {
             var installed: Map<Path, IconSnapshot> = emptyMap()
             var failure: Exception? = null
             var preparedLibrary: IconSetLibraryState? = null
-            if (writes.isNotEmpty() || pendingIconSets.isNotEmpty()) ProgressManager.getInstance().runProcessWithProgressSynchronously(Runnable {
+            val completed = if (writes.isNotEmpty() || pendingIconSets.isNotEmpty()) ProgressManager.getInstance().runProcessWithProgressSynchronously(Runnable {
                 try {
                     if (pendingIconSets.isNotEmpty()) preparedLibrary = ApplicationManager.getApplication()
                         .getService(IconSetLibrary::class.java).prepare(pendingIconSets)
-                    installed = ProjectIconStore.installAll(writes) { sharedChanges.saveTo(sharedSettings) }
+                    installed = ProjectIconStore.installAll(writes, commitSettings = ::commitSettings)
                 } catch (error: Exception) {
                     failure = error
                 }
             }, "Saving project icons", false, project, view.component)
-            else sharedChanges.saveTo(sharedSettings)
+            else { commitSettings(); true }
             failure?.let { error ->
                 writes.forEach { ProjectIconStore.refreshUi(it.project, it.path, it.expected) }
+                if (error is ProcessCanceledException) throw error
                 if (error is ConfigurationException && error.suppressed.isEmpty()) throw error
-                LOG.warn("Cannot save project SVG icons", error)
+                LOG.warn("Cannot save project icons or prepare the icon library", error)
                 val recovery = if (error.suppressed.isEmpty()) "" else
                     " Some previous icon variants could not be restored. See the IDE log for details."
                 throw ConfigurationException((error.message ?: "Cannot save the project icons.") + recovery)
             }
+            if (!completed) throw ProcessCanceledException()
             val app = ApplicationManager.getApplication()
-            app.getService(ProjectOutlineColors::class.java).apply(colors)
             preparedLibrary?.let { app.getService(IconSetLibrary::class.java).apply(it) }
             iconSets = effectiveIconSets()
             pendingIconSets = emptyList()
             view.showImportedCategories(0)
-            pending.forEach { row -> row.saved(row.target.path?.let(installed::get)) }
+            pending.forEach { row -> row.saved(row.target.path?.let(installed::get),
+                row.target.path?.let(colorStore::overrides) ?: row.colorOverrides) }
             writes.forEach { write -> installed[write.path]?.let { ProjectIconStore.refreshUi(write.project, write.path, it) } }
             app.getService(ProjectTabIconsService::class.java).requestRefresh()
             view.saved()

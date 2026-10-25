@@ -1,6 +1,5 @@
 package dev.vlas.projecttabicons
 
-import com.intellij.ide.ImageIconData
 import com.intellij.ide.ProjectFileIcon
 import com.intellij.ide.RecentProjectIconHelper
 import com.intellij.openapi.progress.ProcessCanceledException
@@ -9,14 +8,16 @@ import com.intellij.ui.LayeredIcon
 import com.intellij.util.ui.AvatarIcon
 import com.intellij.util.ui.EmptyIcon
 import java.awt.Color
+import java.nio.file.Files
+import java.nio.file.Path
 import java.awt.image.BufferedImage
 import javax.swing.Icon
 
 internal data class IconColorRead(val color: Color? = null, val avatar: AvatarIcon? = null,
                                   val artwork: Icon? = null)
 
-/** Вызывать в IO-потоке: getData может читать файл с диска. Цвет avatar читается отдельно на EDT. */
-internal fun projectIconColor(delegate: Icon, unscaledSize: Int): IconColorRead {
+/** Ограниченное чтение только активного варианта; цвет avatar читается отдельно на EDT. */
+internal fun projectIconColor(delegate: Icon, unscaledSize: Int, path: Path, dark: Boolean): IconColorRead {
     val resolved = if (delegate is DeferredIconImpl<*>) {
         // Загрузку запускает loadProjectIconWithoutPainting; retrieveIcon не выполняет async evaluator.
         if (!delegate.isDone) throw IconColorNotReady()
@@ -24,26 +25,26 @@ internal fun projectIconColor(delegate: Icon, unscaledSize: Int): IconColorRead 
     } else delegate
     // FullProjectAvatarPresentation читает ProjectWindowCustomizerService: его цвет нужен на EDT.
     if (resolved is AvatarIcon) return IconColorRead(avatar = resolved)
-    val custom = when (resolved) {
+    when (resolved) {
         is ProjectFileIcon -> resolved
         is LayeredIcon -> if (resolved.iconCount == 2 && resolved.getIcon(0) is EmptyIcon) {
             resolved.getIcon(1) as? ProjectFileIcon
         } else null
         else -> null
     } ?: return IconColorRead()
-    val data = (custom.iconData as? ImageIconData)?.getData() ?: return IconColorRead()
-    if (data.size > MAX_ICON_BYTES) return IconColorRead()
-    val svg = !data.take(8).toByteArray().contentEquals(PNG_SIGNATURE)
+    val selected = selectedProjectIconFile(ProjectIconStore.directory(path), dark) ?: return IconColorRead()
+    val data = readIconBytes(selected)
+    val svg = selected.fileName.toString().endsWith(".svg")
     if (svg) {
         val asset = SvgAsset.validate(data, "Project icon")
         // Даже SVG без старого фона рисуем только из проверенной копии байтов.
         // Исходный ProjectFileIcon не используется в paint и больше не обходит очистку.
-        val artwork = RecentProjectIconHelper.createIcon(asset.tabArtwork() ?: asset.bytes, true, unscaledSize)
+        val artwork = projectSvgIcon(asset, unscaledSize)
         val color = (asset.textIcon?.colorHex ?: asset.builder?.colorHex)?.let(::parseIconColor) ?: sampleIconColor(data, true)
         return IconColorRead(color = color, artwork = artwork)
     }
     return IconColorRead(color = sampleIconColor(data, false),
-        artwork = RecentProjectIconHelper.createIcon(data, false, unscaledSize))
+        artwork = projectPngIcon(data, unscaledSize))
 }
 
 /** IO-поток; используется также для цвета в таблице и предпросмотра выбранного SVG. */
@@ -96,6 +97,9 @@ private class ColorBucket {
     var blue = 0L
 }
 
-private val PNG_SIGNATURE = byteArrayOf(0x89.toByte(), 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A)
+internal fun selectedProjectIconFile(directory: Path, dark: Boolean): Path? {
+    val names = if (dark) PROJECT_ICON_FILES.drop(2) + PROJECT_ICON_FILES.take(2) else PROJECT_ICON_FILES.take(2)
+    return names.asSequence().map(directory::resolve).firstOrNull { Files.exists(it) }
+}
 
 internal class IconColorNotReady : Exception(null, null, false, false)

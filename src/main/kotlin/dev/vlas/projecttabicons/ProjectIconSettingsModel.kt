@@ -48,6 +48,17 @@ internal class ProjectIconSettingsRow(loaded: LoadedProjectIcon, overrides: Proj
     val ready: Boolean get() = snapshot != null && failure == null && !target.project.isDisposed
     val svgModified: Boolean get() = choiceDraft != null
     val colorModified: Boolean get() = colorOverrides != colorBaseline
+    fun colorChanges(): ProjectColorChanges = ProjectColorChanges(colorBaseline, colorOverrides, target.name)
+
+    /** Только после сообщения о конфликте quick action: повторный Apply явно подтверждает выбор. */
+    fun reviewColorConflict(overrides: ProjectColorOverrides) {
+        val previous = colorBaseline
+        ProjectColorTarget.entries.forEach { channel ->
+            if (colorOverrides.value(channel) == previous.value(channel))
+                colorOverrides = colorOverrides.with(channel, overrides.value(channel))
+        }
+        colorBaseline = overrides
+    }
     val modified: Boolean get() = svgModified || colorModified
     fun colorModified(target: ProjectColorTarget): Boolean =
         colorOverrides.value(target) != colorBaseline.value(target) ||
@@ -142,13 +153,14 @@ internal class ProjectIconSettingsRow(loaded: LoadedProjectIcon, overrides: Proj
         }
     }
 
-    fun saved(installed: IconSnapshot?) {
+    fun saved(installed: IconSnapshot?, colors: ProjectColorOverrides = colorOverrides) {
         installed?.let {
             snapshot = it
             current = choiceDraft ?: current
             currentColor = current?.color
         }
         choiceDraft = null
+        colorOverrides = colors
         colorBaseline = colorOverrides
         conflicted = false
         failure = null

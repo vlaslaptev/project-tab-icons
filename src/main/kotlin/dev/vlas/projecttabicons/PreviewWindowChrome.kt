@@ -17,7 +17,7 @@ internal object PreviewWindowChrome {
     const val TOOLBAR_HEIGHT = 40
 
     fun paint(graphics: Graphics2D, width: Int, height: Int, tabBottom: Int, palette: PreviewThemePalette,
-              activeTitle: String, activeBranch: String, tabCount: Int) {
+              activeTitle: String, activeBranch: String, tabCount: Int, showEditor: Boolean = true) {
         val g = graphics.create() as Graphics2D
         try {
             val scale = JBUIScale.scale(1f).toDouble()
@@ -30,7 +30,7 @@ internal object PreviewWindowChrome {
             g.color = palette.stripBackground
             g.fillRect(0, 0, w.toInt(), h.toInt())
             toolbar(g, w, palette.chrome, activeTitle, activeBranch)
-            editor(g, w, h, bottom + 6, palette.chrome, activeTitle, tabCount)
+            if (showEditor) editor(g, w, h, bottom + 6, palette.chrome, activeTitle, tabCount)
         } finally { g.dispose() }
     }
 

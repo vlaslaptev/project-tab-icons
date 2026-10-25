@@ -24,7 +24,7 @@ internal data class ProjectTabGroupSurfaceState(
 
 /** Геометрия, заливка и линия общие с обычными табами; различается форма активной области. */
 internal object ProjectTabGroupSurface {
-    private val outline = ProjectTabOutline()
+    private val outline = ProjectTabOutline(cacheLimit = 64)
 
     fun paint(graphics: Graphics2D, width: Int, height: Int, state: ProjectTabGroupSurfaceState,
               colors: ProjectTabSurfaceColors, selected: Boolean, hovered: Boolean = false, outlineVisible: Boolean = true,

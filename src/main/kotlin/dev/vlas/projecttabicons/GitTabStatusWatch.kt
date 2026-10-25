@@ -74,11 +74,11 @@ internal class GitTabStatusWatch(
         val repository = GitBranchUtil.getCurrentRepository(project)
         this.repository = repository
         val next = repository?.let { Selection(it.root.path, it.currentRevision) }
-        if (next != selection) {
+        if (next != selection || refresh.status == null) {
             cancelWork()
             selection = next
             refresh.reset(when {
-                next == null -> null
+                next == null -> GitTabDiffStatus(GitTabDiffState.NO_REPOSITORY)
                 next.revision == null -> GitTabDiffStatus(GitTabDiffState.NO_COMMITS)
                 else -> GitTabDiffStatus(GitTabDiffState.LOADING)
             })

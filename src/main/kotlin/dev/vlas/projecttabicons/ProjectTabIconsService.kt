@@ -75,7 +75,8 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
     )
     private val refreshQueue = CoalescingRefreshQueue(coroutineScope, Dispatchers.Default, Dispatchers.EDT)
     private val invalidateIcons = AtomicBoolean()
-    private val iconFileEvents = java.util.concurrent.ConcurrentLinkedQueue<String>()
+    private val iconFileEvents = java.util.concurrent.ConcurrentLinkedQueue<IconConfigurationEvents>()
+    @Volatile private var iconDirectories = emptySet<String>()
     private data class ProjectIconDelegate(val path: java.nio.file.Path, val size: Int, val name: String, val icon: Icon)
     private val projectDelegates = IdentityHashMap<Project, ProjectIconDelegate>()
     private var connection: MessageBusConnection? = null
@@ -109,7 +110,7 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         postToUi = { SwingUtilities.invokeLater(it) },
         canPublish = { !disposed && !recovery.blocked },
     )
-    private val iconReads = ProjectIconReadCache(iconReadQueue, ::projectIconColor,
+    private val iconReads = ProjectIconReadCache(iconReadQueue,
         resolve = { it.copy(color = it.avatar?.presentation?.color1 ?: it.color) },
         changed = { delegate, ready -> if (ready) iconWrappers.remove(delegate); requestRefresh() },
         report = { LOG.debug("Cannot determine the project icon color", it) })
@@ -193,8 +194,8 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
             )
             bus.subscribe(VirtualFileManager.VFS_CHANGES, object : BulkFileListener {
                 override fun after(events: List<VFileEvent>) {
-                    val paths = events.map { it.path }.filter(::isIconConfiguration)
-                    if (paths.isNotEmpty()) { iconFileEvents.addAll(paths); requestRefresh() }
+                    val paths = iconConfigurationEvents(events)
+                    if (paths.affects(iconDirectories)) { iconFileEvents.add(paths); requestRefresh() }
                 }
             })
         }
@@ -211,8 +212,10 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         }
         val recentProjects = RecentProjectsManagerBase.getInstanceEx()
         val projectPaths = frames.values.mapNotNull { project -> recentProjects.getProjectPath(project)?.let { project to it } }.toMap()
+        iconDirectories = projectPaths.values.flatMap(::projectIconDirectories).toSet()
         val fileEvents = generateSequence { iconFileEvents.poll() }.toList()
-        val changedProjects = affectedIconProjects(projectPaths, fileEvents).toMutableSet()
+        val changedProjects = affectedIconProjects(projectPaths, fileEvents.flatMap { it.files },
+            fileEvents.flatMap { it.directories }).toMutableSet()
         frames.values.forEach { project ->
             val previousName = projectNames.put(project, project.name)
             if (previousName != null && previousName != project.name) changedProjects.add(project)
@@ -312,7 +315,7 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
             val delegate = cached.icon
             activeDelegates.add(delegate)
             val read = if (appearance.showOutline || appearance.showIcons || appearance.showTabBackground) {
-                readIcon(delegate, label, appearance.iconSize.pixels)
+                readIcon(delegate, label, appearance.iconSize.pixels, path)
             } else null
             val overrides = projectColors.overrides(path)
             // Ручной цвет буквенного аватара не перекрашивает сторонние SVG/PNG.
@@ -399,11 +402,16 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
             branchWatches.getOrPut(project) {
                 GitWatch(provider, includeStatus, provider.watch(project, this, includeStatus) { requestRefresh() })
             }
-            val status = if (includeStatus) provider.currentStatus(project)?.let { ProjectTabExtraInfo.Status(it) } else null
-            val branch = if (mode.isBranch) provider.currentBranch(project)?.takeIf { it.isNotBlank() } else null
-            branch?.let {
-                ProjectTabExtraInfo.Branch(it, compact = mode == TabMoreInfo.GIT_BRANCH_COMPACT, status = status)
-            } ?: status
+            val status = if (includeStatus) provider.currentStatus(project)
+                ?.takeUnless { it.state == GitTabDiffState.NO_REPOSITORY }
+                ?.let { ProjectTabExtraInfo.Status(it) } else null
+            val repository = provider.currentRepository(project)
+            val branch = repository?.branchName?.takeIf { it.isNotBlank() }
+            if (repository == null) {
+                ProjectTabExtraInfo.Branch(null)
+            } else if (mode.isBranch && branch != null) {
+                ProjectTabExtraInfo.Branch(branch, compact = mode == TabMoreInfo.GIT_BRANCH_COMPACT, status = status)
+            } else status
         }
     }
 
@@ -599,10 +607,12 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         return lastPreparedArtwork[project]?.get(size)
     }
 
-    private fun readIcon(delegate: Icon, label: JComponent?, unscaledSize: Int): IconColorRead? =
-        iconReads.request(delegate, unscaledSize) {
+    private fun readIcon(delegate: Icon, label: JComponent?, unscaledSize: Int, path: java.nio.file.Path): IconColorRead? {
+        val dark = !com.intellij.ui.JBColor.isBright()
+        return iconReads.request(delegate, unscaledSize, readCurrent = { projectIconColor(delegate, unscaledSize, path, dark) }) {
             if (delegate is DeferredIconImpl<*> && !delegate.isDone) loadProjectIconWithoutPainting(delegate, label)
         }
+    }
 
     private fun restoreTabLabelBorder(label: JComponent) {
         val applied = appliedLabelBorders.remove(label) ?: return
@@ -655,6 +665,7 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         iconReads.clear()
         projectDelegates.clear()
         iconFileEvents.clear()
+        iconDirectories = emptySet()
         lastPreparedArtwork.clear()
         previousAppearance = null
         previousGroups = null

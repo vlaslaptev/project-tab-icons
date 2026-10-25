@@ -12,6 +12,19 @@ import java.util.UUID
 internal data class StyleBundle(val presets: List<UserAppearancePreset>, val categories: List<ImportedIconSet>) {
     val empty get() = presets.isEmpty() && categories.isEmpty()
 }
+internal data class StyleBundleMerge(val bundle: StyleBundle, val changedCategories: List<ImportedIconSet>)
+
+/** Сравниваем переносимое содержимое, а не ссылки на ByteArray или вычисленные цвета. */
+internal fun ImportedIconSet.sameContents(other: ImportedIconSet): Boolean = id == other.id && name == other.name &&
+    icons.size == other.icons.size && icons.zip(other.icons).all { (a, b) ->
+        a.asset.digest == b.asset.digest && a.asset.label.substringBeforeLast(" · ") == b.asset.label.substringBeforeLast(" · ")
+    }
+
+internal fun pendingIconCategories(saved: List<ImportedIconSet>, pending: List<ImportedIconSet>,
+                                   changed: List<ImportedIconSet>): List<ImportedIconSet> {
+    val baseline = saved.associateBy { it.id }
+    return (pending + changed).associateBy { it.id }.values.filter { item -> baseline[item.id]?.sameContents(item) != true }
+}
 internal enum class StyleConflict(val title: String) {
     KEEP_BOTH("Keep both"), REPLACE("Replace matching names"), SKIP("Skip matching names");
     override fun toString() = title
@@ -77,7 +90,7 @@ internal fun readStyleBundle(path: Path): StyleBundle {
     return StyleBundle(presets, categories).also { require(!it.empty) { "This style bundle is empty." } }
 }
 
-internal fun mergeStyleBundle(current: StyleBundle, incoming: StyleBundle, conflict: StyleConflict): StyleBundle {
+internal fun mergeStyleBundle(current: StyleBundle, incoming: StyleBundle, conflict: StyleConflict): StyleBundleMerge {
     val presets = current.presets.map { it.copy(name = normalizeUserPresetName(it.name)) }.toMutableList()
     incoming.presets.forEach { incomingPreset ->
         // Конфликт разрешается по тому же имени, которое останется после сохранения.
@@ -91,12 +104,13 @@ internal fun mergeStyleBundle(current: StyleBundle, incoming: StyleBundle, confl
         }
     }
     require(presets.size <= MAX_USER_APPEARANCE_PRESETS) { "Import would exceed $MAX_USER_APPEARANCE_PRESETS user presets. Select fewer presets or replace matching names." }
-    val sets = current.categories.map { it.copy(name = it.name.trim()) }.toMutableList()
+    // Не нормализуем и не пересохраняем категории, которых импорт не касается.
+    val sets = current.categories.toMutableList()
     incoming.categories.forEach { incomingCategory ->
         val category = incomingCategory.copy(name = incomingCategory.name.trim())
         require(category.name.isNotEmpty() && category.name.codePointCount(0, category.name.length) <= MAX_ICON_SET_NAME_LENGTH &&
             category.name.none(Char::isISOControl)) { "Invalid category name." }
-        val index = sets.indexOfFirst { it.name.equals(category.name, true) }
+        val index = sets.indexOfFirst { it.name.trim().equals(category.name, true) }
         when {
             index < 0 -> sets += category
             conflict == StyleConflict.REPLACE -> sets[index] = category.copy(id = sets[index].id)
@@ -104,7 +118,8 @@ internal fun mergeStyleBundle(current: StyleBundle, incoming: StyleBundle, confl
         }
     }
     require(sets.size <= MAX_LIBRARY_SETS) { "Import would exceed $MAX_LIBRARY_SETS icon categories." }
-    return StyleBundle(presets, sets)
+    val previous = current.categories.associateBy { it.id }
+    return StyleBundleMerge(StyleBundle(presets, sets), sets.filter { previous[it.id]?.sameContents(it) != true })
 }
 /** Лимит включает суффикс; обрезаем только между Unicode code points. */
 internal fun uniqueStyleName(base: String, names: Collection<String>, max: Int): String {

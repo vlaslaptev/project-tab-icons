@@ -26,7 +26,10 @@ internal data class SvgAsset(val bytes: ByteArray, val label: String, val builde
     val digest: String = sha256(bytes)
 
     /** Убирает только старую подложку конструктора из отображения, не меняя сохранённый SVG. */
-    fun tabArtwork(): ByteArray? {
+    private val cleanedArtwork: ByteArray? by lazy { cleanTabArtwork() }
+    fun tabArtwork(): ByteArray? = cleanedArtwork
+
+    private fun cleanTabArtwork(): ByteArray? {
         if (builder?.background != true) return null
         val document = parseSvgDocument(bytes)
         val root = document.documentElement

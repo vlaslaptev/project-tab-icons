@@ -29,12 +29,15 @@ internal data class IconSetLibraryState(@field:OptionTag @JvmField val sets: Lis
 @Service(Service.Level.APP)
 @State(name = "ProjectTabIconsIconSets", storages = [Storage("projectTabIconSets.xml")])
 internal class IconSetLibrary : SerializablePersistentStateComponent<IconSetLibraryState>(IconSetLibraryState()) {
+    @Volatile private var decoded: Pair<IconSetLibraryState, List<ImportedIconSet>>? = null
     fun apply(value: IconSetLibraryState) = updateState { value }
 
     /** Вызывается в IO-потоке, как и чтение иконок проектов. Повреждённый SVG не ломает остальные наборы. */
     fun readSets(): List<ImportedIconSet> {
+        val snapshot = state
+        decoded?.takeIf { it.first === snapshot }?.let { return it.second }
         var bytes = 0
-        return state.sets.take(MAX_LIBRARY_SETS).mapNotNull { stored ->
+        val result = snapshot.sets.take(MAX_LIBRARY_SETS).mapNotNull { stored ->
             val icons = stored.icons.take(MAX_SET_ICONS).mapNotNull { icon ->
                 if (Thread.currentThread().isInterrupted) throw ProcessCanceledException()
                 if (icon.svg.length > MAX_ICON_BYTES * 4 / 3 + 8 || bytes >= MAX_LIBRARY_BYTES) return@mapNotNull null
@@ -51,11 +54,14 @@ internal class IconSetLibrary : SerializablePersistentStateComponent<IconSetLibr
             if (icons.isEmpty() || stored.id.isBlank() || stored.name.isBlank()) null
             else ImportedIconSet(stored.id, stored.name, icons)
         }
+        if (state === snapshot) decoded = snapshot to result
+        return result
     }
 
     fun prepare(additions: List<ImportedIconSet>): IconSetLibraryState {
+        val snapshot = state
         require(additions.all { it.icons.size <= MAX_SET_ICONS }) { "Too many icons in a category." }
-        val existing = state.sets.filterNot { stored -> additions.any { it.id == stored.id } }
+        val existing = snapshot.sets.filterNot { stored -> additions.any { it.id == stored.id } }
         require(existing.size + additions.size <= MAX_LIBRARY_SETS) { "The icon library can contain up to $MAX_LIBRARY_SETS imported categories." }
         val encoded = additions.map { set -> StoredIconSet(set.id, set.name, set.icons.map {
             StoredSetIcon(it.asset.label.substringBeforeLast(" · "), Base64.getEncoder().encodeToString(it.asset.bytes))
@@ -63,7 +69,10 @@ internal class IconSetLibrary : SerializablePersistentStateComponent<IconSetLibr
         require((existing + encoded).sumOf { set -> set.icons.sumOf { it.svg.length.toLong() } } <= MAX_LIBRARY_BYTES * 4L / 3) {
             "The imported icon library is full (16 MiB). Import a smaller folder."
         }
-        return IconSetLibraryState(existing + encoded)
+        val replacements = encoded.associateBy { it.id }
+        // Замены остаются на прежних местах; добавления идут в конец библиотеки.
+        return IconSetLibraryState(snapshot.sets.map { replacements[it.id] ?: it } +
+            encoded.filter { addition -> snapshot.sets.none { it.id == addition.id } })
     }
 }
 

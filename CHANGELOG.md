@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.120 — 2026-10-25
+
+Changes since the public 0.3.107 release:
+
+- Separate Appearance, Projects and Project groups, each with its own scrolling position. Keep built-in and user preset choices above all sections.
+- Start with a compact Preview and offer Full window. Organize Tab layout into Content and Selection on the left and Size & position on the right.
+- Use consistent pixel inputs and synchronized exact values beside percentage sliders. Add an explicit Use IDE font size option.
+- Keep inherited values readable, show Inherited from and link Edit group to the matching group. Register Settings at IDE level, removing the current-project-only marker.
+- Fit tables to their contents. Add projects through the Actions plus button with an independent, initially empty selection; use a trash icon for group deletion.
+- Show [No repo!] without counters outside Git repositories.
+- Refresh prepared icon previews while dialogs are open; reuse bounded group outline and text-icon geometry.
+- Preserve concurrent icon/color edits, handle file changes, improve import/export recovery and preserve exact saved highlight values.
+- Refresh the README and current Settings/Git/group screenshots while preserving the approved icon-library artwork.
+
 ## 0.3.107 — 2026-10-24
 
 Changes since the published 0.3.99 release:

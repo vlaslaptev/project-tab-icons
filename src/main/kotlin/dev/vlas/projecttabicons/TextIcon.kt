@@ -36,6 +36,34 @@ internal data class TextIconSpec(val text: String, val style: TextIconStyle, val
     fun asset(): SvgAsset {
         require(textIconError(text) == null) { textIconError(text).orEmpty() }
         val color = requireNotNull(parseIconColor(colorHex))
+        val data = textIconGeometry.path(text, style, font)
+        val encoded = Base64.getEncoder().encodeToString(text.toByteArray(Charsets.UTF_8))
+        val svg = """<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" data-project-tab-icons-text="$encoded" data-project-tab-icons-text-style="${style.name}" data-project-tab-icons-text-font="${font.name}" data-project-tab-icons-color="${color.hex()}"><path fill="${color.hex()}" d="$data"/></svg>"""
+        return SvgAsset(svg.toByteArray(Charsets.UTF_8), "$text · ${font.title}, ${style.title}", textIcon = copy(colorHex = color.hex()))
+    }
+}
+
+private val textIconGeometry = TextIconGeometryCache()
+
+/** Только неизменяемый SVG path, без цвета, байтов и ссылок на диалоги; максимум 32 последних варианта. */
+internal class TextIconGeometryCache(private val limit: Int = 32) {
+    private data class Key(val text: String, val style: TextIconStyle, val font: TextIconFont)
+    private val paths = object : LinkedHashMap<Key, String>(16, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Key, String>?) = size > limit
+    }
+
+    init { require(limit > 0) }
+
+    fun path(text: String, style: TextIconStyle, font: TextIconFont): String {
+        require(textIconError(text) == null) { textIconError(text).orEmpty() }
+        val key = Key(text, style, font)
+        synchronized(paths) { paths[key]?.let { return it } }
+        // Построение не держит общую блокировку: фоновый вызов не заставляет EDT ждать TextLayout.
+        val path = buildPath(text, style, font)
+        return synchronized(paths) { paths.getOrPut(key) { path } }
+    }
+
+    private fun buildPath(text: String, style: TextIconStyle, font: TextIconFont): String {
         val layout = TextLayout(text, Font(font.family, style.awtStyle, 64), FontRenderContext(null, true, true))
         val shape = layout.getOutline(null)
         val bounds = shape.bounds2D
@@ -63,9 +91,7 @@ internal data class TextIconSpec(val text: String, val style: TextIconStyle, val
             }
             path.next()
         }
-        val encoded = Base64.getEncoder().encodeToString(text.toByteArray(Charsets.UTF_8))
-        val svg = """<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" data-project-tab-icons-text="$encoded" data-project-tab-icons-text-style="${style.name}" data-project-tab-icons-text-font="${font.name}" data-project-tab-icons-color="${color.hex()}"><path fill="${color.hex()}" d="$data"/></svg>"""
-        return SvgAsset(svg.toByteArray(Charsets.UTF_8), "$text · ${font.title}, ${style.title}", textIcon = copy(colorHex = color.hex()))
+        return data.toString()
     }
 }
 

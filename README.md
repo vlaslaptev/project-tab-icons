@@ -2,7 +2,11 @@
 
 Project icons, colored outlines, adjustable fills and Git context for IntelliJ IDEA's **macOS project window tabs**.
 
-### [↓ Download ZIP 0.3.107](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.107/project-tab-icons-0.3.107.zip)
+### [↓ Download ZIP 0.3.120](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.120/project-tab-icons-0.3.120.zip)
+
+This guide describes **0.3.120**. The Settings screenshots were recaptured from the
+installed plugin on 25 October 2026. See the [changelog](CHANGELOG.md) for changes
+since 0.3.107.
 
 ## Install in a minute
 
@@ -11,6 +15,7 @@ Project icons, colored outlines, adjustable fills and Git context for IntelliJ I
 3. Open **Settings → Appearance & Behavior → Project Tab Icons**, choose a preset, adjust it and click **Apply**.
 
 ## Style tabs and groups. Hundreds of combinations. Every IDE theme.
+
 ![Real Preview screenshots across all eight IDE themes, with different tab and group styles](docs/media/appearance-gallery.png)
 
 Choose tab height, text size, icon position, outline, fill and group styling independently.
@@ -28,18 +33,32 @@ tab sizes and readable colors. They are a small selection of the available combi
 - Tab surfaces stay opaque above the IDE project gradient; the gradient remains visible around their contours.
 - Click a sample tab to compare active and inactive states. Preview theme and sample count stay local to the example window.
 
-The **Light** preview uses light tab surfaces and readable text while keeping its dark toolbar and light editor.
+The **Light** preview uses light tab surfaces and readable text while keeping its dark toolbar.
+**Full window** adds file tabs and an editor fragment; Preview starts compact.
+The examples gallery above was captured from 0.3.97; the Settings images below were
+recaptured from installed 0.3.120 on 25 October 2026.
 
 ## Compact controls, a live preview
 
-![Current Settings with presets, live Preview, Style, Tab layout and Group layout](docs/media/appearance-presets.png)
+![Settings 0.3.120: shared preset choices, section navigation, compact Preview and Style](docs/media/appearance-presets.png)
 
-**Tab layout** puts **Info** above paired **Height / Font size** and
-**Close button / Git position** controls. Narrow windows use one column.
-**Style** brings **Icon**, **Outline** and **Fill** together, with sections that wrap
-to fit the window. Switch between **Style**, **Tab layout** and **Group layout**;
-the form fits the selected page, leaving room for the project table.
-**Save as new preset** and **Update preset** sit beside these sections.
+Project Tab Icons is an **IDE-wide** settings page under **Appearance & Behavior**.
+The enable switch, **Presets** and **User presets** stay above all three sections
+and remain visible while their contents scroll.
+
+| Section | Use it for |
+| --- | --- |
+| **Appearance** | Style, Tab layout, Group layout, Preview and saving presets |
+| **Projects** | Open-project icons and colors, membership and Ungroup |
+| **Project groups** | Group icons and colors, members, positions and group order |
+
+Each section keeps its own scrolling position and draft. Within Appearance,
+**Style** brings **Icon**, **Outline** and **Fill** together. **Tab layout** places
+**Content** and **Selection** in the left column and **Size & position** on the right.
+**Use IDE font size** follows the IDE automatically; clear it for a fixed size.
+Pixel dimensions use compact number fields. Percentages have a slider and a
+synchronized exact input. Narrow windows stack the columns.
+**Save as new preset** and **Update preset** sit beside **Style / Tab layout / Group layout**.
 
 ## Start with a preset
 
@@ -64,7 +83,17 @@ The reset remains a draft until you click Apply; Cancel discards it.
 
 Create and edit groups in **Project groups**. Assign an icon, icon color, outline color
 and tab color to the group; members inherit them, including projects added later.
-**Ungroup** restores each project's personal styling.
+In **Projects**, **Inherited from …** explains the source and **Edit group** opens
+the matching group. Inherited values stay readable. **Ungroup** restores each
+project's personal styling.
+
+![Shared presets, Project groups navigation, table header and Add group in 0.3.120](docs/media/captures/groups-settings.png)
+
+Only the header and Add group row are shown; saved working groups are outside the crop.
+Use **+** in **Actions** to search for projects and add several at once. Every opening
+starts with an empty selection, independent of checkboxes in Projects. The edit button
+changes the name, membership and fixed positions; the trash button removes a group.
+Save group changes with **Apply**.
 
 Under **Group layout → Group highlight → Variant**, choose **Shared background** or
 **Joined tabs**. Both follow regular tab dimensions, theme corners, fill settings,
@@ -105,14 +134,19 @@ Use self-contained, static SVGs without scripts, foreignObject, DOCTYPE or exter
 
 ## Git context beside the project name
 
+![Compact Preview and the current Git controls in Tab layout](docs/media/git-context.png)
+
 Show full or compact Git branches, tracked added/removed-line counts, or both.
 Choose whether extra information appears before or after the project name.
 Counts cover saved tracked changes against HEAD, including staged and unstaged
 changes. Git4Idea supplies branches; local background diffs supply counts without
 fetching from remotes.
 
-**Show Git status** adds line counts to either branch format; **Git status** in Info
-shows counts on their own. Background diffs run only while counts are requested.
+In **Tab layout → Content → Show**, choose **Name only**, **Project path**, **Branch**,
+**Compact branch** or **Changed lines**. **Also show changed lines** adds line counts
+to either branch format; **Git info position** selects the side of the project name.
+Background diffs run only while counts are requested. Outside a Git repository,
+the tab shows **[No repo!]** without counters; clean repositories show **+0 -0**.
 Untracked files, binary files and unsaved editor text are excluded. Compact branches
 use the part after the final `/`, keeping at most **13 Unicode characters**, including
 a leading ellipsis. The full branch remains available in the tooltip.
@@ -124,7 +158,7 @@ preset switching and Settings. View or change shortcuts in **Settings → Keymap
 For a grouped project, edit its inherited icon and colors in **Project groups**.
 
 **Save as new preset** creates a named style; **Update preset** replaces the user
-preset you edited. **Manage user presets…** renames, duplicates, deletes and reorders
+preset you edited. **Manage user presets…** in the shared header renames, duplicates, deletes and reorders
 saved presets. Use unique names of up to **32 characters**. Preset changes are saved
 with Apply; Cancel discards the draft.
 

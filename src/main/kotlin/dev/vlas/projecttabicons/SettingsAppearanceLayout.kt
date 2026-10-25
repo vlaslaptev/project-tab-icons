@@ -27,14 +27,14 @@ import javax.swing.border.AbstractBorder
 import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener
 
-/** При нехватке высоты прокручивается вся страница; таблица сохраняет свой header и список. */
+/** Одна прокрутка внутри раздела; содержимое не растягивается по высоте окна. */
 internal class SettingsPageBody : JPanel(BorderLayout(0, JBUI.scale(20))), Scrollable {
     override fun getMinimumSize(): Dimension = Dimension(0, 0)
     override fun getPreferredSize(): Dimension = super.getPreferredSize().apply {
         val arrangement = layout as BorderLayout
         val top = arrangement.getLayoutComponent(BorderLayout.NORTH)?.preferredSize?.height ?: 0
-        val table = arrangement.getLayoutComponent(BorderLayout.CENTER)?.minimumSize?.height ?: 0
-        height = top + arrangement.vgap + table + insets.top + insets.bottom
+        val table = arrangement.getLayoutComponent(BorderLayout.CENTER)?.preferredSize?.height ?: 0
+        height = top + table + (if (top > 0 && table > 0) arrangement.vgap else 0) + insets.top + insets.bottom
     }
     override fun getPreferredScrollableViewportSize(): Dimension = preferredSize
     override fun getScrollableTracksViewportWidth(): Boolean = true
@@ -238,6 +238,7 @@ internal class SettingsGroupSwitcher(
     selectorName: String = "Appearance settings group",
     availableWidth: (() -> Int)? = null,
 ) : JPanel(BorderLayout(0, JBUI.scale(8))) {
+    val selectedTab: String? get() = selector.selectedItem
     private val cardLayout = object : CardLayout() {
         // Обычный CardLayout резервирует высоту самой большой, в том числе скрытой, вкладки.
         override fun preferredLayoutSize(parent: Container): Dimension = visibleCardSize(parent) { it.preferredSize }

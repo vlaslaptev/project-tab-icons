@@ -1,6 +1,5 @@
 package dev.vlas.projecttabicons
 
-import com.intellij.ide.RecentProjectIconHelper
 import com.intellij.ide.RecentProjectsManagerBase
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.progress.ProcessCanceledException
@@ -47,7 +46,7 @@ internal fun loadProjectIcon(target: OpenProjectIconTarget, dark: Boolean): Load
             }
             // PNG тоже получает подготовленную копию: renderer больше не рисует delegate.
             val prepared = if (svg == null && file?.endsWith(".png") == true) {
-                val image = RecentProjectIconHelper.createIcon(snapshot.files.getValue(file), false, 24)
+                val image = projectPngIcon(snapshot.files.getValue(file), 24)
                 target.copy(preview = (target.preview as? CenteredProjectIcon)?.withArtwork(image) ?: image)
             } else target
             LoadedProjectIcon(prepared, snapshot, svg?.let { IconChoice(it, color) }, color)

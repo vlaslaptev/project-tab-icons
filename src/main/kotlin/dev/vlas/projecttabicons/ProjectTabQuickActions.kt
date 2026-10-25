@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.ui.popup.JBPopupFactory
@@ -46,50 +47,64 @@ abstract class ProjectTabQuickAction(private val mode: String) : AnAction() {
                 if (mode == "icon") {
                     sets = app.getService(IconSetLibrary::class.java).readSets()
                     gallery = ProjectIconStore.gallery(listOf(ProjectIconSource(path, target.name, loaded.snapshot)))
-                        .assets.map { asset -> IconChoice(asset, runCatching { svgIconColor(asset) }.getOrNull()) }
+                        .assets.map { asset -> IconChoice(asset, try { svgIconColor(asset) }
+                            catch (error: ProcessCanceledException) { throw error }
+                            catch (_: Exception) { null }) }
                 }
             }) return
         if (project.isDisposed) return
-        val row = ProjectIconSettingsRow(loaded ?: return, app.getService(ProjectOutlineColors::class.java).overrides(path))
+        val colorStore = app.getService(ProjectOutlineColors::class.java)
+        val row = ProjectIconSettingsRow(loaded ?: return, colorStore.overrides(path))
         if (!row.ready) { Messages.showErrorDialog(project, row.failure ?: "Cannot load this project icon.", "Project Tab Icons"); return }
         var additions = emptyList<ImportedIconSet>()
-        if (mode == "icon") {
-            val dialog = IconSelectionDialog(parent, project, project.name, row.color ?: COLOR_PRESETS.first().bright,
-                row.activeChoice, gallery, sets, immediate = true)
-            if (!dialog.showAndGet() || project.isDisposed) return
-            dialog.selection()?.let(row::choose) ?: return
-            additions = dialog.importedSets()
-        } else {
-            val channel = ProjectColorTarget.valueOf(mode)
-            if (channel == ProjectColorTarget.ICON && !row.editableIconColor) {
-                Messages.showInfoMessage(project, "This SVG or PNG keeps its original colors. Choose a built-in or text icon to edit its color.", "Project Tab Icons")
+        while (!project.isDisposed) {
+            if (mode == "icon") {
+                val dialog = IconSelectionDialog(parent, project, project.name, row.color ?: COLOR_PRESETS.first().bright,
+                    row.activeChoice, gallery, (sets + additions).associateBy { it.id }.values.toList(), immediate = true)
+                if (!dialog.showAndGet() || project.isDisposed) return
+                dialog.selection()?.let(row::choose) ?: return
+                additions += dialog.importedSets()
+            } else {
+                val channel = ProjectColorTarget.valueOf(mode)
+                if (channel == ProjectColorTarget.ICON && !row.editableIconColor) {
+                    Messages.showInfoMessage(project, "This SVG or PNG keeps its original colors. Choose a built-in or text icon to edit its color.", "Project Tab Icons")
+                    return
+                }
+                val dialog = ProjectColorDialog(parent, project, row, channel, app.getService(TabAppearanceSettings::class.java).state, immediate = true)
+                if (!dialog.showAndGet() || project.isDisposed) return
+                row.changeColor(channel, dialog.selection())
+            }
+            if (!row.modified && additions.isEmpty()) return
+            var installed: IconSnapshot? = null
+            var library: IconSetLibraryState? = null
+            var colorConflict = false
+            val success = quickWork(project, parent, "Saving project icon", failed = {
+                colorConflict = it is ProjectColorConflictException && it.suppressed.isEmpty()
+            }) {
+                check(!project.isDisposed) { "The project has been closed." }
+                if (additions.isNotEmpty()) library = app.getService(IconSetLibrary::class.java).prepare(additions)
+                val snapshot = ProjectIconStore.snapshot(path)
+                check(snapshot.fingerprint == row.snapshot?.fingerprint && snapshot.directory == row.snapshot?.directory) {
+                    "The project icon changed while the editor was open. Open the action again."
+                }
+                val writes = if (row.svgModified) listOf(ProjectIconWrite(project, path, row.snapshot!!, row.activeChoice!!.asset))
+                    else emptyList()
+                installed = ProjectIconStore.installAll(writes) { colorStore.apply(mapOf(path to row.colorChanges())) }[path]
+            }
+            if (!success) {
+                row.snapshot?.let { ProjectIconStore.refreshUi(project, path, it) }
+                if (colorConflict && !project.isDisposed) {
+                    // Сообщение уже показано. Выбор не теряется; повторное применение требует нового OK.
+                    row.reviewColorConflict(colorStore.overrides(path))
+                    continue
+                }
                 return
             }
-            val dialog = ProjectColorDialog(parent, project, row, channel, app.getService(TabAppearanceSettings::class.java).state, immediate = true)
-            if (!dialog.showAndGet() || project.isDisposed) return
-            row.changeColor(channel, dialog.selection())
-        }
-        if (!row.modified && additions.isEmpty()) return
-        var installed: IconSnapshot? = null
-        var library: IconSetLibraryState? = null
-        val success = quickWork(project, parent, "Saving project icon") {
-            check(!project.isDisposed) { "The project has been closed." }
-            if (additions.isNotEmpty()) library = app.getService(IconSetLibrary::class.java).prepare(additions)
-            val snapshot = ProjectIconStore.snapshot(path)
-            check(snapshot.fingerprint == row.snapshot?.fingerprint && snapshot.directory == row.snapshot?.directory) {
-                "The project icon changed while the editor was open. Open the action again."
-            }
-            if (row.svgModified) installed = ProjectIconStore.installAll(listOf(
-                ProjectIconWrite(project, path, row.snapshot!!, row.activeChoice!!.asset)))[path]
-        }
-        if (!success) {
-            row.snapshot?.let { ProjectIconStore.refreshUi(project, path, it) }
+            library?.let { app.getService(IconSetLibrary::class.java).apply(it) }
+            installed?.let { ProjectIconStore.refreshUi(project, path, it) }
+            app.getService(ProjectTabIconsService::class.java).requestRefresh()
             return
         }
-        app.getService(ProjectOutlineColors::class.java).apply(mapOf(path to row.colorOverrides))
-        library?.let { app.getService(IconSetLibrary::class.java).apply(it) }
-        installed?.let { ProjectIconStore.refreshUi(project, path, it) }
-        app.getService(ProjectTabIconsService::class.java).requestRefresh()
     }
 }
 class ChangeProjectTabIconAction : ProjectTabQuickAction("icon")
@@ -97,12 +112,23 @@ class ChangeProjectTabIconColorAction : ProjectTabQuickAction("ICON")
 class ChangeProjectTabOutlineColorAction : ProjectTabQuickAction("OUTLINE")
 class ChangeProjectTabFillColorAction : ProjectTabQuickAction("TAB")
 
-private fun quickWork(project: Project, parent: JComponent, title: String, work: () -> Unit): Boolean {
+private fun quickWork(project: Project, parent: JComponent, title: String,
+                      failed: (Exception) -> Unit = {}, work: () -> Unit): Boolean {
     var failure: Exception? = null
-    ProgressManager.getInstance().runProcessWithProgressSynchronously(Runnable {
-        try { work() } catch (error: Exception) { failure = error }
+    val completed = ProgressManager.getInstance().runProcessWithProgressSynchronously(Runnable {
+        try { work() }
+        catch (error: ProcessCanceledException) { throw error }
+        catch (error: Exception) { failure = error }
     }, title, false, project, parent)
-    failure?.let { Messages.showErrorDialog(parent, it.message ?: "Cannot update project tabs.", "Project Tab Icons"); return false }
+    if (!completed || project.isDisposed) return false
+    failure?.let {
+        failed(it)
+        if (it.suppressed.isNotEmpty()) com.intellij.openapi.diagnostic.Logger.getInstance(ProjectTabQuickAction::class.java)
+            .warn("Cannot save project icons; rollback was incomplete", it)
+        val recovery = if (it.suppressed.isEmpty()) "" else " Some previous icon variants could not be restored. See the IDE log for details."
+        Messages.showErrorDialog(parent, (it.message ?: "Cannot update project tabs.") + recovery, "Project Tab Icons")
+        return false
+    }
     return true
 }
 

@@ -2,7 +2,7 @@ package dev.vlas.projecttabicons
 
 internal enum class TabGitBranchFormat { FULL, COMPACT }
 
-internal enum class GitTabDiffState { LOADING, READY, NO_COMMITS, UNAVAILABLE }
+internal enum class GitTabDiffState { LOADING, READY, NO_REPOSITORY, NO_COMMITS, UNAVAILABLE }
 
 internal data class GitTabDiffStatus(
     val state: GitTabDiffState,
@@ -17,24 +17,27 @@ internal sealed interface ProjectTabExtraInfo {
     val tooltip: String
 
     data class Branch(
-        val fullName: String,
+        /** null — подтверждённое отсутствие репозитория, а не detached HEAD. */
+        val fullName: String?,
         val compact: Boolean = false,
         val status: Status? = null,
     ) : ProjectTabExtraInfo {
-        val displayName: String = if (compact) compactGitBranch(fullName) else fullName
+        val displayName: String = fullName?.let { if (compact) compactGitBranch(it) else it } ?: "No repo!"
         override val text: String get() = "[$displayName]" + (status?.let { " ${it.text}" } ?: "")
-        override val accessibleText: String get() = "[$fullName]" + (status?.let { " ${it.accessibleText}" } ?: "")
-        override val tooltip: String get() = "Git branch: $fullName" + (status?.let { " · ${it.tooltip}" } ?: "")
+        override val accessibleText: String get() = "[${fullName ?: displayName}]" + (status?.let { " ${it.accessibleText}" } ?: "")
+        override val tooltip: String get() = (fullName?.let { "Git branch: $it" } ?: "Project is not in a Git repository.") +
+            (status?.let { " · ${it.tooltip}" } ?: "")
     }
 
     data class Status(val value: GitTabDiffStatus) : ProjectTabExtraInfo {
         override val text: String get() = when (value.state) {
             GitTabDiffState.READY -> "+${value.added} -${value.removed}"
             GitTabDiffState.LOADING -> "…"
-            GitTabDiffState.NO_COMMITS, GitTabDiffState.UNAVAILABLE -> "—"
+            GitTabDiffState.NO_REPOSITORY, GitTabDiffState.NO_COMMITS, GitTabDiffState.UNAVAILABLE -> "—"
         }
         override val tooltip: String get() = when (value.state) {
             GitTabDiffState.READY -> "Git status: $text lines. Saved tracked changes against HEAD, staged and unstaged. Binary and untracked files are excluded."
+            GitTabDiffState.NO_REPOSITORY -> "Project is not in a Git repository."
             GitTabDiffState.LOADING -> "Git status: calculating changed lines…"
             GitTabDiffState.NO_COMMITS -> "Git status: available after the first commit."
             GitTabDiffState.UNAVAILABLE -> "Git status: changed-line count is unavailable."

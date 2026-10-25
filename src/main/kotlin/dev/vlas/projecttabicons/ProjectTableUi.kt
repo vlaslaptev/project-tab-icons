@@ -1,6 +1,5 @@
 package dev.vlas.projecttabicons
 
-import com.intellij.ide.RecentProjectIconHelper
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBLabel
 import com.intellij.util.ui.JBUI
@@ -17,7 +16,6 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.Icon
 import javax.swing.JPanel
-import javax.swing.Scrollable
 import javax.swing.SwingUtilities
 
 /** Одинаковые ширины и оси для каждой строки и закреплённой шапки. */
@@ -103,14 +101,8 @@ internal class ProjectRowPanel(layout: LayoutManager) : JPanel(layout) {
         JBColor.namedColor("Table.hoverBackground", JBColor(0xF5F6F8, 0x303237)) else UIUtil.getListBackground()
 }
 
-internal class ProjectRowsPanel : JPanel(GridBagLayout()), Scrollable {
+internal class ProjectRowsPanel : JPanel(GridBagLayout()) {
     init { background = UIUtil.getListBackground() }
-    override fun getPreferredScrollableViewportSize(): Dimension = JBUI.size(660, 300)
-    override fun getScrollableTracksViewportWidth(): Boolean = true
-    override fun getScrollableTracksViewportHeight(): Boolean = preferredSize.height < (parent?.height ?: 0)
-    override fun getScrollableUnitIncrement(visible: Rectangle, orientation: Int, direction: Int): Int = JBUI.scale(60)
-    override fun getScrollableBlockIncrement(visible: Rectangle, orientation: Int, direction: Int): Int =
-        (visible.height - JBUI.scale(60)).coerceAtLeast(JBUI.scale(60))
 }
 
 /** Общие подписи и artwork для обеих таблиц. */
@@ -119,5 +111,5 @@ internal fun projectSettingsIconName(row: ProjectIconSettingsRow): String = row.
     ?: if (row.activeChoice != null) "Custom SVG" else if (row.snapshot?.currentFile(!JBColor.isBright()) != null) "Custom icon" else "Default"
 
 internal fun projectSettingsArtwork(row: ProjectIconSettingsRow, appearance: TabAppearanceState): Icon? =
-    row.activeChoice?.let { RecentProjectIconHelper.createIcon(it.asset.tabArtwork() ?: it.asset.bytes, true, 24) }
+    row.activeChoice?.let { projectSvgIcon(it.asset, 24) }
         ?: row.previewIcon(initials = appearance.iconInitials, letterWeight = appearance.iconLetterWeight)

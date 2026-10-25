@@ -12,10 +12,10 @@
   ],
   "socialPreview": "docs/media/social-preview.png",
   "license": "MIT",
-  "version": "0.3.107",
+  "version": "0.3.120",
   "githubUrl": "https://github.com/vlaslaptev/project-tab-icons",
-  "status": "Published 0.3.107: stable group dragging, opaque tab surfaces and expanded icon library",
-  "releaseUrl": "https://github.com/vlaslaptev/project-tab-icons/releases/tag/v0.3.107",
+  "status": "Prepared 0.3.120: IDE-wide settings, shared presets, consistent numeric controls and current UI screenshots",
+  "releaseUrl": "https://github.com/vlaslaptev/project-tab-icons/releases/tag/v0.3.120",
   "publishedRelease": "0.3.107",
   "releasePublishedOn": "2026-10-24"
 }

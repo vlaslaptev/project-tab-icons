@@ -1,6 +1,5 @@
 package dev.vlas.projecttabicons
 
-import com.intellij.ide.RecentProjectIconHelper
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.util.xmlb.annotations.OptionTag
 import java.awt.Color
@@ -20,7 +19,7 @@ internal data class ProjectGroupIcon(
 }
 internal data class PreparedGroupIcon(val choice: IconChoice, val artwork: Map<Int, Icon>)
 
-/** SVG разбираются и растеризуются в фоне; UI использует уже подготовленную копию. */
+/** SVG проверяются в фоне; растр видимого размера запрашивается через ProjectIconRasterCache. */
 internal object GroupAppearanceIcons {
     private val cache = object : LinkedHashMap<ProjectGroupIcon, PreparedGroupIcon>(32, 0.75f, true) {
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<ProjectGroupIcon, PreparedGroupIcon>?) = size > 128
@@ -55,9 +54,8 @@ internal object GroupAppearanceIcons {
             }
         } catch (error: ProcessCanceledException) { throw error }
         catch (_: Exception) { defaultChoice() }
-        val bytes = choice.asset.tabArtwork() ?: choice.asset.bytes
         return PreparedGroupIcon(choice, listOf(20, 24, 28).associateWith {
-            RecentProjectIconHelper.createIcon(bytes, true, it)
+            projectSvgIcon(choice.asset, it)
         }).also { synchronized(cache) { cache[stored] = it } }
     }
     private fun defaultChoice(): IconChoice {

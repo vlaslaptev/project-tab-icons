@@ -1,6 +1,9 @@
 # Compatibility
 
-| Area | Scope for release 0.3.107 |
+Release **0.3.120** retains the declared IDE build range below. The current
+Settings screenshots were captured from the installed 0.3.120 plugin.
+
+| Area | Scope for release 0.3.120 |
 | --- | --- |
 | Operating system | macOS |
 | IDE | IntelliJ IDEA 2026.2.3 and later 2026.2 updates within the declared build range |
@@ -26,6 +29,24 @@ The descriptor keeps a strict `262.*` upper bound. Updating it is a compatibilit
 change, not a way to make an unreviewed build install on a newer IDE.
 
 ## Evidence and limits
+
+### Release 0.3.120
+
+Built and installed in IntelliJ IDEA 2026.2.3 / 262.10968.63. Both installed JARs
+match the release ZIP byte for byte. All packaging inputs were compared with the
+committed source snapshot of the installed build before public export.
+
+Native UI inspection covered the IDE-wide settings page, separate Appearance /
+Projects / Project groups, shared preset choices, compact/full Preview, inherited
+values and Edit group navigation, numeric controls and automatic/fixed font modes.
+Selection appears below Content on the left. Project and group icon/color dialogs,
+including the native color picker, opened successfully. Original settings were
+preserved byte for byte.
+
+The latest visual inspection used Islands Darcula. Smaller windows, other themes
+and operation without open projects were not rechecked for 0.3.120. No new whole-IDE
+performance measurements, standalone JVM tests, linters or Plugin Verifier runs
+are claimed. Older validation below applies to its recorded release.
 
 ### Release 0.3.107
 

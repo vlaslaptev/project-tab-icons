@@ -11,17 +11,15 @@ import com.intellij.ui.components.JBScrollPane
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import java.awt.BorderLayout
+import java.awt.Container
 import java.awt.Dimension
 import java.awt.Font
-import java.awt.GridBagConstraints
-import java.awt.GridBagLayout
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import javax.swing.ButtonGroup
 import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JPanel
-import javax.swing.JSeparator
 import javax.swing.ScrollPaneConstants
 import javax.swing.SwingConstants
 
@@ -37,22 +35,39 @@ internal class IconSettingsPanel(
     chooseGroupColor: (String, ProjectColorTarget) -> Unit,
 ) {
     val component = JPanel(BorderLayout(0, JBUI.scale(20)))
-    private val page = SettingsPageBody()
-    private val pageScroll = JBScrollPane(page).apply {
+    private val appearancePage = SettingsPageBody().apply { border = JBUI.Borders.empty(12) }
+    private val projectsPage = SettingsPageBody()
+    private val groupsPage = SettingsPageBody()
+    private fun pageScroll(page: SettingsPageBody, name: String) = JBScrollPane(page).apply {
         border = JBUI.Borders.empty()
         minimumSize = JBUI.size(0, 0)
         viewportBorder = JBUI.Borders.empty()
         horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
         verticalScrollBar.unitIncrement = JBUI.scale(32)
-        accessibleContext.accessibleName = "Tab customization settings page"
+        accessibleContext.accessibleName = name
     }
-    private val projectTables = SettingsGroupSwitcher("Project tables").apply {
-        accessibleContext.accessibleName = "Projects and project groups"
+    private val appearanceScroll = pageScroll(appearancePage, "Tab appearance settings")
+    private val projectsScroll = pageScroll(projectsPage, "Open project settings")
+    private val groupsScroll = pageScroll(groupsPage, "Project group settings")
+    private val presetsHeader = JPanel(BorderLayout()).apply {
+        isOpaque = false
+        border = JBUI.Borders.empty(0, 12)
     }
+    private val sections = SettingsGroupSwitcher("Settings sections", availableWidth = {
+        component.width - component.insets.left - component.insets.right
+    }).apply {
+        accessibleContext.accessibleName = "Project Tab Icons settings sections"
+    }
+    private var selectedSection = "Appearance"
     private val importStylesButton = JButton("Import styles…").apply { addActionListener { importStyles() } }
     private val exportStylesButton = JButton("Export styles…").apply { addActionListener { exportStyles() } }
     private val status = settingsHint("Loading open projects…")
     private val preview = WindowTabsPreview()
+    private val fullPreview = JBCheckBox("Full window", false).apply {
+        isOpaque = false
+        accessibleContext.accessibleName = "Full window preview"
+        toolTipText = "Expand the example to include file tabs and the editor. Preview only; does not change Apply."
+    }
     private val previewTabCounts = PreviewTabCount.entries.associateWith { count ->
         JBRadioButton(count.title, count == PreviewTabCount.THREE).apply {
             isOpaque = false
@@ -80,12 +95,15 @@ internal class IconSettingsPanel(
     private lateinit var sharedDraftBaseline: SharedIconSettingsSnapshot
     private var importedCategoryCount = 0
     private val pendingMarkers = mutableListOf<Pair<SettingsPendingChange, (TabAppearanceState) -> Boolean>>()
-    private val groups = ProjectGroupsPanel(::pageWidth, ::refreshRows,
-        { projectTables.selectTab("Projects") }, chooseGroupIcon, chooseGroupColor)
-    private val appearanceForm = TabAppearanceForm(::pageWidth, { appearanceChanged() }, ::refreshLayout)
-    private val presets = AppearancePresetsPanel(component, ::pageWidth, ::appearance,
+    private val groups = ProjectGroupsPanel({ pageWidth(projectsScroll) }, ::refreshRows,
+        { sections.selectTab("Projects") }, chooseGroupIcon, chooseGroupColor)
+    private val appearanceForm = TabAppearanceForm({ pageWidth(appearanceScroll) }, { appearanceChanged() }, ::refreshLayout)
+    private val presets = AppearancePresetsPanel(component, ::presetsWidth, ::appearance,
         { displayedAppearance }, ::setAppearance, ::updateStatus, ::refreshLayout)
-    private val projectTable = ProjectIconsTable(groups, chooseIcon, chooseColor, reloadRow)
+    private val projectTable = ProjectIconsTable(groups, chooseIcon, chooseColor, reloadRow) { id ->
+        sections.selectTab("Project groups")
+        groups.focusGroup(id)
+    }
     var rows: List<ProjectIconSettingsRow> = emptyList()
         private set
 
@@ -99,55 +117,57 @@ internal class IconSettingsPanel(
         component.border = JBUI.Borders.empty(16)
         component.preferredSize = JBUI.size(880, 700)
         component.minimumSize = JBUI.size(360, 400)
-        page.add(JPanel(BorderLayout(0, JBUI.scale(20))).apply {
-            add(JPanel(BorderLayout(0, JBUI.scale(12))).apply {
-                add(presets.component, BorderLayout.NORTH)
-                add(JPanel(BorderLayout(0, JBUI.scale(8))).apply {
-                    add(SettingsPreviewHeader(
-                        SettingsRadioRow(JBLabel("Preview").apply { font = font.deriveFont(Font.BOLD) },
-                            previewTabCounts.values.toList(), availableWidth = ::pageWidth),
-                        JBLabel("IDE theme for this preview window:").apply { labelFor = previewTheme },
-                        previewTheme, ::pageWidth,
-                    ), BorderLayout.NORTH)
-                    add(preview, BorderLayout.CENTER)
-                }, BorderLayout.CENTER)
-                add(JPanel(BorderLayout(JBUI.scale(12), 0)).apply {
-                    add(pluginEnabled, BorderLayout.WEST)
-                    add(JPanel(GridBagLayout()).apply {
-                        add(JSeparator(SwingConstants.HORIZONTAL), GridBagConstraints().apply {
-                            weightx = 1.0
-                            fill = GridBagConstraints.HORIZONTAL
-                        })
-                    }, BorderLayout.CENTER)
-                }, BorderLayout.SOUTH)
+        component.add(JPanel(BorderLayout(0, JBUI.scale(16))).apply {
+            isOpaque = false
+            add(pluginEnabled, BorderLayout.NORTH)
+            presetsHeader.add(presets.component, BorderLayout.CENTER)
+            add(presetsHeader, BorderLayout.CENTER)
+        }, BorderLayout.NORTH)
+        appearancePage.add(JPanel(BorderLayout(0, JBUI.scale(20))).apply {
+            add(JPanel(BorderLayout(0, JBUI.scale(8))).apply {
+                add(SettingsPreviewHeader(
+                    SettingsRadioRow(JBLabel("Preview").apply { font = font.deriveFont(Font.BOLD) },
+                        previewTabCounts.values.toList() + fullPreview, wrapChoices = true,
+                        availableWidth = { pageWidth(appearanceScroll) }),
+                    JBLabel("Preview theme:").apply { labelFor = previewTheme },
+                    previewTheme, { pageWidth(appearanceScroll) },
+                ), BorderLayout.NORTH)
+                add(preview, BorderLayout.CENTER)
             }, BorderLayout.NORTH)
             add(appearanceForm.component, BorderLayout.CENTER)
         }, BorderLayout.NORTH)
-        projectTables.addTab("Projects", projectTable.component)
-        projectTables.addTab("Project groups", JPanel(BorderLayout()).apply {
-            isOpaque = false; border = JBUI.Borders.empty(0, 12, 12, 12)
+        projectsPage.add(projectTable.component, BorderLayout.NORTH)
+        groupsPage.add(JPanel(BorderLayout()).apply {
+            isOpaque = false
+            border = JBUI.Borders.empty(0, 12, 12, 12)
             add(groups, BorderLayout.CENTER)
-        })
-        projectTables.addChangeListener { refreshLayout() }
-        page.add(object : JPanel(BorderLayout()) {
-            override fun getMinimumSize(): Dimension {
-                // Единственная видимая таблица получает место для заголовка и строк;
-                // длинный список и раскрытый редактор прокручиваются внутри вкладки.
-                // Ориентируемся на viewport всей страницы, а не на фиксированные
-                // 300 px preferredSize таблицы: редактор участников растёт вместе с Settings.
-                return Dimension(0, maxOf(JBUI.scale(440), pageScroll.viewport.extentSize.height - JBUI.scale(80),
-                    projectTable.headerHeight + JBUI.scale(220)))
-            }
-        }.apply {
-            add(projectTables, BorderLayout.CENTER)
-        }, BorderLayout.CENTER)
-        component.add(pageScroll, BorderLayout.CENTER)
-        pageScroll.viewport.addComponentListener(object : ComponentAdapter() {
+        }, BorderLayout.NORTH)
+        sections.addTab("Appearance", appearanceScroll)
+        sections.addTab("Projects", projectsScroll)
+        sections.addTab("Project groups", groupsScroll)
+        sections.addChangeListener {
+            selectedSection = sections.selectedTab ?: "Appearance"
+            restoreDefaults.isVisible = selectedSection == "Appearance"
+            refreshLayout()
+            updateStatus()
+        }
+        component.add(sections, BorderLayout.CENTER)
+        presetsHeader.addComponentListener(object : ComponentAdapter() {
             override fun componentResized(event: ComponentEvent) {
-                appearanceForm.component.revalidate()
-                page.revalidate()
+                invalidateLayout(presetsHeader)
+                refreshLayout()
             }
         })
+        listOf(appearanceScroll, projectsScroll, groupsScroll).forEach { scroll ->
+            scroll.viewport.addComponentListener(object : ComponentAdapter() {
+                override fun componentResized(event: ComponentEvent) {
+                    // Вложенные BorderLayout кешируют высоту форм. После переноса
+                    // радиокнопок им тоже нужно заново измерить содержимое.
+                    (scroll.viewport.view as? Container)?.let(::invalidateLayout)
+                    refreshLayout()
+                }
+            })
+        }
         component.add(JPanel(BorderLayout(JBUI.scale(16), 0)).apply {
             add(JPanel(java.awt.FlowLayout(java.awt.FlowLayout.LEFT, JBUI.scale(6), 0)).apply {
                 add(restoreDefaults); add(importStylesButton); add(exportStylesButton)
@@ -157,11 +177,14 @@ internal class IconSettingsPanel(
             add(status, BorderLayout.CENTER)
         }, BorderLayout.SOUTH)
         previewTheme.addActionListener { refreshPreviewTheme() }
+        fullPreview.addActionListener {
+            preview.showFullWindow(fullPreview.isSelected)
+            refreshLayout()
+        }
         previewTabCounts.forEach { (count, button) ->
             button.addActionListener {
                 preview.showTabCount(count)
-                page.revalidate()
-                page.repaint()
+                refreshLayout()
             }
         }
         pluginEnabled.addActionListener { appearanceChanged(manualEdit = false) }
@@ -186,11 +209,29 @@ internal class IconSettingsPanel(
         }
     }
 
-    private fun pageWidth(): Int = pageScroll.viewport.extentSize.width.takeIf { it > 0 } ?: JBUI.scale(760)
+    private fun presetsWidth(): Int {
+        val width = presetsHeader.width.takeIf { it > 0 }
+            ?: (component.width - component.insets.left - component.insets.right).takeIf { it > 0 }
+            ?: JBUI.scale(760)
+        return (width - presetsHeader.insets.left - presetsHeader.insets.right).coerceAtLeast(1)
+    }
+
+    private fun pageWidth(scroll: JBScrollPane): Int {
+        val width = scroll.viewport.extentSize.width.takeIf { it > 0 }
+            ?: (sections.width - sections.insets.left - sections.insets.right).takeIf { it > 0 } ?: JBUI.scale(760)
+        val insets = (scroll.viewport.view as? JComponent)?.insets
+        return (width - (insets?.left ?: 0) - (insets?.right ?: 0)).coerceAtLeast(1)
+    }
 
     private fun refreshLayout() {
-        page.revalidate()
-        page.repaint()
+        presetsHeader.revalidate()
+        appearanceForm.component.revalidate()
+        listOf(appearancePage, projectsPage, groupsPage).forEach { it.revalidate(); it.repaint() }
+    }
+
+    private fun invalidateLayout(view: Container) {
+        view.components.filterIsInstance<Container>().forEach(::invalidateLayout)
+        view.invalidate()
     }
 
     private fun installAppearanceMarkers() {
@@ -307,7 +348,9 @@ internal class IconSettingsPanel(
             presets.presetsModified -> "User presets edited · Save with Apply"
             presets.customModified -> "Custom appearance edited · Save with Apply"
             !pluginEnabled.isSelected -> "Tab customization is disabled."
-            else -> "Click an icon or color to change it."
+            selectedSection == "Projects" -> "Grouped projects inherit icons and colors · Use Edit group to change them."
+            selectedSection == "Project groups" -> "Group icons and colors are inherited by all members."
+            else -> "Preview changes here · Save with Apply"
         }
         status.toolTipText = status.text
         modifiedChanged()

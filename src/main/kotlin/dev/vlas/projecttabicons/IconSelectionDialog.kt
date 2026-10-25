@@ -1,6 +1,5 @@
 package dev.vlas.projecttabicons
 
-import com.intellij.ide.RecentProjectIconHelper
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
@@ -81,13 +80,13 @@ internal class IconSelectionDialog(
     private val customIcons = mutableMapOf<String, Icon>()
     private val shapes = IconChoiceGrid<LibraryIcon>({ it.title }) { item ->
         shapeIcons.getOrPut(item.id) {
-            RecentProjectIconHelper.createIcon(item.choice(color).asset.let { it.tabArtwork() ?: it.bytes }, true, 28)
+            projectSvgIcon(item.choice(color).asset, 28)
         }
     }
     private val customGrid = IconChoiceGrid<IconChoice>(
         { it.asset.label.substringBefore(" · ") }, { it.asset.label.substringAfter(" · ", "") },
     ) { choice ->
-        customIcons.getOrPut(choice.asset.digest) { RecentProjectIconHelper.createIcon(choice.asset.tabArtwork() ?: choice.asset.bytes, true, 28) }
+        customIcons.getOrPut(choice.asset.digest) { projectSvgIcon(choice.asset, 28) }
     }
     private val importButton = JButton("Import SVG…")
     private val importFolderButton = JButton("Import folder…")
@@ -411,7 +410,7 @@ internal class IconSelectionDialog(
             status.toolTipText = null
         }
         val selected = selection()
-        preview.icon = selected?.let { RecentProjectIconHelper.createIcon(it.asset.tabArtwork() ?: it.asset.bytes, true, 32) }
+        preview.icon = selected?.let { projectSvgIcon(it.asset, 32) }
         selectionLabel.text = selected?.asset?.label?.let { settingsLiteral(it.substringBefore(" · ")) } ?: "Choose an icon"
         selectionLabel.toolTipText = selected?.asset?.label?.let(::settingsLiteral)
         selectionDetail.text = when {
@@ -424,7 +423,7 @@ internal class IconSelectionDialog(
         if (selected != null) listOf(20, 24, 28).forEach { size ->
             samples.add(JPanel(BorderLayout(0, JBUI.scale(4))).apply {
                 preferredSize = JBUI.size(44, 56)
-                add(JBLabel(RecentProjectIconHelper.createIcon(selected.asset.tabArtwork() ?: selected.asset.bytes, true, size)).apply {
+                add(JBLabel(projectSvgIcon(selected.asset, size)).apply {
                     horizontalAlignment = SwingConstants.CENTER
                     verticalAlignment = SwingConstants.CENTER
                 }, BorderLayout.CENTER)
@@ -458,10 +457,9 @@ private data class LibraryCategory(val key: String?, val title: String) {
 
 private data class LibraryIcon(val id: String, val title: String, val categoryKey: String,
                                val contour: Contour? = null, val imported: IconChoice? = null) {
+    private val searchText = (title + " " + imported?.asset?.label.orEmpty()).lowercase(Locale.ROOT)
     fun choice(color: Color): IconChoice = imported ?: requireNotNull(contour).let {
         IconChoice(SvgAsset(it.svg(color), it.title, BuilderSelection(it.id, color.hex(), background = false)), color)
     }
-    fun matches(terms: List<String>): Boolean = contour?.matches(terms) ?: terms.all {
-        it in (title + " " + imported?.asset?.label.orEmpty()).lowercase(Locale.ROOT)
-    }
+    fun matches(terms: List<String>): Boolean = contour?.matches(terms) ?: terms.all { it in searchText }
 }

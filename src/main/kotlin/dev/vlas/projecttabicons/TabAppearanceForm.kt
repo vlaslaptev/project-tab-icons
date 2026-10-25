@@ -6,8 +6,6 @@ import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBRadioButton
 import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
-import java.awt.Dimension
-import java.awt.FlowLayout
 import java.awt.Font
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
@@ -16,7 +14,7 @@ import javax.swing.JSeparator
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JSlider
-import javax.swing.SwingConstants
+import javax.swing.SpinnerNumberModel
 import kotlin.math.roundToInt
 
 private const val MAX_ACTIVE_TAB_HIGHLIGHT_LEVEL = 100
@@ -70,43 +68,30 @@ internal class TabAppearanceForm(
         isOpaque = false
     }
     private val fillIntensityLabel = JBLabel("Intensity:").apply { labelFor = tabFillIntensity }
-    private val fillIntensityValue = JBLabel("$DEFAULT_TAB_FILL_INTENSITY%", SwingConstants.RIGHT)
     private val inactiveTabDimming = JSlider(0, MAX_INACTIVE_TAB_DIMMING_LEVEL, inactiveTabDimmingLevel(DEFAULT_INACTIVE_TAB_DIMMING)).apply {
         minorTickSpacing = 1; snapToTicks = true; isOpaque = false
     }
     private val inactiveTabDimmingLabel = JBLabel("Inactive tab dimming:").apply { labelFor = inactiveTabDimming }
-    private val inactiveTabDimmingValue = JBLabel("${inactiveTabDimming.value}%", SwingConstants.RIGHT)
     private var displayedInactiveTabDimming = DEFAULT_INACTIVE_TAB_DIMMING
     private val activeTabHighlight = JSlider(0, MAX_ACTIVE_TAB_HIGHLIGHT_LEVEL, activeTabHighlightLevel(DEFAULT_ACTIVE_TAB_HIGHLIGHT)).apply {
         minorTickSpacing = 1; snapToTicks = true; isOpaque = false
     }
     private val activeTabHighlightLabel = JBLabel("Active tab highlight:").apply { labelFor = activeTabHighlight }
-    private val activeTabHighlightValue = JBLabel("${activeTabHighlight.value}%", SwingConstants.RIGHT)
+    private var displayedActiveTabHighlight = DEFAULT_ACTIVE_TAB_HIGHLIGHT
     private val closeButtonPosition = appearanceChoice(TabCloseButtonPosition.entries)
     private val closeButtonLabel = JBLabel("Close button:").apply { labelFor = closeButtonPosition }
     private val fontSizeSelection = TabFontSizeSelection()
-    private val tabFontSize = JSlider(minOf(MIN_TAB_FONT_SIZE, defaultTabFontSize()),
-        maxOf(MAX_TAB_FONT_SIZE, defaultTabFontSize() + 2), defaultTabFontSize()).apply {
-        minorTickSpacing = 1
-        snapToTicks = true
+    private val useIdeFontSize = JBCheckBox("Use IDE font size", true).apply {
         isOpaque = false
+        toolTipText = "Follow the IDE font size automatically. Clear to use a fixed size for project tabs."
     }
+    private val tabFontSize = pixelSpinner(defaultTabFontSize(), minOf(MIN_TAB_FONT_SIZE, defaultTabFontSize()),
+        maxOf(MAX_TAB_FONT_SIZE, defaultTabFontSize() + 2))
     private val fontSizeLabel = JBLabel("Font size:").apply { labelFor = tabFontSize }
-    private val fontSizeValue = JBLabel("${defaultTabFontSize()} px", SwingConstants.RIGHT)
-    private val tabHeight = JSlider(DEFAULT_TAB_HEIGHT, MAX_TAB_HEIGHT, DEFAULT_TAB_HEIGHT).apply {
-        minorTickSpacing = 1
-        snapToTicks = true
-        isOpaque = false
-    }
+    private val tabHeight = pixelSpinner(DEFAULT_TAB_HEIGHT, DEFAULT_TAB_HEIGHT, MAX_TAB_HEIGHT)
     private val tabHeightLabel = JBLabel("Height:").apply { labelFor = tabHeight }
-    private val tabHeightValue = JBLabel("$DEFAULT_TAB_HEIGHT px", SwingConstants.RIGHT)
-    private val groupSpacing = JSlider(0, MAX_GROUP_SPACING, 0).apply {
-        minorTickSpacing = 1
-        snapToTicks = true
-        isOpaque = false
-    }
+    private val groupSpacing = pixelSpinner(0, 0, MAX_GROUP_SPACING)
     private val groupSpacingLabel = JBLabel("Group spacing:").apply { labelFor = groupSpacing }
-    private val groupSpacingValue = JBLabel("0 px", SwingConstants.RIGHT)
     private val showGroupOutline = JBCheckBox("Show group highlight")
     private val groupHighlightStyle = ComboBox(arrayOf(GroupHighlightStyle.BACKGROUND, GroupHighlightStyle.JOINED))
     private val groupVariantLabel = JBLabel("Variant:").apply { labelFor = groupHighlightStyle }
@@ -116,25 +101,29 @@ internal class TabAppearanceForm(
     private lateinit var backgroundHighlightForm: JComponent
     private lateinit var joinedHighlightForm: JComponent
     private val showGroupSeparator = JBCheckBox("Show separator (pipe)")
-    private val groupSeparatorThickness = JSlider(1, MAX_OUTLINE_THICKNESS, 1).apply {
-        minorTickSpacing = 1; snapToTicks = true; isOpaque = false
-    }
+    private val groupSeparatorThickness = pixelSpinner(1, MIN_OUTLINE_THICKNESS, MAX_OUTLINE_THICKNESS)
     private val separatorThicknessLabel = JBLabel("Thickness:").apply { labelFor = groupSeparatorThickness }
-    private val separatorThicknessValue = JBLabel("1 px", SwingConstants.RIGHT)
     private val groupSeparatorHeight = JSlider(20, 100, DEFAULT_GROUP_SEPARATOR_HEIGHT).apply {
         minorTickSpacing = 1; snapToTicks = true; isOpaque = false
     }
     private val separatorHeightLabel = JBLabel("Height:").apply { labelFor = groupSeparatorHeight }
-    private val separatorHeightValue = JBLabel("$DEFAULT_GROUP_SEPARATOR_HEIGHT%", SwingConstants.RIGHT)
     private val groupSeparatorColor = ComboBox(GroupSeparatorColor.entries.toTypedArray())
     private val separatorColorLabel = JBLabel("Color:").apply { labelFor = groupSeparatorColor }
     private val showGroupIcon = JBCheckBox("Show group icon")
     private val hideGroupedTabIcons = JBCheckBox("Hide tab icons inside the group")
-    private val moreInfoLabel = JBLabel("Info:")
-    private val moreInfoButtons = TabMoreInfo.entries.associateWith { JBRadioButton(it.title) }
+    private val moreInfoLabel = JBLabel("Show:")
+    private val moreInfoButtons = TabMoreInfo.entries.associateWith { mode ->
+        JBRadioButton(when (mode) {
+            TabMoreInfo.NONE -> "Name only"
+            TabMoreInfo.PROJECT_PATH -> "Project path"
+            TabMoreInfo.GIT_BRANCH -> "Branch"
+            TabMoreInfo.GIT_BRANCH_COMPACT -> "Compact branch"
+            TabMoreInfo.GIT_STATUS -> "Changed lines"
+        })
+    }
     private val branchPosition = appearanceChoice(TabBranchPosition.entries)
-    private val branchPositionLabel = JBLabel("Git position:").apply { labelFor = branchPosition }
-    private val branchStatus = JBCheckBox("Show Git status")
+    private val branchPositionLabel = JBLabel("Git info position:").apply { labelFor = branchPosition }
+    private val branchStatus = JBCheckBox("Also show changed lines").apply { isOpaque = false }
     private var syncing = false
     private var displayedMoreInfo = TabAppearanceState.defaults().moreInfo()
     val component = createComponent()
@@ -158,31 +147,16 @@ internal class TabAppearanceForm(
 
     private fun createComponent(): JPanel = JPanel(BorderLayout(0, JBUI.scale(12))).apply {
         val rowHeight = maxOf(iconSize.preferredSize.height, outlineThickness.preferredSize.height, JBUI.scale(30))
-        val gitInfoControl = JPanel(FlowLayout(FlowLayout.LEFT, JBUI.scale(8), 0)).apply {
-            isOpaque = false
-            add(branchPosition)
-            add(branchStatus)
-        }
-        val controls = listOf(gitInfoControl, groupSeparatorColor, groupHighlightStyle)
-        val controlWidth = maxOf(controls.maxOf {
-            it.preferredSize.width + if (it === gitInfoControl) SettingsPendingChange.reservedWidth else 0
-        }, JBUI.scale(240))
-        fun sliderControl(slider: JSlider, value: JBLabel, maxValue: Int, unit: String = "px") = JPanel(BorderLayout(JBUI.scale(6), 0)).apply {
-            isOpaque = false
-            val metrics = value.getFontMetrics(value.font)
-            value.preferredSize = Dimension(metrics.stringWidth("$maxValue $unit"), rowHeight)
-            add(slider, BorderLayout.CENTER)
-            add(value, BorderLayout.EAST)
-            preferredSize = Dimension(controlWidth, rowHeight)
-        }
-        val fillIntensityControl = sliderControl(tabFillIntensity, fillIntensityValue, MAX_TAB_FILL_INTENSITY, "%")
-        val inactiveTabDimmingControl = sliderControl(inactiveTabDimming, inactiveTabDimmingValue, MAX_INACTIVE_TAB_DIMMING_LEVEL, "%")
-        val activeTabHighlightControl = sliderControl(activeTabHighlight, activeTabHighlightValue, MAX_ACTIVE_TAB_HIGHLIGHT_LEVEL, "%")
-        val heightControl = sliderControl(tabHeight, tabHeightValue, MAX_TAB_HEIGHT)
-        val fontControl = sliderControl(tabFontSize, fontSizeValue, maxOf(MAX_TAB_FONT_SIZE, defaultTabFontSize() + 2))
-        val groupSpacingControl = sliderControl(groupSpacing, groupSpacingValue, MAX_GROUP_SPACING)
-        val separatorThicknessControl = sliderControl(groupSeparatorThickness, separatorThicknessValue, MAX_OUTLINE_THICKNESS)
-        val separatorHeightControl = sliderControl(groupSeparatorHeight, separatorHeightValue, 100, "%")
+        val controlWidth = maxOf(groupSeparatorColor.preferredSize.width,
+            groupHighlightStyle.preferredSize.width, JBUI.scale(240))
+        val fillIntensityControl = percentField(tabFillIntensity, "Tab fill intensity in percent", controlWidth, rowHeight)
+        val inactiveTabDimmingControl = percentField(inactiveTabDimming, "Inactive tab dimming in percent", controlWidth, rowHeight)
+        val activeTabHighlightControl = percentField(activeTabHighlight, "Active tab highlight in percent", controlWidth, rowHeight)
+        val heightControl = pixelField(tabHeight)
+        val fontControl = pixelField(tabFontSize)
+        val groupSpacingControl = pixelField(groupSpacing)
+        val separatorThicknessControl = pixelField(groupSeparatorThickness)
+        val separatorHeightControl = percentField(groupSeparatorHeight, "Group separator height in percent", controlWidth, rowHeight)
         fun section(title: String, content: JComponent) = JPanel(BorderLayout()).apply {
             isOpaque = false
             add(JPanel(BorderLayout(JBUI.scale(12), 0)).apply {
@@ -196,11 +170,6 @@ internal class TabAppearanceForm(
             }, BorderLayout.NORTH)
             add(content, BorderLayout.CENTER)
         }
-        fun form(master: JComponent, fields: List<AppearanceField>) = SettingsAppearanceForm(
-            master, fields, { fields.mapNotNull { it.label }.maxOfOrNull { it.preferredSize.width } ?: 0 },
-            controlWidth, rowHeight,
-            { (availableWidth() - appearanceTabs.insets.left - appearanceTabs.insets.right).coerceAtLeast(1) },
-        )
         val styleControlWidth = maxOf(JBUI.scale(180), iconSize.preferredSize.width, outlineStyle.preferredSize.width)
         val styleLabelWidth = { listOf(sizeLabel, positionLabel, initialsLabel, letterWeightLabel,
             styleLabel, thicknessLabel, fillInsetLabel, fillIntensityLabel).maxOf { it.preferredSize.width } }
@@ -228,15 +197,34 @@ internal class TabAppearanceForm(
             AppearanceField(fillIntensityLabel, fillIntensityControl),
         ))))
         appearanceTabs.addTab("Style", styleColumns)
+        val tabLabelWidth = { listOf(tabHeightLabel, fontSizeLabel, closeButtonLabel, branchPositionLabel,
+            inactiveTabDimmingLabel, activeTabHighlightLabel).maxOf { it.preferredSize.width } }
+        val tabColumns = SettingsAppearanceColumns(
+            { (availableWidth() - appearanceTabs.insets.left - appearanceTabs.insets.right).coerceAtLeast(1) },
+            { tabLabelWidth() + controlWidth + JBUI.scale(36) },
+        )
+        fun tabForm(master: JComponent, fields: List<AppearanceField>, label: JBLabel? = null) =
+            SettingsAppearanceForm(master, fields, tabLabelWidth, controlWidth, rowHeight,
+                tabColumns::columnWidth, label, singleColumn = true)
         val moreInfoRow = SettingsRadioRow(moreInfoLabel, moreInfoButtons.values.toList(), wrapChoices = true) {
-            (availableWidth() - appearanceTabs.insets.left - appearanceTabs.insets.right - JBUI.scale(24)).coerceAtLeast(1)
+            (tabColumns.columnWidth() - JBUI.scale(24)).coerceAtLeast(1)
         }
-        appearanceTabs.addTab("Tab layout", form(moreInfoRow, listOf(
-            AppearanceField(tabHeightLabel, heightControl), AppearanceField(fontSizeLabel, fontControl),
-            AppearanceField(closeButtonLabel, closeButtonPosition, stretch = false), AppearanceField(branchPositionLabel, gitInfoControl),
-            AppearanceField(inactiveTabDimmingLabel, inactiveTabDimmingControl),
-            AppearanceField(activeTabHighlightLabel, activeTabHighlightControl),
-        )))
+        tabColumns.add(JPanel(BorderLayout(0, JBUI.scale(16))).apply {
+            isOpaque = false
+            add(section("Content", tabForm(moreInfoRow, listOf(
+                AppearanceField(branchPositionLabel, branchPosition, stretch = false),
+                AppearanceField(null, branchStatus),
+            ))), BorderLayout.NORTH)
+            add(section("Selection", tabForm(activeTabHighlightControl, listOf(
+                AppearanceField(inactiveTabDimmingLabel, inactiveTabDimmingControl),
+            ), activeTabHighlightLabel)), BorderLayout.CENTER)
+        })
+        tabColumns.add(section("Size & position", tabForm(compactField(heightControl), listOf(
+            AppearanceField(null, useIdeFontSize),
+            AppearanceField(fontSizeLabel, fontControl, stretch = false),
+            AppearanceField(closeButtonLabel, closeButtonPosition, stretch = false),
+        ), tabHeightLabel)))
+        appearanceTabs.addTab("Tab layout", tabColumns)
         val groupLabelWidth = { maxOf(backgroundHighlight.labelWidth(), joinedHighlight.labelWidth(),
             listOf(groupSpacingLabel, groupVariantLabel,
                 separatorThicknessLabel, separatorHeightLabel, separatorColorLabel).maxOf { it.preferredSize.width }) }
@@ -262,9 +250,9 @@ internal class TabAppearanceForm(
             ))), BorderLayout.NORTH)
             add(section("Spacing & separator", JPanel(BorderLayout()).apply {
                 isOpaque = false
-                add(groupForm(groupSpacingControl, emptyList(), groupSpacingLabel), BorderLayout.NORTH)
+                add(groupForm(compactField(groupSpacingControl), emptyList(), groupSpacingLabel), BorderLayout.NORTH)
                 add(groupForm(showGroupSeparator, listOf(
-                    AppearanceField(separatorThicknessLabel, separatorThicknessControl),
+                    AppearanceField(separatorThicknessLabel, separatorThicknessControl, stretch = false),
                     AppearanceField(separatorHeightLabel, separatorHeightControl),
                     AppearanceField(separatorColorLabel, groupSeparatorColor),
                 )), BorderLayout.CENTER)
@@ -335,7 +323,7 @@ internal class TabAppearanceForm(
         tabHeight.accessibleContext.accessibleDescription = "From $DEFAULT_TAB_HEIGHT to $MAX_TAB_HEIGHT pixels. Use arrow keys for one-pixel steps."
         tabHeight.toolTipText = "Tab height: $DEFAULT_TAB_HEIGHT px (default) to $MAX_TAB_HEIGHT px. Content and outlines remain visible."
         moreInfoButtons.forEach { (mode, button) ->
-            button.accessibleContext.accessibleName = "Show more info: ${mode.title}"
+            button.accessibleContext.accessibleName = "Show more info: ${button.text}"
             button.toolTipText = when (mode) {
                 TabMoreInfo.NONE -> "Show only the project name."
                 TabMoreInfo.PROJECT_PATH -> "Show the project path in window tabs."
@@ -353,7 +341,7 @@ internal class TabAppearanceForm(
         branchPosition.accessibleContext.accessibleName = "Git info position"
         branchPosition.toolTipText = "Place the Git branch and changed-line count together to the left or right of the project name."
         branchPosition.addChangeListener { appearanceChanged() }
-        branchStatus.accessibleContext.accessibleName = "Show Git status with branch"
+        branchStatus.accessibleContext.accessibleName = "Also show changed lines with branch"
         branchStatus.toolTipText = "Show added and removed lines alongside Git branch or Git Branch Compact. Saved tracked changes against HEAD, staged and unstaged."
         branchStatus.addActionListener { appearanceChanged() }
         showIcons.addActionListener { appearanceChanged() }
@@ -370,8 +358,18 @@ internal class TabAppearanceForm(
         tabFontSize.accessibleContext.accessibleDescription = "Use arrow keys for one-pixel steps."
         tabFontSize.toolTipText = "Adjust tab title text. The default size follows the IDE font."
         tabFontSize.addChangeListener {
-            if (!syncing) fontSizeSelection.select(tabFontSize.value, defaultTabFontSize())
+            if (!syncing && !useIdeFontSize.isSelected) fontSizeSelection.reset(tabFontSize.value as Int, defaultTabFontSize())
             appearanceChanged()
+        }
+        useIdeFontSize.addActionListener {
+            if (!syncing) {
+                syncing = true
+                try {
+                    tabFontSize.value = fontSizeSelection.reset(
+                        if (useIdeFontSize.isSelected) 0 else tabFontSize.value as Int, defaultTabFontSize())
+                } finally { syncing = false }
+                appearanceChanged()
+            }
         }
     }
 
@@ -385,7 +383,8 @@ internal class TabAppearanceForm(
         // или возврате ползунка на исходное деление.
         inactiveTabDimming = if (inactiveTabDimming.value == inactiveTabDimmingLevel(displayedInactiveTabDimming)) displayedInactiveTabDimming
             else inactiveTabDimming.value * MAX_INACTIVE_TAB_DIMMING / MAX_INACTIVE_TAB_DIMMING_LEVEL,
-        activeTabHighlight = activeTabHighlight.value * MAX_ACTIVE_TAB_HIGHLIGHT / MAX_ACTIVE_TAB_HIGHLIGHT_LEVEL,
+        activeTabHighlight = if (activeTabHighlight.value == activeTabHighlightLevel(displayedActiveTabHighlight)) displayedActiveTabHighlight
+            else activeTabHighlight.value * MAX_ACTIVE_TAB_HIGHLIGHT / MAX_ACTIVE_TAB_HIGHLIGHT_LEVEL,
         iconSize = iconSize.selectedItem as TabIconSize,
         iconPosition = iconPosition.selectedItem as TabIconPosition,
         iconInitials = iconInitials.selectedItem as TabIconInitials,
@@ -393,14 +392,14 @@ internal class TabAppearanceForm(
         outlineThickness = outlineThickness.value as Int,
         outlineStyle = outlineStyle.selectedItem as TabOutlineStyle,
         closeButtonPosition = closeButtonPosition.selectedItem as TabCloseButtonPosition,
-        tabHeight = tabHeight.value,
-        groupSpacing = groupSpacing.value,
+        tabHeight = tabHeight.value as Int,
+        groupSpacing = groupSpacing.value as Int,
         showGroupOutline = showGroupOutline.isSelected,
         groupHighlightStyle = groupHighlightStyle.selectedItem as GroupHighlightStyle,
         groupBackground = backgroundHighlight.value(),
         groupJoined = joinedHighlight.value(),
         showGroupSeparator = showGroupSeparator.isSelected,
-        groupSeparatorThickness = groupSeparatorThickness.value,
+        groupSeparatorThickness = groupSeparatorThickness.value as Int,
         groupSeparatorHeight = groupSeparatorHeight.value,
         groupSeparatorColor = groupSeparatorColor.selectedItem as GroupSeparatorColor,
         showGroupIcon = showGroupIcon.isSelected,
@@ -419,8 +418,11 @@ internal class TabAppearanceForm(
         syncing = true
         try {
             val size = fontSizeSelection.reset(value.tabFontSize, defaultTabFontSize())
-            tabFontSize.maximum = maxOf(MAX_TAB_FONT_SIZE, defaultTabFontSize() + 2, size)
-            tabFontSize.minimum = minOf(MIN_TAB_FONT_SIZE, defaultTabFontSize())
+            useIdeFontSize.isSelected = value.tabFontSize == 0
+            (tabFontSize.model as SpinnerNumberModel).apply {
+                maximum = maxOf(MAX_TAB_FONT_SIZE, defaultTabFontSize() + 2, size)
+                minimum = minOf(MIN_TAB_FONT_SIZE, defaultTabFontSize())
+            }
             tabFontSize.value = size
             showIcons.isSelected = value.showIcons
             showOutline.isSelected = value.showOutline
@@ -429,7 +431,8 @@ internal class TabAppearanceForm(
             tabFillIntensity.value = value.tabFillIntensity
             displayedInactiveTabDimming = normalizedInactiveTabDimming(value.inactiveTabDimming)
             inactiveTabDimming.value = inactiveTabDimmingLevel(displayedInactiveTabDimming)
-            activeTabHighlight.value = activeTabHighlightLevel(value.activeTabHighlight)
+            displayedActiveTabHighlight = normalizedActiveTabHighlight(value.activeTabHighlight)
+            activeTabHighlight.value = activeTabHighlightLevel(displayedActiveTabHighlight)
             iconSize.selectedItem = value.iconSize
             iconPosition.selectedItem = value.iconPosition
             iconInitials.selectedItem = value.iconInitials
@@ -460,11 +463,14 @@ internal class TabAppearanceForm(
 
     fun refreshEnabled(enabled: Boolean) {
         listOf(showIcons, showOutline, showTabBackground, closeButtonPosition, closeButtonLabel,
-            tabHeight, tabHeightLabel, tabHeightValue, tabFontSize, fontSizeLabel, fontSizeValue, moreInfoLabel,
-            inactiveTabDimming, inactiveTabDimmingLabel, inactiveTabDimmingValue,
-            activeTabHighlight, activeTabHighlightLabel, activeTabHighlightValue,
-            groupSpacing, groupSpacingLabel, groupSpacingValue, showGroupOutline, showGroupSeparator, showGroupIcon)
+            tabHeight, tabHeightLabel, useIdeFontSize, moreInfoLabel,
+            inactiveTabDimming, inactiveTabDimmingLabel,
+            activeTabHighlight, activeTabHighlightLabel,
+            groupSpacing, groupSpacingLabel, showGroupOutline, showGroupSeparator, showGroupIcon)
             .forEach { it.isEnabled = enabled }
+        listOf(tabFontSize, fontSizeLabel).forEach {
+            it.isEnabled = enabled && !useIdeFontSize.isSelected
+        }
         listOf(iconSize, sizeLabel).forEach {
             it.isEnabled = enabled && (showIcons.isSelected || showGroupIcon.isSelected)
         }
@@ -487,12 +493,12 @@ internal class TabAppearanceForm(
             groupVariantDetails.add(details, BorderLayout.CENTER)
             layoutChanged()
         }
-        listOf(groupSeparatorThickness, separatorThicknessLabel, separatorThicknessValue,
-            groupSeparatorHeight, separatorHeightLabel, separatorHeightValue, groupSeparatorColor, separatorColorLabel).forEach {
+        listOf(groupSeparatorThickness, separatorThicknessLabel,
+            groupSeparatorHeight, separatorHeightLabel, groupSeparatorColor, separatorColorLabel).forEach {
             it.isEnabled = enabled && showGroupSeparator.isSelected
         }
         hideGroupedTabIcons.isEnabled = enabled && showGroupIcon.isSelected
-        listOf(tabFillInset, fillInsetLabel, tabFillIntensity, fillIntensityLabel, fillIntensityValue).forEach {
+        listOf(tabFillInset, fillInsetLabel, tabFillIntensity, fillIntensityLabel).forEach {
             it.isEnabled = enabled && showTabBackground.isSelected
         }
         moreInfoButtons.values.forEach { it.isEnabled = enabled }
@@ -500,14 +506,6 @@ internal class TabAppearanceForm(
             it.isEnabled = enabled && moreInfoButtons.entries.any { it.key.isGit && it.value.isSelected }
         }
         branchStatus.isEnabled = enabled && moreInfoButtons.entries.any { it.key.isBranch && it.value.isSelected }
-        activeTabHighlightValue.text = "${activeTabHighlight.value}%"
-        inactiveTabDimmingValue.text = "${inactiveTabDimming.value}%"
-        fillIntensityValue.text = "${tabFillIntensity.value}%"
-        tabHeightValue.text = "${tabHeight.value} px"
-        groupSpacingValue.text = "${groupSpacing.value} px"
-        separatorThicknessValue.text = "${groupSeparatorThickness.value} px"
-        separatorHeightValue.text = "${groupSeparatorHeight.value}%"
-        fontSizeValue.text = "${tabFontSize.value} px"
     }
 
     fun installMarkers(watch: (JComponent, (TabAppearanceState) -> Any?) -> Unit) {
@@ -537,6 +535,7 @@ internal class TabAppearanceForm(
         watch(showGroupIcon) { it.showGroupIcon }
         watch(hideGroupedTabIcons) { it.hideGroupedTabIcons }
         watch(fontSizeLabel) { it.tabFontSize }
+        watch(useIdeFontSize) { it.tabFontSize == 0 }
         watch(closeButtonLabel) { it.closeButtonPosition }
         watch(moreInfoLabel) { it.moreInfo() }
         watch(branchPositionLabel) { it.branchPosition }

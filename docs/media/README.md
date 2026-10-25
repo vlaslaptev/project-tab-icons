@@ -29,28 +29,32 @@ icons and UI colors were not redrawn or retouched.
 | Asset | Source and purpose |
 | --- | --- |
 | `appearance-gallery.png` | 0.3.97: ten Preview frames across eight themes, four three-tab examples, all ending after editor row seven |
-| `appearance-presets.png` | 0.3.97: presets, Preview, current Tab layout and preset actions beside Style / Tab layout / Group layout |
-| `git-context.png` | 0.3.86: Preview branches/counts and their Tab layout controls |
-| `captures/groups-settings.png` | 0.3.86: table switcher, current Projects column and Add group row |
+| `appearance-presets.png` | 0.3.120: shared preset rows, three top-level sections, compact Preview and Style with exact percentage input |
+| `git-context.png` | 0.3.120: compact Preview, Content and Selection on the left, Size & position on the right |
+| `captures/groups-settings.png` | 0.3.120: shared presets, Project groups navigation, table header and Add group only |
 | `icon-library.png` | Unchanged approved illustration with a fixed selection of 100+ bundled SVGs |
 | `hero-dark.png` / `hero-light.png` | Preserved illustrated covers, not screenshots |
 | `social-preview.png` | Preserved repository social preview |
 | `logo-512.png` | Transparent export of the existing logo |
 
-The Appearance slide was recaptured from installed 0.3.97 in IntelliJ IDEA
-2026.2.3 on 23 October 2026. It shows the current three-section switcher and
-preset actions. The Git slide and group-table crop remain from 0.3.86, captured
-on 21 October 2026. Frontend, Backend, Tools, editor text, branches and counts
-are built-in demo fixtures. The screenshot crops use the saved generic `group_git`
-appearance. The group-table crop shows the Projects heading and ends after Add
-group; it does not imply an empty saved group list.
+The three Settings crops were recaptured from installed **0.3.120** in IntelliJ IDEA
+2026.2.3 on **25 October 2026**, using the current Islands Darcula theme. Appearance
+shows the global preset header, navigation, compact Preview and Style. Git shows
+Preview and the current Tab layout labels and numeric controls. Groups includes
+the global preset header and ends after Add group, before any saved group rows;
+it does not imply an empty group list.
 
-For the Settings captures, window titles, navigation, saved group rows, real project names and paths are
-excluded. UI pixels and labels were not redrawn, renamed, blurred or retouched.
-Only rectangular cropping, uniform display scaling and PNG encoding were used.
-The slides add an illustrated background, frame and captions outside UI pixels.
-[Capture provenance](captures/provenance.json) records version, date, SHA-256,
-dimensions and crop scope. All plugin and theme settings were preserved byte for byte.
+Frontend, Backend and Tools, branches and counts are built-in demo fixtures.
+`git_with_icon` and `group_git` are generic appearance preset labels. Window titles,
+the IDE navigation tree, working project names, paths and saved group rows are
+outside the crops. The pointer was moved outside the crop using native UI before
+capture. No UI pixels or labels were redrawn, blurred or retouched. The supplied
+native screenshot JPEG bytes were cropped and encoded as PNG; the two slides add
+an illustrated frame and captions outside the UI. Four plugin settings files and
+laf.xml remained byte-identical after capture.
+[Capture provenance](captures/provenance.json) records source hashes, versions,
+dates, dimensions and exact crop rectangles. The ten-example themes gallery stays
+at its documented 0.3.97 capture version. The icon-library SVG/PNG remains byte-identical.
 
 SVG files are the illustration and Settings slide sources; the themes gallery uses
 the frame sizes and source hashes in its JSON metadata. `manifest.json` describes the generated slides;

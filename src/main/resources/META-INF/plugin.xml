@@ -39,12 +39,11 @@
   ]]></change-notes>
 
   <extensions defaultExtensionNs="com.intellij">
-    <projectConfigurable
+    <applicationConfigurable
         parentId="appearance"
         instance="dev.vlas.projecttabicons.IconSettingsConfigurable"
         id="dev.vlas.projecttabicons.settings"
         displayName="Project Tab Icons"
-        nonDefaultProject="true"
         os="mac"/>
     <postStartupActivity
         implementation="dev.vlas.projecttabicons.ProjectTabIconsStartupActivity"

@@ -58,6 +58,7 @@ internal class ColorSwatch(private val color: Color) : Icon {
 internal class SettingsValueButton(text: String, icon: Icon? = null) : JButton(text, icon) {
     var hideWhenDisabled = false
     var muteDisabledIcon = true
+    var readOnlyValue = false
     init {
         ui = object : BasicButtonUI() {
             override fun paintText(graphics: Graphics, component: JComponent, rect: Rectangle, text: String) {
@@ -68,7 +69,8 @@ internal class SettingsValueButton(text: String, icon: Icon? = null) : JButton(t
                 // BasicButtonUI иначе рисует тиснёную подпись, не подходящую теме IDEA.
                 val g = graphics.create()
                 try {
-                    g.color = UIManager.getColor("Label.disabledForeground") ?: UIUtil.getContextHelpForeground()
+                    g.color = if (readOnlyValue) component.foreground else
+                        UIManager.getColor("Label.disabledForeground") ?: UIUtil.getContextHelpForeground()
                     BasicGraphicsUtils.drawStringUnderlineCharAt(g, text, -1, rect.x, rect.y + g.fontMetrics.ascent)
                 } finally { g.dispose() }
             }
@@ -223,7 +225,7 @@ internal class IconChoiceGrid<T>(
         hoveredIndex = -1
         try {
             items.clear()
-            values.forEach(items::addElement)
+            items.addAll(values)
             selectedIndex = values.indexOf(selected)
         } finally {
             valueIsAdjusting = false

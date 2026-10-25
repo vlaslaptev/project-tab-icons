@@ -63,7 +63,7 @@ internal class CenteredProjectIcon(
         } catch (error: RuntimeException) {
             if (!renderingFailureLogged) {
                 renderingFailureLogged = true
-                LOG.warn("Cannot render the prepared project tab icon; leaving its slot empty", error)
+                LOG.warn("Cannot render the prepared project tab icon", error)
             }
         } finally {
             g.dispose()

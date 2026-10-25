@@ -21,6 +21,7 @@ internal class TextIconEditor(project: Project, initial: TextIconSpec?, color: C
     private val hex = JBTextField(initial?.colorHex ?: color.hex(), 10)
     private val errorLabel = JBLabel(" ").apply { foreground = JBColor.RED }
     private var choice: IconChoice? = null
+    private var updatingColor = false
     var validationError: String? = null
         private set
 
@@ -47,7 +48,7 @@ internal class TextIconEditor(project: Project, initial: TextIconSpec?, color: C
         val more = JButton("More colors…").apply {
             addActionListener {
                 ColorChooserService.getInstance().showDialog(project, this@TextIconEditor, "Text icon color",
-                    parseIconColor(hex.text), enableOpacity = false)?.let { hex.text = it.hex() }
+                    parseIconColor(hex.text), enableOpacity = false)?.let(::chooseColor)
             }
         }
         row(3, "Color:", JPanel(java.awt.BorderLayout(JBUI.scale(8), 0)).apply {
@@ -59,7 +60,7 @@ internal class TextIconEditor(project: Project, initial: TextIconSpec?, color: C
                     toolTipText = preset.name
                     accessibleContext.accessibleName = "Text icon color: ${preset.name}"
                     preferredSize = JBUI.size(36, 30)
-                    addActionListener { hex.text = preset.bright.hex() }
+                    addActionListener { chooseColor(preset.bright) }
                 })
             }
         }
@@ -73,10 +74,16 @@ internal class TextIconEditor(project: Project, initial: TextIconSpec?, color: C
         })
         add(JPanel(), GridBagConstraints().apply { gridx = 0; gridy = 7; weighty = 1.0 })
         textField.document.addDocumentListener(onTextChanged { refresh() })
-        hex.document.addDocumentListener(onTextChanged { refresh() })
+        hex.document.addDocumentListener(onTextChanged { if (!updatingColor) refresh() })
         style.addActionListener { refresh() }
         fontFamily.addActionListener { refresh() }
         refresh(notify = false)
+    }
+
+    private fun chooseColor(color: Color) {
+        updatingColor = true
+        try { hex.text = color.hex() } finally { updatingColor = false }
+        refresh()
     }
 
     private fun refresh(notify: Boolean = true) {

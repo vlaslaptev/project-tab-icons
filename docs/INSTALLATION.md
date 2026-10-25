@@ -1,12 +1,14 @@
 # Installation
 
+The ZIP, README and feature guide below describe **0.3.120**.
+
 Requires **macOS** and **IntelliJ IDEA 2026.2.3**, or a later update in the **2026.2**
 branch. Check the full build number under **Help → About**. The declared range is
 `262.10968.63` through `262.*`; support for 2026.3 is not declared.
 
 ## Install from a GitHub release
 
-1. Open [Releases](https://github.com/vlaslaptev/project-tab-icons/releases/tag/v0.3.107) and download [project-tab-icons-0.3.107.zip](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.107/project-tab-icons-0.3.107.zip).
+1. Open [Releases](https://github.com/vlaslaptev/project-tab-icons/releases/tag/v0.3.120) and download [project-tab-icons-0.3.120.zip](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.120/project-tab-icons-0.3.120.zip).
    Use the plugin ZIP attached to the release, rather than GitHub's source-code archive.
 2. In IDEA, open **Settings → Plugins**.
 3. Use the gear menu and select **Install Plugin from Disk…**.

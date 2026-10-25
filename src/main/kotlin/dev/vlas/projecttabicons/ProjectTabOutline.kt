@@ -23,12 +23,20 @@ internal fun projectTabOutlineInsets(color: Color?, thickness: Int, style: TabOu
     }
 }
 
-internal class ProjectTabOutline {
-    private var lastOutlineGeometry: ProjectTabGeometry? = null
-    private var lastStyle: TabOutlineStyle? = null
-    private var lastOutlineStroke = Float.NaN
+/** Координаты вкладки не входят в ключ; размеры, радиус и stroke уже учитывают UI scale. Все вызовы — UI. */
+internal class ProjectTabOutline(cacheLimit: Int = 1) {
+    private data class Key(val width: Double, val height: Double, val radius: Double,
+                           val stroke: Float, val style: TabOutlineStyle)
+    private data class Outline(val path: Shape, val stroke: BasicStroke)
+    private var lastKey: Key? = null
+    // Обычной вкладке достаточно последней формы; общий painter групп хранит ограниченную историю размеров.
+    private val cache = if (cacheLimit > 1) object : LinkedHashMap<Key, Outline>(16, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Key, Outline>?) = size > cacheLimit
+    } else null
     private var outlinePath: Shape? = null
     private var outlineStroke = BasicStroke(1f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+
+    init { require(cacheLimit > 0) }
 
     fun paint(g: Graphics2D, geometry: ProjectTabGeometry, color: Color, thickness: Int, style: TabOutlineStyle) {
         val stroke = JBUI.scale(thickness.coerceIn(MIN_OUTLINE_THICKNESS, MAX_OUTLINE_THICKNESS)).toFloat()
@@ -36,18 +44,38 @@ internal class ProjectTabOutline {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         g.stroke = outlineStroke
         g.color = color
-        g.draw(line)
+        val bounds = geometry.bounds
+        if (bounds.x == 0.0 && bounds.y == 0.0) g.draw(line) else {
+            // Перенос сохраняет device clip вкладки. Исходный transform восстанавливаем точно,
+            // в том числе при дробном масштабе и отрицательных координатах общей поверхности.
+            val transform = g.transform
+            try {
+                g.translate(bounds.x, bounds.y)
+                g.draw(line)
+            } finally { g.transform = transform }
+        }
     }
 
     private fun cachedOutline(geometry: ProjectTabGeometry, stroke: Float, outlineStyle: TabOutlineStyle): Shape? {
-        if (lastOutlineGeometry != geometry || lastStyle != outlineStyle || lastOutlineStroke != stroke) {
+        val bounds = geometry.bounds
+        if (bounds.width <= stroke || bounds.height <= stroke) return null
+        val previous = lastKey
+        if (previous == null || previous.width != bounds.width || previous.height != bounds.height ||
+            previous.radius != geometry.radius || previous.style != outlineStyle || previous.stroke != stroke) {
+            val key = Key(bounds.width, bounds.height, geometry.radius, stroke, outlineStyle)
+            val cached = cache?.get(key)
+            if (cached != null) {
+                lastKey = key
+                outlinePath = cached.path
+                outlineStroke = cached.stroke
+                return cached.path
+            }
             val halfStroke = stroke / 2.0
-            val left = geometry.bounds.x + halfStroke
-            val right = geometry.bounds.maxX - halfStroke
-            val top = geometry.bounds.y + halfStroke
-            val bottom = geometry.bounds.maxY - halfStroke
+            val left = halfStroke
+            val right = bounds.width - halfStroke
+            val top = halfStroke
+            val bottom = bounds.height - halfStroke
             val radius = (geometry.radius - halfStroke).coerceAtLeast(0.0)
-            if (right <= left || bottom <= top) return null
             val control = radius * 0.5522847498307936
             outlinePath = when (outlineStyle) {
                 TabOutlineStyle.BOTTOM -> Line2D.Double(left + radius, bottom, right - radius, bottom)
@@ -61,10 +89,9 @@ internal class ProjectTabOutline {
                     left, top, right - left, bottom - top, radius * 2, radius * 2,
                 )
             }
-            if (lastOutlineStroke != stroke) outlineStroke = BasicStroke(stroke, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
-            lastOutlineGeometry = geometry
-            lastStyle = outlineStyle
-            lastOutlineStroke = stroke
+            if (previous?.stroke != stroke) outlineStroke = BasicStroke(stroke, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+            lastKey = key
+            cache?.put(key, Outline(requireNotNull(outlinePath), outlineStroke))
         }
         return outlinePath
     }

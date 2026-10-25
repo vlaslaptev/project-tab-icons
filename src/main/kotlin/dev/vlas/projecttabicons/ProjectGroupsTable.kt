@@ -5,9 +5,9 @@ import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
-import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTextField
 import com.intellij.util.ui.EmptyIcon
+import com.intellij.util.IconUtil
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import java.awt.BorderLayout
@@ -17,24 +17,21 @@ import java.awt.FlowLayout
 import java.awt.GridBagConstraints
 import java.awt.KeyboardFocusManager
 import java.awt.Dimension
-import java.awt.event.ComponentAdapter
-import java.awt.event.ComponentEvent
 import java.nio.file.Path
 import javax.swing.BoxLayout
+import javax.swing.Box
 import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JPanel
-import javax.swing.ScrollPaneConstants
 import javax.swing.SwingUtilities
 
 /** Те же колонки и реальные Swing-контролы, что у проектов; форма редактирования — часть строки. */
 internal class ProjectGroupsTable(
-    private val selectedProjects: () -> Set<String>,
     private val save: (String?, String, Set<String>, Map<String, Int>) -> String?,
     private val delete: (String) -> Unit,
-    private val assign: (String) -> Unit,
     private val move: (String, Int) -> Unit,
     private val showProjects: (String) -> Unit,
+    private val addProjects: (String) -> Unit,
     private val chooseIcon: (String) -> Unit,
     private val chooseColor: (String, ProjectColorTarget) -> Unit,
     private val editingChanged: () -> Unit,
@@ -54,30 +51,21 @@ internal class ProjectGroupsTable(
     private var baseline = ProjectGroupsState()
     private var projects = emptyList<ProjectIconSettingsRow>()
     private var editingEnabled = true
-    private var canAssign = false
     private val columns = ProjectColumns()
     private val rows = ProjectRowsPanel()
-    private val scroll = JBScrollPane(rows).apply {
-        border = JBUI.Borders.customLine(JBColor.border())
-        horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
-        minimumSize = JBUI.size(0, 0)
-        preferredSize = JBUI.size(660, 300)
-        viewport.background = UIUtil.getListBackground()
-        accessibleContext.accessibleName = "Project groups table"
-        setColumnHeaderView(JPanel(columns.layout(header = true)).apply {
-            isOpaque = false
-            listOf("Group", "Projects", "Icon", "Icon color", "Outline color", "Tab color", "Actions").forEach { add(settingsHint(it)) }
-            border = JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 0)
-        })
+    private val columnHeader = JPanel(columns.layout(header = true)).apply {
+        isOpaque = false
+        listOf("Group", "Projects", "Icon", "Icon color", "Outline color", "Tab color", "Actions").forEach { add(settingsHint(it)) }
+        border = JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 0)
     }
-    private var memberScroll: JBScrollPane? = null
     private val availability = mutableListOf<Pair<JComponent, () -> Boolean>>()
 
     init {
-        isOpaque = false; add(scroll, BorderLayout.CENTER)
-        addComponentListener(object : ComponentAdapter() {
-            override fun componentResized(event: ComponentEvent) { memberScroll?.revalidate(); rows.revalidate() }
-        })
+        isOpaque = false
+        border = JBUI.Borders.customLine(JBColor.border())
+        getAccessibleContext().accessibleName = "Project groups table"
+        add(columnHeader, BorderLayout.NORTH)
+        add(rows, BorderLayout.CENTER)
         refresh()
     }
 
@@ -92,10 +80,23 @@ internal class ProjectGroupsTable(
         refresh()
     }
     fun cancelInput() {
-        if (input != null) { input = null; memberScroll = null; refresh(); editingChanged() }
+        if (input != null) { input = null; refresh(); editingChanged() }
     }
-    fun setEditingEnabled(enabled: Boolean, selected: Boolean) {
-        editingEnabled = enabled; canAssign = selected
+    fun focusGroup(id: String) {
+        SwingUtilities.invokeLater {
+            if (!isShowing) return@invokeLater
+            fun find(view: Component): JComponent? {
+                if (view is JComponent && view.getClientProperty("projectGroupControl") == "$id/icon") return view
+                return (view as? Container)?.components?.firstNotNullOfOrNull(::find)
+            }
+            find(rows)?.let { control ->
+                control.scrollRectToVisible(java.awt.Rectangle(0, 0, control.width, control.height))
+                if (control.isEnabled) control.requestFocusInWindow()
+            }
+        }
+    }
+    fun setEditingEnabled(enabled: Boolean) {
+        editingEnabled = enabled
         availability.forEach { (control, allowed) ->
             control.isEnabled = enabled && allowed()
             if (control is SettingsValueButton) control.muteDisabledIcon = !enabled || control.getClientProperty("preserveGroupIcon") != true
@@ -104,7 +105,7 @@ internal class ProjectGroupsTable(
             if (view is JBLabel || view is ProjectRowPanel) view.isEnabled = enabled
             if (view is Container) view.components.forEach(::dim)
         }
-        scroll.columnHeader.view?.let(::dim)
+        dim(columnHeader)
         dim(rows)
         rows.isEnabled = enabled
         rows.repaint()
@@ -113,12 +114,11 @@ internal class ProjectGroupsTable(
         if (!editingEnabled || input != null || (id == null && state.groups.size >= 50)) return
         val group = id?.let { key -> state.groups.firstOrNull { it.id == key } ?: return }
         val keys = (projects.map { it.key } + state.memberships.filterValues { it == id }.keys).toMutableSet()
-        input = Input(id, group?.name.orEmpty(), if (id == null) selectedProjects().intersect(keys).toMutableSet()
+        input = Input(id, group?.name.orEmpty(), if (id == null) mutableSetOf()
             else state.memberships.filterValues { it == id }.keys.toMutableSet(), keys,
             group?.memberPositions.orEmpty().toMutableMap()).also { pending ->
             pending.nameField.addActionListener { submit() }
         }
-        memberScroll = null
         refresh(focusName = true)
         editingChanged()
     }
@@ -132,9 +132,6 @@ internal class ProjectGroupsTable(
             pending.error = error
             input = pending
             refresh(focusName = true)
-        } else {
-            // save уже обновил таблицу через родительский showGroups().
-            memberScroll = null
         }
         editingChanged()
     }
@@ -147,8 +144,6 @@ internal class ProjectGroupsTable(
     private fun refresh(focusName: Boolean = false) {
         val owner = KeyboardFocusManager.getCurrentKeyboardFocusManager().focusOwner as? JComponent
         val focusKey = owner?.takeIf { SwingUtilities.isDescendingFrom(it, rows) }?.getClientProperty("projectGroupControl")
-        val y = scroll.verticalScrollBar.value
-        val memberY = memberScroll?.verticalScrollBar?.value ?: 0
         rows.removeAll(); availability.clear()
         var index = 0
         fun addRow(view: JComponent) {
@@ -178,8 +173,6 @@ internal class ProjectGroupsTable(
         rows.revalidate(); rows.repaint(); revalidate()
         SwingUtilities.invokeLater {
             if (!isShowing) return@invokeLater
-            scroll.verticalScrollBar.value = y
-            memberScroll?.verticalScrollBar?.value = memberY
             fun find(view: Component): JComponent? {
                 if (focusKey == null) return null
                 if (view is JComponent && view.getClientProperty("projectGroupControl") == focusKey) return view
@@ -204,26 +197,36 @@ internal class ProjectGroupsTable(
         accessibleContext.accessibleName = "Project group ${group.name}"
         add(identity(group))
         val total = state.memberships.count { it.value == group.id }
-        add(settingsHint("${members.size} open" + if (total != members.size) " · $total total" else "").apply {
-            toolTipText = "Group members are arranged together on the left when windows merge"
+        add(JPanel(BorderLayout(JBUI.scale(4), 0)).apply {
+            isOpaque = false
+            add(JPanel(BorderLayout(0, JBUI.scale(2))).apply {
+                isOpaque = false
+                val hint = "${members.size} open · $total total · Grouped tabs are arranged together on merge"
+                add(settingsHint("${members.size} open").apply { toolTipText = hint }, BorderLayout.NORTH)
+                if (total != members.size) add(settingsHint("$total total").apply { toolTipText = hint }, BorderLayout.SOUTH)
+            }, BorderLayout.CENTER)
         })
         addAppearance(this, group, enabled = true)
         add(JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)).apply {
             isOpaque = false
-            fun action(name: String, icon: javax.swing.Icon, allowed: () -> Boolean, run: () -> Unit) {
+            fun action(name: String, icon: javax.swing.Icon, allowed: () -> Boolean,
+                       rollover: javax.swing.Icon? = null, run: () -> Unit) {
                 add(registerWhen(SettingsValueButton("", icon).apply {
                     preferredSize = JBUI.size(32, 32)
+                    if (rollover != null) { rolloverIcon = rollover; pressedIcon = rollover }
                     toolTipText = name; accessibleContext.accessibleName = name
                     putClientProperty("projectGroupControl", "${group.id}/$name")
                     addActionListener { if (editingEnabled) run() }
                 }, allowed))
             }
-            action("Assign selected projects to ${group.name}", AllIcons.Actions.Checked, { input == null && canAssign }) { assign(group.id) }
+            action("Add projects to group ${group.name}", AllIcons.General.Add, { input == null }) { addProjects(group.id) }
             action("Edit project group ${group.name}", AllIcons.Actions.Edit, { input == null }) { begin(group.id) }
-            action("Delete project group ${group.name}", AllIcons.General.Remove, { input == null }) { delete(group.id) }
             val index = state.groups.indexOfFirst { it.id == group.id }
             action("Move group ${group.name} up", AllIcons.Actions.MoveUp, { input == null && index > 0 }) { move(group.id, -1) }
             action("Move group ${group.name} down", AllIcons.Actions.MoveDown, { input == null && index < state.groups.lastIndex }) { move(group.id, 1) }
+            add(Box.createHorizontalStrut(JBUI.scale(8)))
+            action("Delete project group ${group.name}", AllIcons.General.Delete, { input == null },
+                IconUtil.colorize(AllIcons.General.Delete, JBColor.namedColor("Actions.Red", JBColor(0xDB3B4B, 0xF08080)))) { delete(group.id) }
         })
         trackHover()
     }
@@ -254,21 +257,9 @@ internal class ProjectGroupsTable(
                     }
                     add(JBLabel("Projects (optional):"), BorderLayout.SOUTH)
                 }, BorderLayout.NORTH)
-                val members = memberOptions(group, pending)
-                memberScroll = object : JBScrollPane(members) {
-                    override fun getMinimumSize() = Dimension(0, preferredSize.height)
-                    override fun getPreferredSize(): Dimension {
-                        // Высота формы следует доступному месту таблицы при изменении Settings.
-                        // Длинный список прокручивается внутри, кнопки Add/Save остаются под ним.
-                        val room = (this@ProjectGroupsTable.height - JBUI.scale(240)).coerceAtLeast(JBUI.scale(100))
-                        return Dimension(JBUI.scale(300), minOf(members.preferredSize.height + JBUI.scale(4), room))
-                    }
-                }.apply {
-                    horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
-                    verticalScrollBar.unitIncrement = JBUI.scale(52)
+                add(memberOptions(group, pending).apply {
                     accessibleContext.accessibleName = "Group members and fixed tab positions"
-                }
-                add(requireNotNull(memberScroll), BorderLayout.CENTER)
+                }, BorderLayout.CENTER)
                 add(JPanel(BorderLayout(0, JBUI.scale(6))).apply {
                     isOpaque = false
                     add(JPanel(FlowLayout(FlowLayout.LEFT, JBUI.scale(6), 0)).apply {
@@ -349,7 +340,7 @@ internal class ProjectGroupsTable(
         val iconLabel = choice?.asset?.textIcon?.let { "Text: ${it.text}" }
             ?: choice?.asset?.builder?.contourId?.let { id -> ContourCatalog.entries.firstOrNull { it.id == id }?.title }
             ?: choice?.asset?.label ?: "Loading…"
-        val artwork = choice?.let { com.intellij.ide.RecentProjectIconHelper.createIcon(it.asset.tabArtwork() ?: it.asset.bytes, true, 24) }
+        val artwork = choice?.let { projectSvgIcon(it.asset, 24) }
         value(SettingsValueButton(settingsLiteral(iconLabel), artwork).apply {
             toolTipText = "Group icon · Inherited by all members, including closed and newly assigned projects"
             accessibleContext.accessibleName = "Change icon for group ${group?.name.orEmpty()}"

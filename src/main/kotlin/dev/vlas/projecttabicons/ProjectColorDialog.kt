@@ -1,6 +1,5 @@
 package dev.vlas.projecttabicons
 
-import com.intellij.ide.RecentProjectIconHelper
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.ValidationInfo
@@ -53,6 +52,7 @@ internal class ProjectColorDialog(
     private val preview = ProjectColorPreview(row.target.name, appearance)
     private val colorLabel = JBLabel().apply { font = font.deriveFont(Font.BOLD) }
     private val colorDetail = settingsHint("")
+    private var updatingColor = false
 
     init {
         title = label
@@ -109,11 +109,7 @@ internal class ProjectColorDialog(
                 val button = ColorPresetButton(value).apply {
                     toolTipText = label
                     accessibleContext.accessibleName = label
-                    addActionListener {
-                        customColor.isSelected = true
-                        hex.text = value.hex()
-                        updateControls()
-                    }
+                    addActionListener { chooseColor(value) }
                 }
                 colorGroup.add(button)
                 buttons[value] = button
@@ -147,7 +143,7 @@ internal class ProjectColorDialog(
         }), BorderLayout.SOUTH)
         autoColor.addActionListener { updateControls() }
         customColor.addActionListener { updateControls() }
-        hex.document.addDocumentListener(onTextChanged { updateSelection() })
+        hex.document.addDocumentListener(onTextChanged { if (!updatingColor) updateSelection() })
         nativePicker.addActionListener {
             // Режим Choose: нативный диалог меняет только черновик после подтверждения.
             val listener = object : ColorPickerListener {
@@ -156,14 +152,21 @@ internal class ProjectColorDialog(
             }
             ColorChooserService.getInstance().showDialog(project, body, target.title,
                 parseIconColor(hex.text), enableOpacity = false, listeners = listOf(listener))?.let { color ->
-                customColor.isSelected = true
-                hex.text = color.hex()
-                updateControls()
+                chooseColor(color)
             }
         }
         init()
         updateControls()
         initValidation()
+    }
+
+    private fun chooseColor(color: Color) {
+        updatingColor = true
+        try {
+            customColor.isSelected = true
+            hex.text = color.hex()
+        } finally { updatingColor = false }
+        updateControls()
     }
 
     private fun updateSelection() {
@@ -183,15 +186,14 @@ internal class ProjectColorDialog(
         } else value?.hex() ?: "Enter six HEX digits"
         val choice = row.activeChoice
         val image = if (target == ProjectColorTarget.ICON && value != null && choice?.asset?.textIcon != null) {
-            RecentProjectIconHelper.createIcon(choice.asset.textIcon.copy(colorHex = value.hex()).asset().bytes, true, 24)
+            projectSvgIcon(choice.asset.textIcon.copy(colorHex = value.hex()).asset(), 24)
         } else if (target == ProjectColorTarget.ICON && value != null && choice?.asset?.builder != null) {
             val builder = choice.asset.builder
             ContourCatalog.entries.firstOrNull { it.id == builder.contourId }?.let {
-                RecentProjectIconHelper.createIcon(it.svg(value), true, 24)
+                projectSvgIcon(SvgAsset(it.svg(value), it.title), 24)
             }
         } else choice?.let {
-            val bytes = it.asset.tabArtwork() ?: it.asset.bytes
-            RecentProjectIconHelper.createIcon(bytes, true, 24)
+            projectSvgIcon(it.asset, 24)
         }
             ?: row.previewIcon(if (target == ProjectColorTarget.ICON) value else row.colorOverrides.icon,
                 appearance.iconInitials, appearance.iconLetterWeight)

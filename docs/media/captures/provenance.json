@@ -1,58 +1,79 @@
 {
   "plugin": "Project Tab Icons",
+  "pluginVersion": "0.3.120",
   "application": "IntelliJ IDEA 2026.2.3",
-  "previewTheme": "Current \u00b7 Islands Darcula",
-  "source": "Native Settings screenshots from installed Project Tab Icons. Appearance: 0.3.97 on 23 October 2026. Git and groups: 0.3.86 on 21 October 2026. IntelliJ IDEA 2026.2.3.",
-  "crop": "Appearance: presets, built-in Preview and current Tab layout with Style / Tab layout / Group layout and preset actions. Git: built-in Preview and Tab layout. Groups: table switcher, header and Add group only. No real project names, paths or saved group rows.",
-  "demoData": "Frontend, Backend and Tools, editor text, branches and line counts are built-in fixtures. User-preset names are generic appearance labels.",
-  "processing": "Rectangular crops; lossless PNG encoding. UI pixels and labels were not redrawn or retouched.",
-  "settings": "Saved group_git appearance. Settings closed with Cancel after capture; all four plugin settings files and two theme settings files remain byte-identical.",
+  "previewTheme": "Current · Islands Darcula",
+  "source": "Native Settings screenshots from installed Project Tab Icons 0.3.120, captured on 25 October 2026.",
+  "crop": "Appearance: shared presets, section navigation, compact Preview and Style. Git: compact Preview and Tab layout. Groups: shared presets, navigation, table header and Add group, ending before saved group rows. IDE titles, navigation tree and all working project names and paths are outside the crops.",
+  "demoData": "Frontend, Backend and Tools, branches and line counts are built-in fixtures. git_with_icon and group_git are generic appearance preset names.",
+  "processing": "Rectangular crops of native screenshot captures, converted from their supplied JPEG bytes to PNG. No UI pixels, labels or pointer were redrawn, blurred or retouched; the pointer was moved outside the crop through native UI before capture.",
+  "settings": "The saved group_git appearance was used without edits. Settings closed with Cancel. Four plugin XML files and laf.xml remain byte-identical.",
   "files": [
     {
       "file": "appearance-settings.png",
-      "sha256": "c76ad10ab17ed8d457318acd6ca71cf0c3d48bbe92306cec91b0b43b7b42f499",
-      "width": 2382,
-      "height": 1140,
+      "sha256": "e89ee2f3f23249e64177a9ddd4feb88fbbe56fe6e0fc346d8b3dded397e86639",
+      "width": 2700,
+      "height": 1360,
       "preset": "group_git",
-      "section": "current Tab layout, Style / Tab layout / Group layout switcher and preset actions",
-      "pluginVersion": "0.3.97",
-      "capturedOn": "2026-10-23",
+      "section": "global preset rows, Appearance navigation, compact Preview and Style",
+      "pluginVersion": "0.3.120",
+      "capturedOn": "2026-10-25",
       "userPresetRow": true,
-      "sourceCaptureSha256": "a6919394a0adc31b342aa550a23e09fcc2b31ccbe36171b08a7adcec3e0d5480",
+      "sourceCaptureSha256": "7a46d2b5fe473cc1012ba4373f7fd973ac1b21c01229a622bbb0595c001b03fe",
       "sourceSize": [
-        3060,
-        2066
+        3442,
+        2260
       ],
       "crop": [
-        646,
+        720,
         172,
-        3028,
-        1312
+        3420,
+        1532
       ]
     },
     {
       "file": "git-settings.png",
-      "sha256": "3e4c5ee6256ff46403107b98ed7f64b7772d662b1c5fce6da94545cb750225c5",
-      "width": 2788,
-      "height": 980,
+      "sha256": "77d6579a087bc5d45bec1683dbcb313a4513bec88ac595572c2f7878dd05c2d4",
+      "width": 2700,
+      "height": 1118,
       "preset": "group_git",
-      "section": "Preview and Git controls in Tab layout",
-      "pluginVersion": "0.3.86",
-      "capturedOn": "2026-10-21",
+      "section": "compact Preview and Tab layout, with Content and Selection on the left",
+      "pluginVersion": "0.3.120",
+      "capturedOn": "2026-10-25",
       "userPresetRow": false,
-      "sourceCaptureSha256": "986f16f013e9273dd3023828a3413e03ba27b89f637768ad1d09de2fa65b9748"
+      "sourceCaptureSha256": "282aa7aaa5cbf01b5b4bea8c9b0755a5438ae1922580c250182984490fd124bb",
+      "sourceSize": [
+        3442,
+        2260
+      ],
+      "crop": [
+        720,
+        582,
+        3420,
+        1700
+      ]
     },
     {
       "file": "groups-settings.png",
-      "sha256": "d7b4930aa7de1548e318098ea896e3584a47947ac79f2d3dcaf420a25f9548cf",
-      "width": 2788,
-      "height": 290,
+      "sha256": "8ab1b900f2071df7edc633ab56a7c96f475c0277f76888914c54e712f1f64a36",
+      "width": 2700,
+      "height": 576,
       "preset": "group_git",
-      "section": "Project groups table header and Add group",
-      "pluginVersion": "0.3.86",
-      "capturedOn": "2026-10-21",
-      "userPresetRow": false,
-      "sourceCaptureSha256": "c9ca07c0717ac531f6c087d507f9686d2fd71c4fba39c9dfcf8c951a048c2c70"
+      "section": "global preset rows, Project groups navigation, table header and Add group only",
+      "pluginVersion": "0.3.120",
+      "capturedOn": "2026-10-25",
+      "userPresetRow": true,
+      "sourceCaptureSha256": "20aabe49d580eaa53460032f9447a1c5029aa9632b3311dc2eb7c7c556e56ef2",
+      "sourceSize": [
+        3442,
+        2260
+      ],
+      "crop": [
+        720,
+        172,
+        3420,
+        748
+      ]
     }
   ],
   "pixelScale": 2
