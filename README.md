@@ -50,8 +50,8 @@ tab sizes and readable colors. They are a small selection of the available combi
 
 The **Light** preview uses light tab surfaces and readable text while keeping its dark toolbar.
 **Full window** adds file tabs and an editor fragment; Preview starts compact.
-The Appearance screenshot below shows installed 0.4.15-macos, captured on 29 October 2026.
-The examples gallery is from 0.3.97; Git and Project groups captures are from 0.3.120.
+The Appearance and Git screenshots below show installed 0.4.15-macos, captured on
+29 October 2026. The examples gallery is from 0.3.97; the Project groups capture is from 0.3.120.
 
 ## Compact controls, a live preview
 
@@ -151,7 +151,7 @@ Use self-contained, static SVGs without scripts, foreignObject, DOCTYPE or exter
 
 ## Git context beside the project name
 
-![Compact Preview and the current Git controls in Tab layout](assets/readme/git-context.png)
+![Settings 0.4.15-macos: compact Preview, Git controls and Tab corners in Tab layout](assets/readme/git-context.png)
 
 Show full or compact Git branches, tracked added/removed-line counts, or both.
 Choose whether extra information appears before or after the project name.

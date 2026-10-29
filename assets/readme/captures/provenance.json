@@ -7,7 +7,7 @@
   "crop": "Appearance: automatic project tabs, shared presets, section navigation, compact Preview and Style. Git: compact Preview and Tab layout. Groups: shared presets, navigation, table header and Add group, ending before saved group rows. IDE titles, navigation tree and all working project names and paths are outside the crops.",
   "demoData": "Frontend, Backend and Tools, branches and line counts are built-in fixtures. git_with_icon and group_git are generic appearance preset names.",
   "processing": "Rectangular crops of native screenshot captures, converted from their supplied JPEG bytes to PNG. No UI pixels, labels or pointer were redrawn, blurred or retouched; the pointer was moved outside the crop through native UI before capture.",
-  "settings": "Appearance uses the saved Custom appearance; Git and Groups use group_git. Settings were closed with Cancel after capture.",
+  "settings": "Appearance and Git use the saved Custom appearance; Groups uses group_git. Settings were closed with Cancel after capture.",
   "files": [
     {
       "file": "appearance-settings.png",
@@ -33,24 +33,24 @@
     },
     {
       "file": "git-settings.png",
-      "sha256": "77d6579a087bc5d45bec1683dbcb313a4513bec88ac595572c2f7878dd05c2d4",
-      "width": 2700,
-      "height": 1118,
-      "preset": "group_git",
-      "section": "compact Preview and Tab layout, with Content and Selection on the left",
-      "pluginVersion": "0.3.120",
-      "capturedOn": "2026-10-25",
+      "sha256": "75b5760633c86774ce17163ba49aef448c102595d4fe595bfbefd45d9afdeb25",
+      "width": 2816,
+      "height": 1048,
+      "preset": "Custom",
+      "section": "compact Preview and Tab layout, with Content, Selection and Tab corners controls",
+      "pluginVersion": "0.4.15-macos",
+      "capturedOn": "2026-10-29",
       "userPresetRow": false,
-      "sourceCaptureSha256": "282aa7aaa5cbf01b5b4bea8c9b0755a5438ae1922580c250182984490fd124bb",
+      "sourceCaptureSha256": "41b529adc11d79ec1bbfd942c3b489507e91c663b2b784520f1450e7a4919423",
       "sourceSize": [
-        3442,
+        3600,
         2260
       ],
       "crop": [
-        720,
-        582,
-        3420,
-        1700
+        752,
+        704,
+        3568,
+        1752
       ]
     },
     {
