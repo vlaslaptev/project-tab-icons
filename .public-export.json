@@ -78,7 +78,7 @@
     "licenses/Microsoft-Fluent-Emoji-MIT.txt": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
     "licenses/Phosphor-MIT.txt": "b5b1f1da112d18ea2147decfd48ddc1bf2b5aeb6c265381579340e95b15a2bb2",
     "licenses/Tabler-MIT.txt": "b740a1d46122672da62833e97f7e7c8a13fa85cbc7445b584b297cc00dde93db",
-    "repository.json": "cc9c0f2b3f8a8a2e2d36804f25b980ca540737bdb0c81ddc1326eec9ae233a74",
+    "repository.json": "a718e795d5a574cb0bae2ee44b04e7830bd8098b5ab06903e3d24a5871c815e0",
     "settings.gradle.kts": "c3b88464238fec3884189e003d13691aa86df86ac136565991ad4d83113fd26c",
     "src/main/kotlin/dev/vlas/projecttabicons/AppearancePresetsPanel.kt": "5aa6ba5ee07b4d1ba0fd6fb535b002803fc622305bc91f6cb07e7eb9c436a762",
     "src/main/kotlin/dev/vlas/projecttabicons/AtomicFileWrite.kt": "ea54ebcae333b4a2c6ea199da4465a2bcde4b2e2353378bbb87e5696a32c0a15",
