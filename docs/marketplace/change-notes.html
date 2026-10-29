@@ -1,3 +1,106 @@
+<h2>0.4.16</h2>
+<ul>
+  <li>Remove the light outline around dark headers in the macOS settings preview.</li>
+</ul>
+<h2>0.4.15 — local builds</h2>
+<ul>
+  <li>Use the actual project path for quick appearance actions, including file-based .ipr projects.</li>
+  <li>Save and validate unfinished group edits with Settings Apply or OK.</li>
+  <li>Avoid unchanged Windows tab repaints, resolve avatar colors before painting, and watch Git only for projects present on tab strips.</li>
+  <li>Batch project icon refreshes and remove the unused standalone Windows tab hosts.</li>
+</ul>
+<h2>0.4.13 — Windows beta</h2>
+<ul>
+  <li>Keep project-tab styling when Show Project Gradient is turned on or off, including delayed IDE decoration refreshes.</li>
+  <li>Match the Windows preview to the merged window: project tabs and window controls above the toolbar, full-width tab layout, and close buttons on every tab.</li>
+</ul>
+<h2>0.4.12 — local Windows build</h2>
+<ul>
+  <li>With customization off, show only project names with a uniform theme-blue 2 px underline and right-side close buttons.</li>
+  <li>Align Windows project tabs with the window edge and distribute the full tab strip width without theme margins.</li>
+  <li>Use right-side close buttons by default and in all built-in presets on Windows. Explicit custom positions remain editable.</li>
+</ul>
+<h2>0.4.11 — local Windows build</h2>
+<ul>
+  <li>Refresh stale Java window insets after restoring merged Windows project tabs, removing the white margins at the right and bottom.</li>
+</ul>
+<h2>0.4.10 — local Windows build</h2>
+<ul>
+  <li>Keep the relative order of ungrouped tabs when arranging after group edits with customization off.</li>
+  <li>Restore maximized project windows through their native state transition when separating merged tabs.</li>
+  <li>Reconcile embedded window position, frame insets and shell layout after display or DPI changes, and retain fitted bounds when switching tabs.</li>
+</ul>
+<h2>0.4.9 — local Windows build</h2>
+<ul>
+  <li>Preserve manual tab order when customization is off and enable Arrange Tabs by Group in that mode.</li>
+  <li>Keep keyboard focus on project tabs during repeated arrow navigation.</li>
+  <li>Restore and switch between distinct .ipr projects in the same directory.</li>
+  <li>Preserve normal window bounds when merging maximized windows, separating projects and closing down to one tab.</li>
+</ul>
+<h2>0.4.8 — local builds</h2>
+<ul>
+  <li>Choose Auto, Square or IDEA theme corners for project tabs on Windows and macOS.</li>
+  <li>Auto uses square corners on Windows and follows the IDEA theme on macOS.</li>
+  <li>Keep tab backgrounds, outlines, groups and previews consistent, including while dragging.</li>
+  <li>Preserve existing styles and include corner preferences in saved presets and style bundles.</li>
+</ul>
+<h2>0.4.7 — local Windows build</h2>
+<ul>
+  <li>Keep the IDE layout synchronized when resizing a merged project window.</li>
+  <li>Refresh hidden project layouts before showing them and recover from native resize failures.</li>
+  <li>Preserve the first tab click when activating the merged window.</li>
+</ul>
+<h2>0.4.6 — local build</h2>
+<ul>
+  <li>Open All Grouped Projects opens missing projects from every saved group and then arranges their tabs by group.</li>
+  <li>Find the command beside Arrange Tabs by Group or in Tools → Project Tab Icons, even when automatic tab opening is off.</li>
+  <li>Reuse existing projects and keep unrelated separate windows intact.</li>
+</ul>
+<h2>0.4.5 — local macOS build</h2>
+<ul>
+  <li>Place automatic project opening above tab customization with a separator between the independent settings.</li>
+  <li>Remove the inline macOS explanation from the settings page.</li>
+</ul>
+<h2>0.4.4 — local macOS build</h2>
+<ul>
+  <li>Add Automatically open projects in tabs to plugin settings and the Tools menu.</li>
+  <li>Reflect the macOS Always preference, or enable automatic tabs only for this IDE without changing system settings.</li>
+  <li>Add new projects to a native tab group while keeping other independent windows and restored sessions intact.</li>
+  <li>Store the macOS preference independently of Windows and appearance presets.</li>
+</ul>
+<h2>0.4.3 — local Windows build</h2>
+<ul>
+  <li>Add Automatically open projects in tabs to Project Tab Icons settings on Windows, disabled by default.</li>
+  <li>Join each newly opened project window to the existing tabbed window, or create a group with the previous project.</li>
+  <li>Keep other independent windows and restored session membership unchanged; manual separation stays available.</li>
+  <li>Save window-opening behavior independently of appearance presets and the customization switch.</li>
+</ul>
+
+<h2>0.4.2 — local Windows and macOS builds</h2>
+<ul>
+  <li>Merge Windows project windows into one tabbed window with native caption buttons.</li>
+  <li>Keep IDEA menus, project switching, editor focus and close confirmations; add tab context menus and Move Project to New Window.</li>
+  <li>Restore merged projects and their tab order after normal IDE restart.</li>
+  <li>Return to independent project windows before native full-screen or presentation mode.</li>
+  <li>Package Windows integration separately from the macOS build.</li>
+</ul>
+
+<h2>0.4.1</h2>
+<ul>
+  <li>Fix Windows tab dragging and cancellation without changing editor-tab sorting settings.</li>
+  <li>Improve keyboard window switching, release hidden tab references, and preserve case-sensitive NTFS and WSL project paths.</li>
+  <li>Keep native macOS window tabs and ship one plugin package for macOS and Windows.</li>
+</ul>
+
+<h2>0.4.0</h2>
+<ul>
+  <li>Add a Windows project-window strip with shared appearance settings, project groups, icons and optional Git information.</li>
+  <li>Switch and close project windows, synchronize manual tab order between windows, and arrange tabs by group.</li>
+  <li>Use Windows controls and example paths in the settings preview. Keep native macOS window merging and ordering.</li>
+  <li>Activate Windows project windows on completed clicks, restore tab order on canceled drags, and preserve editor-tab sorting settings.</li>
+  <li>Support keyboard navigation between project windows, release hidden tab references, and preserve case-sensitive Windows and WSL project paths.</li>
+</ul>
+
 <h2>0.3.120</h2>
 <ul>
   <li>Place Selection below Content in the left Tab layout column, keeping Size &amp; position on the right.</li>

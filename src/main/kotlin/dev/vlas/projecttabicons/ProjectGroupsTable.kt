@@ -38,15 +38,20 @@ internal class ProjectGroupsTable(
 ) : JPanel(BorderLayout()) {
     private class Input(val id: String?, name: String, val projects: MutableSet<String>, val knownKeys: MutableSet<String>,
                         val positions: MutableMap<String, Int>) {
+        private val originalName = name
+        private val originalProjects = projects.toSet()
+        private val originalPositions = positions.toMap()
         val nameField = JBTextField(name).apply {
             emptyText.text = "Group name"
             accessibleContext.accessibleName = if (id == null) "New project group name" else "Edit project group name"
             putClientProperty("projectGroupControl", "name")
         }
         var error: String? = null
+        val modified get() = nameField.text != originalName || projects != originalProjects || positions != originalPositions
     }
     private var input: Input? = null
     val isEditing get() = input != null
+    val modified get() = input?.modified == true
     private var state = ProjectGroupsState()
     private var baseline = ProjectGroupsState()
     private var projects = emptyList<ProjectIconSettingsRow>()
@@ -118,13 +123,20 @@ internal class ProjectGroupsTable(
             else state.memberships.filterValues { it == id }.keys.toMutableSet(), keys,
             group?.memberPositions.orEmpty().toMutableMap()).also { pending ->
             pending.nameField.addActionListener { submit() }
+            pending.nameField.document.addDocumentListener(object : com.intellij.ui.DocumentAdapter() {
+                override fun textChanged(event: javax.swing.event.DocumentEvent) = editingChanged()
+            })
         }
         refresh(focusName = true)
         editingChanged()
     }
-    private fun submit() {
-        if (!editingEnabled) return
-        val pending = input ?: return
+    fun commitPendingEdit(): String? {
+        if (!modified) { cancelInput(); return null }
+        return submit()
+    }
+    private fun submit(): String? {
+        val pending = input ?: return null
+        if (!editingEnabled) return "Group editing is unavailable."
         input = null
         val error = save(pending.id, pending.nameField.text.trim(), pending.projects.toSet(),
             pending.positions.toMap())
@@ -134,6 +146,7 @@ internal class ProjectGroupsTable(
             refresh(focusName = true)
         }
         editingChanged()
+        return error
     }
     private fun register(control: JComponent, enabled: Boolean = true): JComponent = registerWhen(control) { enabled }
     private fun registerWhen(control: JComponent, allowed: () -> Boolean): JComponent {
@@ -201,7 +214,9 @@ internal class ProjectGroupsTable(
             isOpaque = false
             add(JPanel(BorderLayout(0, JBUI.scale(2))).apply {
                 isOpaque = false
-                val hint = "${members.size} open · $total total · Grouped tabs are arranged together on merge"
+                val arrangement = if (com.intellij.openapi.util.SystemInfoRt.isWindows)
+                    "Use Arrange Tabs by Group in the project tab menu" else "Grouped tabs are arranged together on merge"
+                val hint = "${members.size} open · $total total · $arrangement"
                 add(settingsHint("${members.size} open").apply { toolTipText = hint }, BorderLayout.NORTH)
                 if (total != members.size) add(settingsHint("$total total").apply { toolTipText = hint }, BorderLayout.SOUTH)
             }, BorderLayout.CENTER)
@@ -305,6 +320,7 @@ internal class ProjectGroupsTable(
                 addActionListener {
                     (selectedItem as? String)?.toIntOrNull()?.let { pending.positions[member.key] = it }
                         ?: pending.positions.remove(member.key)
+                    editingChanged()
                 }
             }
             add(JPanel(BorderLayout(JBUI.scale(16), 0)).apply {

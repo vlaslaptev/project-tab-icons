@@ -51,6 +51,8 @@ internal enum class PreviewIdeTheme(val title: String, private val themeId: Stri
                 hoverBackground = if (islands) JBColor.namedColor("MainWindow.Tab.hoverBackground",
                     JBColor.namedColor("MainToolbar.Dropdown.transparentHoverBackground"))
                     else JBUI.CurrentTheme.MainWindow.Tab.background(false, false, true),
+                defaultTabAccent = defaultProjectTabAccent(),
+                defaultTabSeparator = defaultProjectTabSeparatorColor(),
             )
         }
         cached?.let { return it }
@@ -89,6 +91,8 @@ internal enum class PreviewIdeTheme(val title: String, private val themeId: Stri
             groupSeparatorColor = groupSeparatorNeutralColor(::color),
             hoverBackground = color("MainWindow.Tab.hoverBackground",
                 color("MainToolbar.Dropdown.transparentHoverBackground", strip)),
+            defaultTabAccent = color("Checkbox.Background.Selected", color("Component.focusColor", Color(0x3574F0))),
+            defaultTabSeparator = color("MainWindow.Tab.separatorColor", Color(if (dark) 0x4E5157 else 0xD3D5DB)),
         )
         // У Light штатные оконные табы чёрные, как её тёмная шапка. В Preview
         // показываем светлую полосу табов, сохраняя toolbar и editor самой Light.
@@ -123,8 +127,11 @@ internal data class PreviewThemePalette(
     val groupSeparatorColor: Color,
     val nativeClose: Boolean = false,
     val hoverBackground: Color = background,
+    val defaultTabAccent: Color = Color(0x3574F0),
+    val defaultTabSeparator: Color = Color(0x4E5157),
 ) {
-    fun geometry(width: Int, height: Int): ProjectTabGeometry = projectTabGeometry(width, height, islands, arc)
+    fun geometry(width: Int, height: Int, corners: TabCornerMode = TabCornerMode.IDEA_THEME): ProjectTabGeometry =
+        projectTabGeometry(width, height, islands, arc, corners)
 }
 
 /** Цвета обрамления читаются отдельно от проектных табов, без установки темы/схемы. */

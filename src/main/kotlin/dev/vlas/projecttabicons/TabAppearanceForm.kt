@@ -58,7 +58,7 @@ internal class TabAppearanceForm(
     private val positionLabel = JBLabel("Position:").apply { labelFor = iconPosition }
     private val outlineStyle = ComboBox(TabOutlineStyle.entries.toTypedArray())
     private val outlineThickness = pixelSpinner(DEFAULT_OUTLINE_THICKNESS, MIN_OUTLINE_THICKNESS, MAX_OUTLINE_THICKNESS)
-    private val styleLabel = JBLabel("Shape:").apply { labelFor = outlineStyle }
+    private val styleLabel = JBLabel("Style:").apply { labelFor = outlineStyle }
     private val thicknessLabel = JBLabel("Thickness:").apply { labelFor = outlineThickness }
     private val tabFillInset = pixelSpinner(0, MIN_TAB_FILL_INSET, MAX_TAB_FILL_INSET)
     private val fillInsetLabel = JBLabel("Inset:").apply { labelFor = tabFillInset }
@@ -90,6 +90,8 @@ internal class TabAppearanceForm(
     private val fontSizeLabel = JBLabel("Font size:").apply { labelFor = tabFontSize }
     private val tabHeight = pixelSpinner(DEFAULT_TAB_HEIGHT, DEFAULT_TAB_HEIGHT, MAX_TAB_HEIGHT)
     private val tabHeightLabel = JBLabel("Height:").apply { labelFor = tabHeight }
+    private val tabCorners = ComboBox(TabCornerMode.entries.toTypedArray())
+    private val tabCornersLabel = JBLabel("Tab corners:").apply { labelFor = tabCorners }
     private val groupSpacing = pixelSpinner(0, 0, MAX_GROUP_SPACING)
     private val groupSpacingLabel = JBLabel("Group spacing:").apply { labelFor = groupSpacing }
     private val showGroupOutline = JBCheckBox("Show group highlight")
@@ -197,7 +199,7 @@ internal class TabAppearanceForm(
             AppearanceField(fillIntensityLabel, fillIntensityControl),
         ))))
         appearanceTabs.addTab("Style", styleColumns)
-        val tabLabelWidth = { listOf(tabHeightLabel, fontSizeLabel, closeButtonLabel, branchPositionLabel,
+        val tabLabelWidth = { listOf(tabHeightLabel, tabCornersLabel, fontSizeLabel, closeButtonLabel, branchPositionLabel,
             inactiveTabDimmingLabel, activeTabHighlightLabel).maxOf { it.preferredSize.width } }
         val tabColumns = SettingsAppearanceColumns(
             { (availableWidth() - appearanceTabs.insets.left - appearanceTabs.insets.right).coerceAtLeast(1) },
@@ -220,6 +222,7 @@ internal class TabAppearanceForm(
             ), activeTabHighlightLabel)), BorderLayout.CENTER)
         })
         tabColumns.add(section("Size & position", tabForm(compactField(heightControl), listOf(
+            AppearanceField(tabCornersLabel, tabCorners),
             AppearanceField(null, useIdeFontSize),
             AppearanceField(fontSizeLabel, fontControl, stretch = false),
             AppearanceField(closeButtonLabel, closeButtonPosition, stretch = false),
@@ -322,6 +325,8 @@ internal class TabAppearanceForm(
         tabHeight.accessibleContext.accessibleName = "Window tab height in pixels"
         tabHeight.accessibleContext.accessibleDescription = "From $DEFAULT_TAB_HEIGHT to $MAX_TAB_HEIGHT pixels. Use arrow keys for one-pixel steps."
         tabHeight.toolTipText = "Tab height: $DEFAULT_TAB_HEIGHT px (default) to $MAX_TAB_HEIGHT px. Content and outlines remain visible."
+        tabCorners.accessibleContext.accessibleName = "Tab corner mode"
+        tabCorners.toolTipText = "Auto: square corners on Windows, IDEA theme on macOS. Square and IDEA theme override this on either platform. Applies to tab backgrounds, outlines and groups."
         moreInfoButtons.forEach { (mode, button) ->
             button.accessibleContext.accessibleName = "Show more info: ${button.text}"
             button.toolTipText = when (mode) {
@@ -354,6 +359,7 @@ internal class TabAppearanceForm(
         outlineThickness.addChangeListener { appearanceChanged() }
         closeButtonPosition.addChangeListener { appearanceChanged() }
         tabHeight.addChangeListener { appearanceChanged() }
+        tabCorners.addActionListener { appearanceChanged() }
         tabFontSize.accessibleContext.accessibleName = "Window tab font size in pixels"
         tabFontSize.accessibleContext.accessibleDescription = "Use arrow keys for one-pixel steps."
         tabFontSize.toolTipText = "Adjust tab title text. The default size follows the IDE font."
@@ -393,6 +399,7 @@ internal class TabAppearanceForm(
         outlineStyle = outlineStyle.selectedItem as TabOutlineStyle,
         closeButtonPosition = closeButtonPosition.selectedItem as TabCloseButtonPosition,
         tabHeight = tabHeight.value as Int,
+        tabCorners = tabCorners.selectedItem as TabCornerMode,
         groupSpacing = groupSpacing.value as Int,
         showGroupOutline = showGroupOutline.isSelected,
         groupHighlightStyle = groupHighlightStyle.selectedItem as GroupHighlightStyle,
@@ -441,6 +448,7 @@ internal class TabAppearanceForm(
             outlineThickness.value = value.outlineThickness
             closeButtonPosition.selectedItem = value.closeButtonPosition
             tabHeight.value = value.tabHeight
+            tabCorners.selectedItem = value.tabCorners
             groupSpacing.value = value.groupSpacing
             showGroupOutline.isSelected = value.showGroupOutline
             groupHighlightStyle.selectedItem = value.groupHighlightStyle.normalized()
@@ -463,7 +471,7 @@ internal class TabAppearanceForm(
 
     fun refreshEnabled(enabled: Boolean) {
         listOf(showIcons, showOutline, showTabBackground, closeButtonPosition, closeButtonLabel,
-            tabHeight, tabHeightLabel, useIdeFontSize, moreInfoLabel,
+            tabHeight, tabHeightLabel, tabCorners, tabCornersLabel, useIdeFontSize, moreInfoLabel,
             inactiveTabDimming, inactiveTabDimmingLabel,
             activeTabHighlight, activeTabHighlightLabel,
             groupSpacing, groupSpacingLabel, showGroupOutline, showGroupSeparator, showGroupIcon)
@@ -521,6 +529,7 @@ internal class TabAppearanceForm(
         watch(fillInsetLabel) { it.tabFillInset }
         watch(fillIntensityLabel) { it.tabFillIntensity }
         watch(tabHeightLabel) { it.tabHeight }
+        watch(tabCornersLabel) { it.tabCorners }
         watch(inactiveTabDimmingLabel) { it.inactiveTabDimming }
         watch(activeTabHighlightLabel) { it.activeTabHighlight }
         watch(groupSpacingLabel) { it.groupSpacing }

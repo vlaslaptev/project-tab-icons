@@ -20,6 +20,7 @@ internal class ProjectGroupsPanel(
     showProjects: () -> Unit,
     chooseGroupIcon: (String) -> Unit,
     chooseGroupColor: (String, ProjectColorTarget) -> Unit,
+    private val editingChanged: () -> Unit = {},
 ) : JPanel(BorderLayout(0, JBUI.scale(6))) {
     private data class Filter(val id: String?, val title: String) { override fun toString() = title }
     private val filter = ComboBox<Filter>().apply {
@@ -49,9 +50,10 @@ internal class ProjectGroupsPanel(
         addProjects = ::addProjects,
         chooseIcon = chooseGroupIcon,
         chooseColor = chooseGroupColor,
-        editingChanged = ::refreshControls,
+        editingChanged = { refreshControls(); editingChanged() },
     )
-    val modified get() = draft != baseline
+    val modified get() = draft != baseline || table.modified
+    fun commitPendingEdit(): String? = table.commitPendingEdit()
     val projectControls: JComponent = JPanel(BorderLayout(0, JBUI.scale(6))).apply {
         isOpaque = false
         add(JPanel(java.awt.FlowLayout(java.awt.FlowLayout.LEFT, JBUI.scale(6), 0)).apply {

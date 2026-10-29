@@ -1,5 +1,17 @@
 # Architecture
 
+## Platform packages
+
+Shared appearance, icons and settings live in `src/main`. Windows-specific window
+integration and its descriptor live in `src/windows` and are included only with
+`pluginTarget=windows`. The default target is macOS. Each ZIP declares its operating
+system dependency and uses a platform suffix in the plugin version.
+
+macOS keeps native AppKit window tabs. Windows uses a merged-window container with
+a shared project-tab strip and native window controls. The settings preview follows
+the respective toolbar/tab order. Automatic project opening is configured separately
+from appearance and has an independent preference for each platform.
+
 ## Observe, decorate, restore
 
 `ProjectTabIconsStartupActivity` connects the application service when a project

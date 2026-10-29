@@ -3,6 +3,8 @@ package dev.vlas.projecttabicons
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.ide.RecentProjectsManagerBase
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.progress.ProgressManager
@@ -10,32 +12,57 @@ import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.openapi.util.SystemInfoRt
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.ui.JBColor
 import javax.swing.JComponent
 
-/** Быстрые действия используют тот же редактор и атомарное сохранение, что и Settings. */
-abstract class ProjectTabQuickAction(private val mode: String) : AnAction() {
+private fun supportsProjectTabs(): Boolean = SystemInfoRt.isMac || SystemInfoRt.isWindows
+
+class ProjectTabActionsGroup : DefaultActionGroup() {
     override fun getActionUpdateThread() = ActionUpdateThread.BGT
     override fun update(event: AnActionEvent) {
+        super.update(event)
+        event.presentation.isEnabledAndVisible = supportsProjectTabs()
+    }
+}
+
+abstract class SupportedProjectTabAction : AnAction() {
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
+    override fun update(event: AnActionEvent) {
+        event.presentation.isEnabledAndVisible = supportsProjectTabs()
+    }
+    final override fun actionPerformed(event: AnActionEvent) {
+        if (supportsProjectTabs()) perform(event)
+    }
+    protected abstract fun perform(event: AnActionEvent)
+}
+
+/** Быстрые действия используют тот же редактор и атомарное сохранение, что и Settings. */
+abstract class ProjectTabQuickAction(private val mode: String) : SupportedProjectTabAction() {
+    override fun update(event: AnActionEvent) {
+        super.update(event)
+        if (!event.presentation.isVisible) return
         val project = event.project
-        event.presentation.isEnabledAndVisible = project != null && !project.isDisposed && !project.isDefault && project.basePath != null
+        val path = project?.takeUnless { it.isDisposed || it.isDefault }
+            ?.let { RecentProjectsManagerBase.getInstanceEx().getProjectPath(it) }
+        event.presentation.isEnabledAndVisible = path != null
         if (event.presentation.isEnabled) event.presentation.isEnabled = ApplicationManager.getApplication()
             .getService(TabAppearanceSettings::class.java).state.enabled
-        val group = project?.basePath?.let { path -> ApplicationManager.getApplication().getService(ProjectGroups::class.java)
-            .state.groupFor(projectIconPathKey(java.nio.file.Path.of(path))) }
+        val group = path?.let { ApplicationManager.getApplication().getService(ProjectGroups::class.java)
+            .resolvedState.groupFor(projectIconPathKey(it)) }
         if (group != null) {
             event.presentation.isEnabled = false
             event.presentation.description = "Inherited from ${group.name}. Edit its appearance in Project groups."
         } else event.presentation.description = "Edit this project's own icon or color"
     }
-    override fun actionPerformed(event: AnActionEvent) {
+    override fun perform(event: AnActionEvent) {
         val project = event.project ?: return
         val parent = WindowManager.getInstance().getFrame(project)?.rootPane ?: return
         val target = openProjectIconTargets().firstOrNull { it.project === project && it.path != null } ?: return
         val path = target.path ?: return
         val app = ApplicationManager.getApplication()
-        if (app.getService(ProjectGroups::class.java).state.groupFor(projectIconPathKey(path)) != null) {
+        if (app.getService(ProjectGroups::class.java).resolvedState.groupFor(projectIconPathKey(path)) != null) {
             ShowSettingsUtil.getInstance().showSettingsDialog(project, IconSettingsConfigurable::class.java)
             return
         }
@@ -152,9 +179,8 @@ private fun applyAppearance(choice: AppearanceChoice) {
         app.getService(LastCustomAppearanceSettings::class.java).remember(settings.state)
     settings.apply(choice.state)
 }
-class ChooseProjectTabPresetAction : AnAction() {
-    override fun getActionUpdateThread() = ActionUpdateThread.BGT
-    override fun actionPerformed(event: AnActionEvent) {
+class ChooseProjectTabPresetAction : SupportedProjectTabAction() {
+    override fun perform(event: AnActionEvent) {
         val choices = appearanceChoices()
         val current = ApplicationManager.getApplication().getService(TabAppearanceSettings::class.java).state
         val selected = choices.firstOrNull { it.state.userPresetId == current.userPresetId && it.state.preset == current.preset }
@@ -164,18 +190,16 @@ class ChooseProjectTabPresetAction : AnAction() {
             .setItemChosenCallback { applyAppearance(it) }.createPopup().showInFocusCenter()
     }
 }
-class NextProjectTabPresetAction : AnAction() {
-    override fun getActionUpdateThread() = ActionUpdateThread.BGT
-    override fun actionPerformed(event: AnActionEvent) {
+class NextProjectTabPresetAction : SupportedProjectTabAction() {
+    override fun perform(event: AnActionEvent) {
         val current = ApplicationManager.getApplication().getService(TabAppearanceSettings::class.java).state
         val choices = appearanceChoices()
         val index = choices.indexOfFirst { it.state.userPresetId == current.userPresetId && it.state.preset == current.preset }
         applyAppearance(choices[(index + 1) % choices.size])
     }
 }
-class OpenProjectTabSettingsAction : AnAction() {
-    override fun getActionUpdateThread() = ActionUpdateThread.BGT
-    override fun actionPerformed(event: AnActionEvent) {
+class OpenProjectTabSettingsAction : SupportedProjectTabAction() {
+    override fun perform(event: AnActionEvent) {
         ShowSettingsUtil.getInstance().showSettingsDialog(event.project, IconSettingsConfigurable::class.java)
     }
 }

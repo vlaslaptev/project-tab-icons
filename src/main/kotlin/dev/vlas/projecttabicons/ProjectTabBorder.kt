@@ -26,6 +26,8 @@ internal class ProjectTabBorder(
     var groupTab: TabInfo? = null,
     var inactiveTabDimming: Double = DEFAULT_INACTIVE_TAB_DIMMING,
     var activeTabHighlight: Double = DEFAULT_ACTIVE_TAB_HIGHLIGHT,
+    var tabCorners: TabCornerMode = TabCornerMode.IDEA_THEME,
+    var trailingSeparatorColor: Color? = null,
 ) : Border {
     var sharedGroupSurfacePreview: Boolean = false
     var hideProjectIconPreview: Boolean = false
@@ -65,7 +67,7 @@ internal class ProjectTabBorder(
             g.translate(x, y)
             val margins = groupMargins()
             val bodyWidth = (width - margins.left - margins.right).coerceAtLeast(0)
-            val body = geometryOverride?.invoke(bodyWidth, height) ?: projectTabGeometry(bodyWidth, height)
+            val body = geometryOverride?.invoke(bodyWidth, height) ?: projectTabGeometry(bodyWidth, height, tabCorners)
             val geometry = if (margins.left == 0) body else body.copy(bounds = java.awt.geom.Rectangle2D.Double(
                 body.bounds.x + margins.left, body.bounds.y, body.bounds.width, body.bounds.height))
             val colors = surfaceColors?.invoke(component)
@@ -98,6 +100,7 @@ internal class ProjectTabBorder(
                 }
             }
             if (sharedSurface) return
+            trailingSeparatorColor?.let { paintProjectTabSeparator(component, g, width, height, it) }
             val color = outlineColor ?: return
             val idle = colors?.let {
                 ProjectTabSurface.resolve(it.copy(background = it.idleBackground, state = ProjectTabSurfaceState.IDLE), null, 0, activeTabHighlight).background

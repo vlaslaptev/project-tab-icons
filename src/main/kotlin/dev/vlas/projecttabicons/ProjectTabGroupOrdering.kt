@@ -22,29 +22,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.util.IdentityHashMap
-
-/** Группы слева в порядке таблицы, остальные вкладки сохраняют взаимный порядок справа. */
-internal fun <T : Any> orderedProjectGroupTabs(tabs: List<T>, state: ProjectGroupsState, key: (T) -> String?): List<T> {
-    val grouped = tabs.filter { state.groupFor(key(it).orEmpty()) != null }.toSet()
-    if (grouped.isEmpty()) return tabs
-    val block = state.groups.flatMap { group ->
-        val members = tabs.filter { state.memberships[key(it)] == group.id }
-        val slots = MutableList<T?>(members.size) { null }
-        val pinned = members.filter { key(it) in group.memberPositions }.sortedBy { group.memberPositions[key(it)] }
-        var last = -1
-        pinned.forEachIndexed { index, member ->
-            // Отсутствующие/закрытые участники не оставляют дыр. Порядок закреплённых остаётся прежним.
-            val requested = group.memberPositions.getValue(requireNotNull(key(member))) - 1
-            val slot = requested.coerceIn(last + 1, members.size - pinned.size + index)
-            slots[slot] = member; last = slot
-        }
-        val automatic = members.filterNot { it in pinned }.iterator()
-        slots.map { it ?: automatic.next() }
-    }
-    return block + tabs.filterNot { it in grouped }
-}
+import kotlin.coroutines.resume
 
 /** Реагирует на объединение состава окон, а не на перетаскивания и обычные refresh оформления. */
 internal class ProjectTabGroupOrdering(
@@ -129,19 +111,32 @@ internal class ProjectTabGroupOrdering(
         val wrapper = DefaultActionGroup().apply {
             // Штатные Close / Move / Show All остаются на том же уровне меню.
             children.forEach { add(it) }
-            addSeparator(); add(restore)
+            addSeparator(); add(restore); add(OpenGroupedProjectsAction())
         }
         val place = tabs.popupPlace ?: ActionPlaces.POPUP
         menus[tabs] = Menu(original, wrapper, place)
         tabs.setPopupGroup(wrapper, place, false)
     }
 
-    private fun restoreOrder(snapshot: Bar, explicit: Boolean = false) {
+    suspend fun arrangeFor(frame: IdeFrameImpl): Boolean = withTimeoutOrNull(10_000) {
+        withContext(Dispatchers.EDT) {
+            update(projectFrameHelpers().mapValues { requireNotNull(it.value.project) })
+            // A merge may already have scheduled the usual automatic ordering.
+            // Wait for that operation, then explicitly restore the group appearance as well.
+            while (isOrdering) delay(50)
+            val bar = bars.firstOrNull { frame in it.members } ?: return@withContext true
+            suspendCancellableCoroutine { continuation ->
+                restoreOrder(bar, explicit = true) { success -> if (continuation.isActive) continuation.resume(success) }
+            }
+        }
+    } ?: false
+
+    private fun restoreOrder(snapshot: Bar, explicit: Boolean = false, completed: (Boolean) -> Unit = {}) {
         // Снимок refresh не обязан совпадать с порядком после последнего ручного DnD.
         val live = snapshot.tabs.tabs.mapNotNull { it.`object` as? IdeFrameImpl }
-        if (live.size != snapshot.tabs.tabCount || live.toSet() != snapshot.members) return
+        if (live.size != snapshot.tabs.tabCount || live.toSet() != snapshot.members) { completed(false); return }
         val bar = Bar(snapshot.tabs, live)
-        if (disposed || !inFlight.add(bar.members)) return
+        if (disposed || !inFlight.add(bar.members)) { completed(false); return }
         val state = ApplicationManager.getApplication().getService(ProjectGroups::class.java).state
         val desired = orderedProjectGroupTabs(bar.frames, state) { keys[it] }
         if (desired == bar.frames && bars.filter { it.members == bar.members }.all { current ->
@@ -149,12 +144,14 @@ internal class ProjectTabGroupOrdering(
             }) {
             inFlight.remove(bar.members)
             bars.filter { it.members == bar.members }.forEach { orderRestored(it.tabs, explicit) }
+            completed(true)
             return
         }
         val synchronizer = try { reorder } catch (error: Exception) {
             inFlight.remove(bar.members)
             LOG.warn("Project window tab ordering is unavailable in this IDE build", error)
             bars.filter { it.members == bar.members }.forEach { orderRestored(it.tabs, false) }
+            completed(false)
             return
         }
         val token = generation
@@ -211,6 +208,7 @@ internal class ProjectTabGroupOrdering(
                         if (!disposed && token == generation) bars.filter { it.members == bar.members }.forEach {
                             orderRestored(it.tabs, explicit && allCopiesSynchronized)
                         }
+                        completed(!disposed && token == generation && allCopiesSynchronized)
                     }
                 }
             }

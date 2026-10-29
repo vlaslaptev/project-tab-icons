@@ -9,6 +9,7 @@ import java.awt.RenderingHints
 import java.awt.Shape
 import java.awt.geom.Line2D
 import java.awt.geom.Path2D
+import java.awt.geom.Rectangle2D
 import java.awt.geom.RoundRectangle2D
 
 /** Одна форма линии и одинаковые защитные поля у обычных табов и групп. */
@@ -25,7 +26,7 @@ internal fun projectTabOutlineInsets(color: Color?, thickness: Int, style: TabOu
 
 /** Координаты вкладки не входят в ключ; размеры, радиус и stroke уже учитывают UI scale. Все вызовы — UI. */
 internal class ProjectTabOutline(cacheLimit: Int = 1) {
-    private data class Key(val width: Double, val height: Double, val radius: Double,
+    private data class Key(val width: Double, val height: Double, val radius: Double, val squareCorners: Boolean,
                            val stroke: Float, val style: TabOutlineStyle)
     private data class Outline(val path: Shape, val stroke: BasicStroke)
     private var lastKey: Key? = null
@@ -61,8 +62,9 @@ internal class ProjectTabOutline(cacheLimit: Int = 1) {
         if (bounds.width <= stroke || bounds.height <= stroke) return null
         val previous = lastKey
         if (previous == null || previous.width != bounds.width || previous.height != bounds.height ||
-            previous.radius != geometry.radius || previous.style != outlineStyle || previous.stroke != stroke) {
-            val key = Key(bounds.width, bounds.height, geometry.radius, stroke, outlineStyle)
+            previous.radius != geometry.radius || previous.squareCorners != geometry.squareCorners ||
+            previous.style != outlineStyle || previous.stroke != stroke) {
+            val key = Key(bounds.width, bounds.height, geometry.radius, geometry.squareCorners, stroke, outlineStyle)
             val cached = cache?.get(key)
             if (cached != null) {
                 lastKey = key
@@ -77,7 +79,10 @@ internal class ProjectTabOutline(cacheLimit: Int = 1) {
             val bottom = bounds.height - halfStroke
             val radius = (geometry.radius - halfStroke).coerceAtLeast(0.0)
             val control = radius * 0.5522847498307936
-            outlinePath = when (outlineStyle) {
+            outlinePath = if (geometry.squareCorners) {
+                if (outlineStyle == TabOutlineStyle.FULL) Rectangle2D.Double(left, top, right - left, bottom - top)
+                else Line2D.Double(0.0, bottom, bounds.width, bottom)
+            } else when (outlineStyle) {
                 TabOutlineStyle.BOTTOM -> Line2D.Double(left + radius, bottom, right - radius, bottom)
                 TabOutlineStyle.ROUNDED -> Path2D.Double().apply {
                     moveTo(left, bottom - radius)
@@ -89,7 +94,10 @@ internal class ProjectTabOutline(cacheLimit: Int = 1) {
                     left, top, right - left, bottom - top, radius * 2, radius * 2,
                 )
             }
-            if (previous?.stroke != stroke) outlineStroke = BasicStroke(stroke, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+            if (previous == null || previous.stroke != stroke || previous.squareCorners != geometry.squareCorners) {
+                outlineStroke = if (geometry.squareCorners) BasicStroke(stroke, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER)
+                else BasicStroke(stroke, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+            }
             lastKey = key
             cache?.put(key, Outline(requireNotNull(outlinePath), outlineStroke))
         }

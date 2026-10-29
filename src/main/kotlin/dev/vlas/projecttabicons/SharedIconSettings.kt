@@ -13,6 +13,7 @@ internal data class SharedIconSettingsSnapshot(
     val customAppearance: TabAppearanceState?,
     val userPresets: List<UserAppearancePreset>,
     val projectGroups: ProjectGroupsState,
+    val windowOpening: ProjectWindowOpeningState = ProjectWindowOpeningState(),
 )
 
 /** Исходное хранилище и исходный UI различаются: например, ещё не сохранённый Custom имеет fallback. */
@@ -25,6 +26,7 @@ internal class SharedIconSettingsChanges(
     private val customChanged = draft.customAppearance != initialDraft.customAppearance
     private val presetsChanged = draft.userPresets != initialDraft.userPresets
     private val groupsChanged = draft.projectGroups != initialDraft.projectGroups
+    private val windowOpeningChanged = draft.windowOpening != initialDraft.windowOpening
 
     fun validate(current: SharedIconSettingsSnapshot) {
         val conflicts = buildList<String> {
@@ -35,6 +37,7 @@ internal class SharedIconSettingsChanges(
             check("Custom appearance", customChanged, stored.customAppearance, current.customAppearance, draft.customAppearance)
             check("User presets", presetsChanged, stored.userPresets, current.userPresets, draft.userPresets)
             check("Project groups", groupsChanged, stored.projectGroups, current.projectGroups, draft.projectGroups)
+            check("Project window opening", windowOpeningChanged, stored.windowOpening, current.windowOpening, draft.windowOpening)
         }
         if (conflicts.isNotEmpty()) throw ConfigurationException(
             "Changed outside this settings page: ${conflicts.joinToString()}. " +
@@ -54,6 +57,7 @@ internal class SharedIconSettingsChanges(
         }
         if (presetsChanged && draft.userPresets != current.userPresets) store.presets.apply(draft.userPresets)
         if (groupsChanged && draft.projectGroups != current.projectGroups) store.groups.apply(draft.projectGroups)
+        if (windowOpeningChanged && draft.windowOpening != current.windowOpening) store.windowOpening.apply(draft.windowOpening)
     }
 }
 
@@ -64,8 +68,10 @@ internal class SharedIconSettingsStore {
     val custom = app.getService(LastCustomAppearanceSettings::class.java)
     val presets = app.getService(UserAppearancePresets::class.java)
     val groups = app.getService(ProjectGroups::class.java)
+    val windowOpening = app.getService(ProjectWindowOpeningSettings::class.java)
 
     fun snapshot(): SharedIconSettingsSnapshot = SharedIconSettingsLock.withLock {
-        SharedIconSettingsSnapshot(appearance.state, custom.state.appearance, presets.state.presets, groups.state)
+        SharedIconSettingsSnapshot(appearance.state, custom.state.appearance, presets.state.presets, groups.resolvedState,
+            windowOpening.state)
     }
 }

@@ -56,7 +56,7 @@ internal object ProjectTabGroupSurface {
                     val cardBounds = Rectangle2D.Double(state.body.x, bounds.y,
                         state.body.width, bounds.height)
                     val card = ProjectTabGeometry(cardBounds,
-                        minOf(geometry.radius, cardBounds.width / 2, cardBounds.height / 2))
+                        minOf(geometry.radius, cardBounds.width / 2, cardBounds.height / 2), geometry.squareCorners)
                         .inset(JBUI.scale(options.cardInset).toDouble())
                     val cardGraphics = g.create() as Graphics2D
                     try {

@@ -1,6 +1,7 @@
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
+import org.jetbrains.intellij.platform.gradle.tasks.PatchPluginXmlTask
 import java.time.Duration
 
 plugins {
@@ -10,6 +11,35 @@ plugins {
 
 group = "dev.vlas.projecttabicons"
 version = providers.gradleProperty("pluginVersion").get()
+
+// Shared settings/artwork and platform-specific window integration are packaged separately.
+val pluginTarget = providers.gradleProperty("pluginTarget").orElse("macos").get()
+require(pluginTarget in setOf("macos", "windows")) { "pluginTarget must be macos or windows" }
+layout.buildDirectory.set(layout.projectDirectory.dir("build/$pluginTarget"))
+kotlin.sourceSets.named("main") {
+    if (pluginTarget == "windows") kotlin.srcDir("src/windows/kotlin")
+}
+kotlin.sourceSets.named("test") {
+    if (pluginTarget == "windows") kotlin.srcDir("src/windowsTest/kotlin")
+}
+sourceSets.named("main") {
+    if (pluginTarget == "windows") resources.srcDir("src/windows/resources")
+}
+tasks.named<Zip>("buildPlugin") {
+    archiveClassifier.set(pluginTarget)
+}
+val preparePlatformDescriptor = tasks.register<Copy>("preparePlatformDescriptor") {
+    val platformId = if (pluginTarget == "macos") "mac" else "windows"
+    inputs.property("targetPlatform", platformId)
+    from("src/main/resources/META-INF/plugin.xml")
+    into(layout.buildDirectory.dir("generated/platform-descriptor"))
+    filter { line: String ->
+        line.replace("<!-- target-platform -->", "<dependencies><plugin id=\"com.intellij.modules.os.$platformId\"/></dependencies>")
+    }
+}
+tasks.named<PatchPluginXmlTask>("patchPluginXml") {
+    inputFile.fileProvider(preparePlatformDescriptor.map { it.destinationDir.resolve("plugin.xml") })
+}
 
 repositories {
     mavenCentral()
@@ -98,11 +128,11 @@ if (nativeProbe) {
 }
 
 intellijPlatform {
-    // Настройки объявлены в plugin.xml; индексация searchable options включена.
-    buildSearchableOptions = true
+    // OS-specific packages can only be loaded for indexing on their target OS.
+    buildSearchableOptions = pluginTarget == if (System.getProperty("os.name").startsWith("Windows")) "windows" else "macos"
 
     pluginConfiguration {
-        version = project.version.toString()
+        version = "${project.version}-$pluginTarget"
         description = providers.fileContents(
             layout.projectDirectory.file("docs/marketplace/description.html")
         ).asText

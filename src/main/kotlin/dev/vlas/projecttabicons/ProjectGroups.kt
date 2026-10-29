@@ -20,7 +20,7 @@ internal data class ProjectGroupsState(
     @field:OptionTag @JvmField val groups: List<ProjectTabGroup> = emptyList(),
     @field:OptionTag @JvmField val memberships: Map<String, String> = emptyMap(),
 ) {
-    fun normalized(): ProjectGroupsState {
+    fun normalized(windows: Boolean = com.intellij.openapi.util.SystemInfoRt.isWindows): ProjectGroupsState {
         var iconBytes = 0L
         val valid = groups.filter { it.id.isNotBlank() && it.id.length <= 64 && groupNameError(it.name) == null }
             .distinctBy { it.id }.distinctBy { it.name.lowercase(java.util.Locale.ROOT) }.take(50)
@@ -31,13 +31,15 @@ internal data class ProjectGroupsState(
                     outlineColor = parseIconColor(group.outlineColor)?.hex().orEmpty(),
                     tabColor = parseIconColor(group.tabColor)?.hex().orEmpty())
             }
-        val members = memberships.filter { (path, id) ->
+        // После разворачивания $USER_HOME$ нормализуем разделители. Регистр можно
+        // сопоставлять только по cached VFS: безусловный lowercase теряет проекты.
+        val members = normalizedProjectPathKeys(memberships, windows).filter { (path, id) ->
             path.isNotBlank() && path.length <= 4096 && valid.any { it.id == id }
         }
         return copy(groups = valid.map { group ->
             val count = members.count { it.value == group.id }
             val used = mutableSetOf<Int>()
-            group.copy(memberPositions = group.memberPositions.filter { (path, position) ->
+            group.copy(memberPositions = normalizedProjectPathKeys(group.memberPositions, windows).filter { (path, position) ->
                 members[path] == group.id && position in 1..count && used.add(position)
             })
         }, memberships = members)
@@ -54,6 +56,13 @@ internal fun groupNameError(name: String): String? = when {
 @Service(Service.Level.APP)
 @State(name = "ProjectTabIconsGroups", storages = [Storage("projectTabIconsGroups.xml")])
 internal class ProjectGroups : SerializablePersistentStateComponent<ProjectGroupsState>(ProjectGroupsState()) {
+    val resolvedState: ProjectGroupsState get() {
+        val stored = state
+        if (!com.intellij.openapi.util.SystemInfoRt.isWindows) return stored
+        // loadState может прийти раньше загрузки проектных путей в VFS.
+        return stored.copy(memberships = normalizedProjectPathKeys(stored.memberships, true),
+            groups = stored.groups.map { it.copy(memberPositions = normalizedProjectPathKeys(it.memberPositions, true)) })
+    }
     fun apply(value: ProjectGroupsState) = SharedIconSettingsLock.withLock { updateState { value.normalized() } }
     override fun loadState(state: ProjectGroupsState) = SharedIconSettingsLock.withLock { super.loadState(state.normalized()) }
 }

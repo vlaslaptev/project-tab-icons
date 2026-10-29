@@ -1,6 +1,6 @@
 # Feature guide
 
-This guide describes **0.3.120** and its current Settings layout.
+This guide describes **0.4.16** and its current Settings layout.
 
 Open **Settings → Appearance & Behavior → Project Tab Icons**.
 The preview uses three or five fictional projects: Frontend, Backend, MobileApp, Tools and pet_projects. It updates
@@ -16,6 +16,7 @@ stay above **Appearance / Projects / Project groups**, outside section scrolling
 | Icon size | Small 20 px, Medium 24 px, Large 28 px |
 | Icon position | Left or right |
 | Close button | Left or right, independently of the icon |
+| Tab corners | Auto, Square or IDEA theme; Auto follows the theme on macOS and uses square corners on Windows |
 | Outline | Bottom only, Rounded corners, Full outline |
 | Outline thickness | 1–6 px |
 | Height | 30–60 px |
@@ -63,7 +64,7 @@ The enable switch, preview theme and individual project assignments are excluded
 **Restore defaults** changes the draft and takes effect after Apply; Cancel abandons
 the draft. The enable switch and project icon assignments are preserved by a reset.
 
-**Save as new preset** and **Update preset** remain beside the Appearance sub-tabs.
+**Save as new preset** sits beside the Appearance sub-tabs.
 **Manage user presets…** in the shared header renames, duplicates, deletes and
 reorders user presets. **Import styles… / Export styles…** transfers
 selected presets, SVG categories and editable text icons in portable JSON bundles.
@@ -82,7 +83,8 @@ with an empty selection on every opening, independent of checkboxes in Projects.
 The first group row is **+ Add group**. Edit a name, select members and set
 optional positions directly in the table, then use **Add / Save**.
 Paths appear under member names; long lists use the section scrollbar. **Cancel**
-closes the inline draft. Group changes are persisted with Settings **Apply**.
+closes the inline draft. Settings **Apply** or **OK** also validates and commits
+an unfinished group edit; duplicate names keep the draft open for correction.
 Groups have their own icon and three colors. Members inherit them dynamically,
 including newly assigned and reopened projects. Removing a member or deleting its
 group restores that project's personal appearance. Group styling does not overwrite
@@ -96,6 +98,8 @@ leave gaps while absent. Existing groups follow the same ordering without an ext
 
 Order is applied on merge. Later manual rearrangements remain available.
 **Arrange Tabs by Group** in a window tab's context menu reapplies the saved order.
+**Open All Grouped Projects**, also in **Tools → Project Tab Icons**, opens missing
+group members, merges them into the current window and arranges the tabs.
 
 Under **Group layout → Group highlight → Variant**, choose **Shared background**
 or **Joined tabs**. Both inherit regular tab dimensions, theme corners, Style

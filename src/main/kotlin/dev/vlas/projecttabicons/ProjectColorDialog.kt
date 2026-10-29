@@ -245,7 +245,7 @@ internal class ProjectColorPreview(projectName: String, private val appearance: 
         caption.icon = icon
         tabColor = fill
         border = ProjectTabBorder(baseBorder, null, outline, appearance.outlineThickness, appearance.outlineStyle,
-            surfaceColors = null)
+            surfaceColors = null, tabCorners = appearance.tabCorners)
         revalidate()
         repaint()
     }
@@ -253,7 +253,7 @@ internal class ProjectColorPreview(projectName: String, private val appearance: 
     override fun paintComponent(graphics: Graphics) {
         super.paintComponent(graphics)
         val palette = PreviewIdeTheme.CURRENT.palette()
-        ProjectTabSurface.paint(graphics as Graphics2D, width, height, projectTabGeometry(width, height),
+        ProjectTabSurface.paint(graphics as Graphics2D, width, height, projectTabGeometry(width, height, appearance.tabCorners),
             ProjectTabSurfaceColors(palette.stripBackground, palette.selectedBackground, palette.background,
                 ProjectTabSurfaceState.SELECTED),
             tabColor, appearance.tabFillInset, appearance.tabFillIntensity, appearance.activeTabHighlight)

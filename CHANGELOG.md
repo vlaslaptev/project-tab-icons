@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.4.16 — 2026-10-29
+
+Changes since the public 0.3.120 release:
+
+- Ship separate macOS and Windows beta packages. Merge Windows projects into one window, separate individual projects, and restore the merged layout between sessions.
+- Add automatic project-window tabs on both platforms and Open All Grouped Projects for opening and arranging saved groups.
+- Add Auto, Square and IDEA theme tab corners. Preserve native macOS window tabs and use square corners by default on Windows.
+- Match the Windows preview to the merged window, including top-row project tabs, native window controls, right-side close buttons and base tab styling.
+- Keep Windows layouts synchronized during resize, maximize/restore and display changes. Preserve tab styling after toolbar gradient updates.
+- Use a single Save as new preset action. Commit and validate unfinished group drafts through Settings Apply or OK.
+- Resolve quick actions using the actual project path, including `.ipr` projects; avoid redundant repaints and batch icon refreshes.
+- Remove the light outline around dark macOS preview headers.
+- Exclude local agent instructions from Git and public release exports.
+
+Both ZIPs have source and packaging checks. Earlier targeted GUI checks used
+0.4.15 on macOS ARM64 and Windows 11 ARM64; no new GUI pass is claimed for 0.4.16.
+
 ## 0.3.120 — 2026-10-25
 
 Changes since the public 0.3.107 release:

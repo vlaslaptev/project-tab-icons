@@ -153,6 +153,7 @@ private fun encodeAppearance(value: TabAppearanceState): JsonObject = JsonObject
     addProperty("outlineStyle", value.outlineStyle.name)
     addProperty("closeButtonPosition", value.closeButtonPosition.name)
     addProperty("tabHeight", value.tabHeight)
+    addProperty("tabCorners", value.tabCorners.name)
     addProperty("showProjectPath", value.showProjectPath)
     addProperty("showGitBranch", value.showGitBranch)
     addProperty("gitBranchFormat", value.gitBranchFormat.name)
@@ -189,6 +190,8 @@ private fun decodeAppearance(value: JsonObject): TabAppearanceState {
         outlineStyle = value.enum("outlineStyle", defaults.outlineStyle),
         closeButtonPosition = value.enum("closeButtonPosition", defaults.closeButtonPosition),
         tabHeight = value.integer("tabHeight", defaults.tabHeight),
+        // Отсутствие нового поля у старого стиля сохраняет прежнее оформление на любой ОС.
+        tabCorners = value.enum("tabCorners", TabCornerMode.IDEA_THEME),
         showProjectPath = value.bool("showProjectPath", defaults.showProjectPath),
         showGitBranch = value.bool("showGitBranch", defaults.showGitBranch),
         gitBranchFormat = value.enum("gitBranchFormat", defaults.gitBranchFormat),

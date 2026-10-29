@@ -3,7 +3,7 @@ package dev.vlas.projecttabicons
 import com.intellij.openapi.ui.AbstractPainter
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.IdeGlassPaneUtil
-import com.intellij.ui.mac.WindowTabsComponent
+import com.intellij.ui.tabs.impl.JBTabsImpl
 import com.intellij.ui.tabs.TabInfo
 import com.intellij.ui.tabs.TabsListener
 import com.intellij.util.ui.JBUI
@@ -19,7 +19,7 @@ internal data class ProjectTabGroupMargins(val left: Int = 0, val right: Int = 0
 
 /** Только оформление. Порядок и hit areas вкладок остаются под управлением IDEA. */
 internal class ProjectTabGroupLayout(
-    val tabs: WindowTabsComponent,
+    val tabs: JBTabsImpl,
     private val visualState: ProjectTabGroupVisualState,
     private val drag: ProjectTabGroupDrag,
     private val isOrdering: () -> Boolean,
@@ -270,7 +270,7 @@ internal class ProjectTabGroupLayout(
         if (isMovingTab(info)) {
             // Видимое тело движется независимо от неподвижной геометрии группы.
             // Поля общей иконки / разделителя остаются прозрачными для соседних label-ов.
-            val body = projectTabGeometry((width - edges.left - edges.right).coerceAtLeast(0), height)
+            val body = projectTabGeometry((width - edges.left - edges.right).coerceAtLeast(0), height, appearance.tabCorners)
             val geometry = body.copy(bounds = Rectangle2D.Double(body.bounds.x + edges.left,
                 body.bounds.y, body.bounds.width, body.bounds.height))
             ProjectTabGroupSurface.paint(g, width, height,
@@ -286,7 +286,7 @@ internal class ProjectTabGroupLayout(
         if (fixed == null && (!first.isVisible || !last.isVisible || first.width <= 0 || last.width <= 0)) return false
         val left = fixed?.bounds?.x ?: (first.x + margins(run.first).left - leadingSlot(run.first))
         val right = fixed?.bounds?.let { it.x + it.width } ?: (last.x + last.width - margins(run.last).right)
-        val source = fixed?.geometry ?: projectTabGeometry((right - left).coerceAtLeast(0), height)
+        val source = fixed?.geometry ?: projectTabGeometry((right - left).coerceAtLeast(0), height, appearance.tabCorners)
         val geometry = source.copy(bounds = Rectangle2D.Double(source.bounds.x + (if (fixed == null) left else 0) - label.x,
             source.bounds.y - if (fixed != null) label.y else 0, source.bounds.width, source.bounds.height))
         val state = ProjectTabGroupSurfaceState(appearance, geometry,
@@ -380,7 +380,7 @@ internal class ProjectTabGroupLayout(
             val bounds = runBounds(run) ?: return@mapNotNull null
             val first = tabs.getTabLabel(run.first) ?: return@mapNotNull null
             val palette = nativeProjectTabSurfaceColors(first) ?: return@mapNotNull null
-            val geometry = projectTabGeometry(bounds.width, bounds.height).let {
+            val geometry = projectTabGeometry(bounds.width, bounds.height, appearance.tabCorners).let {
                 it.copy(bounds = Rectangle2D.Double(it.bounds.x + bounds.x, it.bounds.y + bounds.y, it.bounds.width, it.bounds.height))
             }
             val icon = visibleGroupIcon(icons[run.id], leadingSlot(run.first), tabs.height, appearance)

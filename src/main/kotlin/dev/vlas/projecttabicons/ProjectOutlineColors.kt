@@ -40,6 +40,7 @@ internal class ProjectColorConflictException(projectName: String, channel: Proje
 
 /** Чистое слияние: одинаковое итоговое значение не конфликтует, чистые каналы берутся из хранилища. */
 internal fun mergeProjectColors(previous: ProjectOutlineColorState, changes: Map<Path, ProjectColorChanges>): ProjectOutlineColorState {
+    val resolved = previous.normalizedPathKeys()
     fun updated(source: Map<String, String>, target: ProjectColorTarget): Map<String, String> =
         source.toMutableMap().apply {
             changes.forEach { (path, change) ->
@@ -52,9 +53,9 @@ internal fun mergeProjectColors(previous: ProjectOutlineColorState, changes: Map
                 if (wanted == null) remove(key) else put(key, wanted.hex())
             }
         }.toMap()
-    return previous.copy(colors = updated(previous.colors, ProjectColorTarget.OUTLINE),
-        iconColors = updated(previous.iconColors, ProjectColorTarget.ICON),
-        tabColors = updated(previous.tabColors, ProjectColorTarget.TAB))
+    return resolved.copy(colors = updated(resolved.colors, ProjectColorTarget.OUTLINE),
+        iconColors = updated(resolved.iconColors, ProjectColorTarget.ICON),
+        tabColors = updated(resolved.tabColors, ProjectColorTarget.TAB))
 }
 
 internal data class ProjectOutlineColorState(
@@ -62,7 +63,17 @@ internal data class ProjectOutlineColorState(
     @field:OptionTag @JvmField val colors: Map<String, String> = emptyMap(),
     @field:OptionTag @JvmField val iconColors: Map<String, String> = emptyMap(),
     @field:OptionTag @JvmField val tabColors: Map<String, String> = emptyMap(),
-)
+) {
+    fun overrides(path: Path): ProjectColorOverrides {
+        val key = projectIconPathKey(path)
+        return ProjectColorOverrides(iconColors[key]?.let(::parseIconColor),
+            colors[key]?.let(::parseIconColor), tabColors[key]?.let(::parseIconColor))
+    }
+
+    fun normalizedPathKeys(windows: Boolean = com.intellij.openapi.util.SystemInfoRt.isWindows): ProjectOutlineColorState =
+        if (!windows) this else copy(colors = normalizedProjectPathKeys(colors, true),
+            iconColors = normalizedProjectPathKeys(iconColors, true), tabColors = normalizedProjectPathKeys(tabColors, true))
+}
 
 /** Независимые цвета проектов. SVG/PNG сохраняют исходные цвета; iconColors — только для буквенных аватаров. */
 @Service(Service.Level.APP)
@@ -70,14 +81,8 @@ internal data class ProjectOutlineColorState(
 internal class ProjectOutlineColors :
     SerializablePersistentStateComponent<ProjectOutlineColorState>(ProjectOutlineColorState()) {
 
-    fun overrides(path: Path): ProjectColorOverrides {
-        val key = projectIconPathKey(path)
-        val snapshot = state
-        return ProjectColorOverrides(snapshot.iconColors[key]?.let(::parseIconColor),
-            snapshot.colors[key]?.let(::parseIconColor), snapshot.tabColors[key]?.let(::parseIconColor))
-    }
-
-    fun iconColor(path: Path): Color? = state.iconColors[projectIconPathKey(path)]?.let(::parseIconColor)
+    val resolvedState get() = state.normalizedPathKeys()
+    fun overrides(path: Path): ProjectColorOverrides = resolvedState.overrides(path)
 
     fun apply(changes: Map<Path, ProjectColorChanges>, commitSettings: () -> Unit = {}) = SharedIconSettingsLock.withLock {
         // Callback проверяет общие настройки до первой записи; I/O и ожидания EDT здесь нет.
@@ -88,8 +93,6 @@ internal class ProjectOutlineColors :
     }
 
     override fun loadState(state: ProjectOutlineColorState) {
-        SharedIconSettingsLock.withLock { super.loadState(state) }
+        SharedIconSettingsLock.withLock { super.loadState(state.normalizedPathKeys()) }
     }
 }
-
-internal fun projectIconPathKey(path: Path): String = path.toAbsolutePath().normalize().toString()

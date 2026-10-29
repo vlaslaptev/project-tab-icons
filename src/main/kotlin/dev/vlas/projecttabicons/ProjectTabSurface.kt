@@ -6,6 +6,7 @@ import com.intellij.ui.Graphics2DDelegate
 import com.intellij.ui.IslandsState
 import com.intellij.ui.JBColor
 import com.intellij.ui.mac.WindowTabsComponent
+import com.intellij.ui.tabs.impl.JBTabsImpl
 import com.intellij.ui.tabs.impl.TabLabel
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
@@ -137,9 +138,9 @@ internal object ProjectTabSurface {
 /** Состояние читается во время paint: наведение и активация окна не ждут refresh сервиса. */
 internal fun nativeProjectTabSurfaceColors(component: Component): ProjectTabSurfaceColors? {
     val label = component as? TabLabel ?: return null
-    val tabs = SwingUtilities.getAncestorOfClass(WindowTabsComponent::class.java, label) as? WindowTabsComponent ?: return null
+    val tabs = projectTabBar(label) ?: return null
     val window = SwingUtilities.getWindowAncestor(tabs)
-    val selected = label.info.`object` === window
+    val selected = if (tabs is ManagedProjectTabs) tabs.selectedInfo === label.info else label.info.`object` === window
     val hovered = tabs.isHoveredOrWithPopup(label)
     val strip = tabs.tabPainter.getBackgroundColor()
     val islands = ExperimentalUI.isNewUI() && IslandsState.isEnabled()
@@ -157,15 +158,29 @@ internal fun nativeProjectTabSurfaceColors(component: Component): ProjectTabSurf
     return ProjectTabSurfaceColors(strip, background, idle, ProjectTabSurfaceState.of(selected, hovered))
 }
 
+internal fun defaultProjectTabSeparatorColor(): Color = JBColor.namedColor("MainWindow.Tab.separatorColor",
+    JBColor(Color(0xD3D5DB), Color(0x4E5157)))
+
+/** Одна граница между соседями; после последнего таба и поверх нижней линии её нет. */
+internal fun paintProjectTabSeparator(component: Component, g: Graphics2D, width: Int, height: Int, color: Color) {
+    if (component is TabLabel) {
+        val tabs = projectTabBar(component) ?: return
+        if (tabs.getIndexOf(component.info) !in 0 until tabs.tabCount - 1) return
+    }
+    val thickness = JBUI.scale(1)
+    g.color = color
+    g.fillRect(width - thickness, 0, thickness, height)
+}
+
 /** Возвращаем линии Classic UI поверх собранной подложки, до пользовательской обводки. */
 internal fun paintNativeProjectTabEdges(component: Component, g: Graphics2D, width: Int, height: Int) {
     if (ExperimentalUI.isNewUI() && IslandsState.isEnabled()) return
     val label = component as? TabLabel ?: return
-    val tabs = SwingUtilities.getAncestorOfClass(WindowTabsComponent::class.java, label) as? WindowTabsComponent ?: return
+    val tabs = projectTabBar(label) ?: return
     val index = tabs.getIndexOf(label.info)
     val last = tabs.tabCount - 1
     val edge = JBUI.scale(1)
-    if (label.info.`object` === SwingUtilities.getWindowAncestor(tabs)) {
+    if (if (tabs is ManagedProjectTabs) tabs.selectedInfo === label.info else label.info.`object` === SwingUtilities.getWindowAncestor(tabs)) {
         g.color = JBUI.CurrentTheme.MainWindow.Tab.BORDER
         g.fillRect(0, 0, width, edge)
         if (index > 0) g.fillRect(0, 0, edge, height)
@@ -175,3 +190,7 @@ internal fun paintNativeProjectTabEdges(component: Component, g: Graphics2D, wid
         g.fillRect(width - edge, 0, edge, height)
     }
 }
+
+private fun projectTabBar(label: TabLabel): JBTabsImpl? =
+    (SwingUtilities.getAncestorOfClass(JBTabsImpl::class.java, label) as? JBTabsImpl)
+        ?.takeIf { it is WindowTabsComponent || it is ManagedProjectTabs }

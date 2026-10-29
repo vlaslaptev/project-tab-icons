@@ -6,7 +6,6 @@ import com.intellij.ide.RecentProjectIconHelper
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.ui.IconDeferrer
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -30,6 +29,7 @@ internal data class IconSnapshot(val directory: Path, val files: Map<String, Byt
 internal data class ProjectIconSource(val path: Path, val title: String, val snapshot: IconSnapshot? = null)
 internal data class SvgGallery(val assets: List<SvgAsset>, val skipped: Int)
 internal data class ProjectIconWrite(val project: Project, val path: Path, val expected: IconSnapshot, val asset: SvgAsset)
+internal data class ProjectIconRefresh(val project: Project, val path: Path, val snapshot: IconSnapshot)
 
 /** Файловые операции выполняются в фоне; refreshUi вызывается на EDT. */
 internal object ProjectIconStore {
@@ -176,14 +176,21 @@ internal object ProjectIconStore {
         writeFileAtomically(target, bytes)
     }
 
-    fun refreshUi(project: Project, projectPath: Path, snapshot: IconSnapshot) {
-        LocalFileSystem.getInstance().refreshNioFiles(listOf(snapshot.directory), true, true, null)
-        RecentProjectIconHelper.refreshProjectIcon(projectPath)
-        IconDeferrer.getInstance().clearCache()
-        if (project.isDisposed) return
+    fun refreshUi(project: Project, projectPath: Path, snapshot: IconSnapshot) =
+        refreshUiAll(listOf(ProjectIconRefresh(project, projectPath, snapshot)))
+
+    fun refreshUiAll(updates: List<ProjectIconRefresh>) {
+        if (updates.isEmpty()) return
+        LocalFileSystem.getInstance().refreshNioFiles(updates.map { it.snapshot.directory }.distinct(), true, true, null)
         val customizer = ProjectWindowCustomizerService.getInstance()
-        customizer.dropProjectIconCache(project)
-        customizer.setIconMainColorAsProjectColor(project)
+        updates.forEach { (project, path, _) ->
+            RecentProjectIconHelper.refreshProjectIcon(path)
+            if (!project.isDisposed) {
+                customizer.dropProjectIconCache(project)
+                customizer.setIconMainColorAsProjectColor(project)
+            }
+        }
+        // The coalesced service refresh clears the global IDE cache once per batch.
         service<ProjectTabIconsService>().requestRefresh(invalidate = true)
     }
 }

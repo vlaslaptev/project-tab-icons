@@ -1,8 +1,10 @@
 package dev.vlas.projecttabicons
 
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.components.service
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.ui.ComboBox
+import com.intellij.openapi.util.SystemInfoRt
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
@@ -20,8 +22,10 @@ import javax.swing.ButtonGroup
 import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JPanel
+import javax.swing.JSeparator
 import javax.swing.ScrollPaneConstants
 import javax.swing.SwingConstants
+import javax.swing.Timer
 
 /** Собирает форму, пресеты и таблицы; синхронизирует общий черновик и preview. */
 internal class IconSettingsPanel(
@@ -85,6 +89,15 @@ internal class IconSettingsPanel(
         font = font.deriveFont(Font.BOLD)
         toolTipText = "Turn tab customization on or off for all projects. Saved project icons are kept."
     }
+    private val windowOpeningHelp = "Add new project windows to the tabbed window, independently of tab customization. " +
+        "Existing separate windows are kept. Choose New Window if IDEA asks where to open a project."
+    private val automaticallyOpenInTabs = JBCheckBox("Automatically open projects in tabs", false).apply {
+        toolTipText = windowOpeningHelp
+    }
+    private val windowOpeningMarker = if (SystemInfoRt.isWindows || SystemInfoRt.isMac) SettingsPendingChange(automaticallyOpenInTabs) else null
+    private var windowOpeningBaseline = ProjectWindowOpeningState()
+    private var macWindowOpeningDraft = false
+    private val macPreferenceTimer = Timer(1_000) { if (component.isShowing) refreshWindowOpening() }
     private val restoreDefaults = JButton("Restore defaults").apply {
         toolTipText = "Restore default tab appearance. Project icons, colors and the global switch stay unchanged."
     }
@@ -96,7 +109,7 @@ internal class IconSettingsPanel(
     private var importedCategoryCount = 0
     private val pendingMarkers = mutableListOf<Pair<SettingsPendingChange, (TabAppearanceState) -> Boolean>>()
     private val groups = ProjectGroupsPanel({ pageWidth(projectsScroll) }, ::refreshRows,
-        { sections.selectTab("Projects") }, chooseGroupIcon, chooseGroupColor)
+        { sections.selectTab("Projects") }, chooseGroupIcon, chooseGroupColor, ::updateStatus)
     private val appearanceForm = TabAppearanceForm({ pageWidth(appearanceScroll) }, { appearanceChanged() }, ::refreshLayout)
     private val presets = AppearancePresetsPanel(component, ::presetsWidth, ::appearance,
         { displayedAppearance }, ::setAppearance, ::updateStatus, ::refreshLayout)
@@ -108,7 +121,7 @@ internal class IconSettingsPanel(
         private set
 
     val modified: Boolean get() = appearance() != appearanceBaseline || presets.modified ||
-        groups.modified || rows.any { it.modified }
+        windowOpening() != windowOpeningBaseline || groups.modified || rows.any { it.modified }
     val preferredFocus: JComponent get() = pluginEnabled
 
     init {
@@ -119,7 +132,14 @@ internal class IconSettingsPanel(
         component.minimumSize = JBUI.size(360, 400)
         component.add(JPanel(BorderLayout(0, JBUI.scale(16))).apply {
             isOpaque = false
-            add(pluginEnabled, BorderLayout.NORTH)
+            add(JPanel(BorderLayout(0, JBUI.scale(12))).apply {
+                isOpaque = false
+                if (SystemInfoRt.isWindows || SystemInfoRt.isMac) {
+                    add(automaticallyOpenInTabs, BorderLayout.NORTH)
+                    add(JSeparator(), BorderLayout.CENTER)
+                    add(pluginEnabled, BorderLayout.SOUTH)
+                } else add(pluginEnabled, BorderLayout.NORTH)
+            }, BorderLayout.NORTH)
             presetsHeader.add(presets.component, BorderLayout.CENTER)
             add(presetsHeader, BorderLayout.CENTER)
         }, BorderLayout.NORTH)
@@ -188,9 +208,16 @@ internal class IconSettingsPanel(
             }
         }
         pluginEnabled.addActionListener { appearanceChanged(manualEdit = false) }
+        automaticallyOpenInTabs.addActionListener {
+            if (!syncing) {
+                if (SystemInfoRt.isMac) macWindowOpeningDraft = automaticallyOpenInTabs.isSelected
+                updateStatus()
+            }
+        }
         restoreDefaults.addActionListener { presets.restoreDefaults() }
         installAppearanceMarkers()
         resetAppearance()
+        if (SystemInfoRt.isMac) macPreferenceTimer.start()
     }
 
     fun refreshPreviewTheme() {
@@ -243,6 +270,12 @@ internal class IconSettingsPanel(
     }
 
     fun projectGroups(): ProjectGroupsState = groups.draft
+    fun commitPendingGroupEdit() {
+        groups.commitPendingEdit()?.let { error ->
+            sections.selectTab("Project groups")
+            throw com.intellij.openapi.options.ConfigurationException(error)
+        }
+    }
     fun updateGroup(id: String, transform: (ProjectTabGroup) -> ProjectTabGroup) = groups.updateGroup(id, transform)
     fun replaceUserPresets(value: List<UserAppearancePreset>) = presets.replaceUserPresets(value)
     fun customAppearance(): TabAppearanceState = presets.customAppearance()
@@ -258,6 +291,26 @@ internal class IconSettingsPanel(
         userPresetId = presets.selectedUserPresetId,
     )
 
+    private fun windowOpening(): ProjectWindowOpeningState = when {
+        SystemInfoRt.isWindows -> windowOpeningBaseline.copy(automaticallyOpenInTabs = automaticallyOpenInTabs.isSelected)
+        SystemInfoRt.isMac -> windowOpeningBaseline.copy(automaticallyOpenInTabsOnMac = macWindowOpeningDraft)
+        else -> windowOpeningBaseline.copy()
+    }
+
+    private fun refreshWindowOpening() {
+        if (!SystemInfoRt.isMac) return
+        val preference = service<MacTabbingPreference>()
+        preference.refresh()
+        // A system-forced checkmark is presentation only, never a saved local opt-in.
+        automaticallyOpenInTabs.isSelected = macWindowOpeningDraft || preference.mode == MacTabbingMode.ALWAYS
+        automaticallyOpenInTabs.isEnabled = preference.mode != MacTabbingMode.UNKNOWN && preference.mode != MacTabbingMode.ALWAYS
+        automaticallyOpenInTabs.toolTipText = when (preference.mode) {
+            MacTabbingMode.UNKNOWN -> "Reading macOS window tabbing preference…"
+            MacTabbingMode.ALWAYS -> "Enabled by macOS. Your local preference is kept."
+            else -> windowOpeningHelp
+        }
+    }
+
     fun resetAppearance(preserveEditing: Boolean = false) {
         val saved = SharedIconSettingsStore().snapshot()
         if (preserveEditing && saved.projectGroups == groups.draft) groups.saved()
@@ -266,12 +319,16 @@ internal class IconSettingsPanel(
             saved.appearance, saved.userPresets, saved.customAppearance,
             preserveEditing = preserveEditing,
         )
+        windowOpeningBaseline = saved.windowOpening
+        macWindowOpeningDraft = saved.windowOpening.automaticallyOpenInTabsOnMac
+        automaticallyOpenInTabs.isSelected = saved.windowOpening.automaticallyOpenInTabs
+        refreshWindowOpening()
         setAppearance(appearanceBaseline)
         sharedSettingsBaseline = saved
         sharedDraftBaseline = sharedDraft()
     }
 
-    private fun sharedDraft() = SharedIconSettingsSnapshot(appearance(), customAppearance(), userPresets(), projectGroups())
+    private fun sharedDraft() = SharedIconSettingsSnapshot(appearance(), customAppearance(), userPresets(), projectGroups(), windowOpening())
 
     fun sharedSettingsChanges() = SharedIconSettingsChanges(sharedSettingsBaseline, sharedDraftBaseline, sharedDraft())
 
@@ -344,6 +401,7 @@ internal class IconSettingsPanel(
             changed > 0 -> "$changed project${if (changed == 1) "" else "s"} edited · Save with Apply"
             importedCategoryCount > 0 -> "$importedCategoryCount icon categor${if (importedCategoryCount == 1) "y" else "ies"} imported · Save with Apply"
             appearance() != appearanceBaseline -> "Window tabs edited · Save with Apply"
+            windowOpening() != windowOpeningBaseline -> "Project window opening edited · Save with Apply"
             groups.modified -> "Project groups edited · Save with Apply"
             presets.presetsModified -> "User presets edited · Save with Apply"
             presets.customModified -> "Custom appearance edited · Save with Apply"
@@ -368,10 +426,12 @@ internal class IconSettingsPanel(
     private fun refreshPendingChanges() {
         val current = appearance()
         pendingMarkers.forEach { (marker, changed) -> marker.update(changed(current)) }
+        windowOpeningMarker?.update(windowOpening() != windowOpeningBaseline)
         presets.refreshPendingChanges(current, appearanceBaseline)
     }
 
     fun disposeDialogs() {
+        macPreferenceTimer.stop()
         groups.disposeDialogs()
         presets.disposeDialogs()
     }

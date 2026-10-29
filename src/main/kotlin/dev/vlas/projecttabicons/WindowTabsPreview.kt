@@ -1,6 +1,7 @@
 package dev.vlas.projecttabicons
 
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.util.SystemInfoRt
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.scale.JBUIScale
 import com.intellij.util.ui.AvatarUtils
@@ -71,7 +72,8 @@ internal class WindowTabsPreview : JPanel(null) {
     }
 
     private fun createTabs() = samples.mapIndexed { index, sample ->
-        PreviewTab(sample.title, sample.path, sample.branch, sample.contourId, sample.color, index == selectedIndex, sample.groupMember) {
+        PreviewTab(sample.title, if (SystemInfoRt.isWindows) "C:\\Projects\\${sample.title}" else sample.path,
+            sample.branch, sample.contourId, sample.color, index == selectedIndex, sample.groupMember) {
             selectTab(index)
         }
     }
@@ -84,7 +86,8 @@ internal class WindowTabsPreview : JPanel(null) {
     }
 
     private fun updateAccessibleDescription() {
-        getAccessibleContext().accessibleDescription = "Decorative macOS window with traffic lights, toolbar and ${samples.size} project tabs${if (fullWindow) ", file tabs and an editor fragment" else ""}. $groupDescription Click a project tab to preview activation and inactive tab dimming. Window decorations are not interactive."
+        val platform = if (SystemInfoRt.isWindows) "Windows window with project tabs and window controls above the toolbar" else "macOS window with traffic lights"
+        getAccessibleContext().accessibleDescription = "Decorative $platform, toolbar and ${samples.size} project tabs${if (fullWindow) ", file tabs and an editor fragment" else ""}. $groupDescription Click a project tab to preview activation and inactive tab dimming. Window decorations are not interactive."
     }
 
     fun showFullWindow(value: Boolean) {
@@ -123,10 +126,13 @@ internal class WindowTabsPreview : JPanel(null) {
 
     override fun doLayout() {
         // Полное окно имеет постоянную высоту; компактное вмещает только toolbar и табы.
-        val top = JBUI.scale(PreviewWindowChrome.TOOLBAR_HEIGHT)
+        val windows = SystemInfoRt.isWindows
+        val top = if (windows) 0 else JBUI.scale(PreviewWindowChrome.TOOLBAR_HEIGHT)
         val availableHeight = (height - top).coerceAtLeast(0)
-        val edge = JBUI.scale(8)
-        val available = (width - edge * 2).coerceAtLeast(0)
+        val edge = if (windows) 0 else JBUI.scale(8)
+        val captionSpace = if (windows) JBUI.scale(WindowsCaptionMetrics.DRAG_AREA_WIDTH +
+            WindowsCaptionMetrics.PREVIEW_CONTROLS_WIDTH) else 0
+        val available = (width - edge * 2 - captionSpace).coerceAtLeast(0)
         val gap = (if (appearance.enabled) JBUI.scale(groupBoundarySpacing(appearance)) else 0).coerceIn(0, available / sampleTabs.size)
         groupIconSlot = if (groupIcon != null) groupIconSlotWidth(appearance).takeIf { it <= available / 4 } ?: 0 else 0
         val iconHeight = maxOf(JBUI.scale(tabHeight), groupIconMinimumHeight(appearance)).coerceAtMost(availableHeight)
@@ -158,7 +164,7 @@ internal class WindowTabsPreview : JPanel(null) {
         val first = sampleTabs[0]
         val last = sampleTabs[groupTabCount - 1]
         val left = first.x - groupIconSlot
-        val geometry = palette.geometry((last.x + last.width - left).coerceAtLeast(0), first.height)
+        val geometry = palette.geometry((last.x + last.width - left).coerceAtLeast(0), first.height, appearance.tabCorners)
         return geometry.copy(bounds = Rectangle2D.Double(geometry.bounds.x + left,
             geometry.bounds.y + first.y, geometry.bounds.width, geometry.bounds.height))
     }
@@ -217,8 +223,19 @@ internal class WindowTabsPreview : JPanel(null) {
                         appearance.groupSeparatorThickness, appearance.groupSeparatorHeight, color)
                 }
             }
-            g.color = palette.chrome.border
             g.stroke = BasicStroke(JBUIScale.scale(1f))
+            if (!SystemInfoRt.isWindows) {
+                // Светлая рамка редактора не должна обводить тёмный macOS-toolbar.
+                // Регионы не перекрываются, чтобы на сглаженных углах не остался светлый ореол.
+                val headerHeight = JBUI.scale(PreviewWindowChrome.TOOLBAR_HEIGHT).coerceAtMost(height)
+                val header = g.create(0, 0, width, headerHeight) as Graphics2D
+                try {
+                    header.color = palette.chrome.toolbarBackground
+                    header.draw(windowShape())
+                } finally { header.dispose() }
+                g.clipRect(0, headerHeight, width, height - headerHeight)
+            }
+            g.color = palette.chrome.border
             g.draw(windowShape())
         } finally { g.dispose() }
     }
@@ -239,8 +256,9 @@ internal class WindowTabsPreview : JPanel(null) {
 
     fun showAppearance(appearance: TabAppearanceState) {
         this.appearance = appearance
-        tabHeight = if (appearance.enabled) {
-            appearance.tabHeight.coerceIn(DEFAULT_TAB_HEIGHT, MAX_TAB_HEIGHT)
+        val rendered = appearance.renderedAppearance()
+        tabHeight = if (rendered.enabled || SystemInfoRt.isWindows) {
+            rendered.tabHeight.coerceIn(DEFAULT_TAB_HEIGHT, MAX_TAB_HEIGHT)
         } else DEFAULT_TAB_HEIGHT
         palette = theme.palette()
         groupIcon = if (appearance.enabled && appearance.showGroupIcon) {
@@ -248,7 +266,10 @@ internal class WindowTabsPreview : JPanel(null) {
                 appearance.iconSize.pixels, DEFAULT_ICON_INITIALS, TabIconLetterWeight.BOLD, projectName = "Group")
             CenteredProjectIcon(image, appearance.iconSize.pixels, artwork = { image })
         } else null
-        sampleTabs.forEach { it.showAppearance(appearance, palette) }
+        sampleTabs.forEachIndexed { index, tab ->
+            tab.showAppearance(rendered, palette, trailingSeparator = SystemInfoRt.isWindows &&
+                !appearance.enabled && index < sampleTabs.lastIndex)
+        }
         revalidate()
         // null-layout требует явно обновить дочернюю геометрию и при смене шрифта,
         // когда внешний размер самого Preview остался прежним.
@@ -303,7 +324,7 @@ private class PreviewTab(
 
     init {
         isOpaque = false
-        // Неактивные вкладки сохраняют место под крестик, как в полосе окон IDEA.
+        // Windows shows close buttons on every project tab; macOS reserves the inactive slot.
         add(close, BorderLayout.WEST)
         add(caption, BorderLayout.CENTER)
         layout = previewLayout
@@ -347,17 +368,18 @@ private class PreviewTab(
         (border as? ProjectTabBorder)?.sharedGroupSurfacePreview = value != null
     }
 
-    fun showAppearance(appearance: TabAppearanceState, theme: PreviewThemePalette) {
-        customizationEnabled = appearance.enabled
+    fun showAppearance(appearance: TabAppearanceState, theme: PreviewThemePalette, trailingSeparator: Boolean = false) {
+        val decorated = appearance.enabled || SystemInfoRt.isWindows
+        customizationEnabled = decorated
         palette = theme
         caption.foreground = if (selected) palette.selectedForeground else palette.foreground
         caption.branchForeground = palette.chrome.muted
         close.icon = when {
-            !selected -> EmptyIcon.create(AllIcons.Actions.Close.iconWidth, AllIcons.Actions.Close.iconHeight)
+            !selected && !SystemInfoRt.isWindows -> EmptyIcon.create(AllIcons.Actions.Close.iconWidth, AllIcons.Actions.Close.iconHeight)
             palette.nativeClose -> AllIcons.Actions.Close
             else -> PreviewCloseIcon(palette.closeColor)
         }
-        caption.font = if (appearance.enabled && appearance.tabFontSize > 0) {
+        caption.font = if (decorated && appearance.tabFontSize > 0) {
             JBFont.medium().deriveFont(JBUI.scale(appearance.tabFontSize).toFloat())
         } else JBFont.medium()
         font = caption.font
@@ -375,9 +397,9 @@ private class PreviewTab(
         caption.removedForeground = Color(if (light) 0xC62828 else 0xDB5C5C)
         caption.border = if (extra != null) JBUI.Borders.empty(0, 12) else null
         caption.toolTipText = extra?.tooltip ?: fullTitle
-        caption.showTitle(if (!appearance.enabled || appearance.showProjectPath) fullTitle else title,
+        caption.showTitle(if (!decorated || appearance.showProjectPath) fullTitle else title,
             extra, appearance.branchPosition)
-        if (!appearance.enabled) {
+        if (!decorated) {
             previewLayout.restoreCloseInsets()
             layout = baseLayout
             border = baseBorder
@@ -397,12 +419,15 @@ private class PreviewTab(
         previewLayout.position = appearance.iconPosition
         previewLayout.closeButtonPosition = appearance.closeButtonPosition
         previewLayout.centerProjectName = mode == TabMoreInfo.NONE
-        border = ProjectTabBorder(baseBorder, icon, color.takeIf { appearance.showOutline },
+        val outlineColor = if (!appearance.enabled && SystemInfoRt.isWindows) palette.defaultTabAccent else color
+        border = ProjectTabBorder(baseBorder, icon, outlineColor.takeIf { appearance.showOutline },
             appearance.outlineThickness, appearance.outlineStyle,
             tabColor = color.takeIf { appearance.showTabBackground }, tabFillInset = appearance.tabFillInset,
-            tabFillIntensity = appearance.tabFillIntensity, geometryOverride = palette::geometry,
+            tabFillIntensity = appearance.tabFillIntensity,
+            geometryOverride = { width, height -> palette.geometry(width, height, appearance.tabCorners) },
             surfaceColors = { surfaceColors() }, inactiveTabDimming = appearance.inactiveTabDimming,
-            activeTabHighlight = appearance.activeTabHighlight).apply {
+            activeTabHighlight = appearance.activeTabHighlight, tabCorners = appearance.tabCorners,
+            trailingSeparatorColor = palette.defaultTabSeparator.takeIf { trailingSeparator }).apply {
                 sharedGroupSurfacePreview = groupMember && appearance.showGroupOutline
             }
         revalidate()

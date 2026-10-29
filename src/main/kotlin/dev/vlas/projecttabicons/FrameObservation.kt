@@ -19,11 +19,18 @@ internal class FrameObservation(
     val rootPane: JRootPane,
     private val changed: () -> Unit,
     private val titleChanged: () -> Unit,
+    private val tabsKey: String? = WINDOW_TABS_CONTAINER_KEY,
 ) : AutoCloseable {
     private var closed = false
     private val containers = identitySet<Container>()
     private val titleListener = PropertyChangeListener { titleChanged() }
     private val tabsListener = PropertyChangeListener { changed() }
+    private val decorationListener = PropertyChangeListener { event ->
+        // JBTabsImpl.updateUI applies its native decoration in a later EDT task.
+        // Observe that replacement, not our own border installation, so refresh
+        // runs after it without creating a decoration/refresh loop.
+        if (event.oldValue is ProjectTabBorder && event.newValue !is ProjectTabBorder) changed()
+    }
     private val activationListener = object : WindowAdapter() {
         override fun windowActivated(event: WindowEvent) = changed()
         override fun windowDeactivated(event: WindowEvent) = changed()
@@ -36,20 +43,26 @@ internal class FrameObservation(
     init {
         frame?.addPropertyChangeListener("title", titleListener)
         frame?.addWindowListener(activationListener)
-        rootPane.addPropertyChangeListener(WINDOW_TABS_CONTAINER_KEY, tabsListener)
+        tabsKey?.let { rootPane.addPropertyChangeListener(it, tabsListener) }
     }
 
-    fun update() {
+    fun update(tabsContainer: Container? = tabsKey?.let { rootPane.getClientProperty(it) as? Container }) {
         if (closed) return
         val present = identitySet<Container>()
         fun collect(container: Container) {
             if (!present.add(container)) return
             container.components.filterIsInstance<Container>().forEach(::collect)
         }
-        (rootPane.getClientProperty(WINDOW_TABS_CONTAINER_KEY) as? Container)?.let(::collect)
+        tabsContainer?.let(::collect)
 
-        containers.filter { it !in present }.forEach { it.removeContainerListener(childListener) }
-        present.filter { it !in containers }.forEach { it.addContainerListener(childListener) }
+        containers.filter { it !in present }.forEach {
+            it.removeContainerListener(childListener)
+            it.removePropertyChangeListener("border", decorationListener)
+        }
+        present.filter { it !in containers }.forEach {
+            it.addContainerListener(childListener)
+            it.addPropertyChangeListener("border", decorationListener)
+        }
         containers.clear()
         containers.addAll(present)
     }
@@ -58,8 +71,11 @@ internal class FrameObservation(
         closed = true
         frame?.removePropertyChangeListener("title", titleListener)
         frame?.removeWindowListener(activationListener)
-        rootPane.removePropertyChangeListener(WINDOW_TABS_CONTAINER_KEY, tabsListener)
-        containers.forEach { it.removeContainerListener(childListener) }
+        tabsKey?.let { rootPane.removePropertyChangeListener(it, tabsListener) }
+        containers.forEach {
+            it.removeContainerListener(childListener)
+            it.removePropertyChangeListener("border", decorationListener)
+        }
         containers.clear()
     }
 }

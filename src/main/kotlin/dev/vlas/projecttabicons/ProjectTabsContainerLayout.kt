@@ -1,6 +1,6 @@
 package dev.vlas.projecttabicons
 
-import com.intellij.ui.mac.WindowTabsComponent
+import com.intellij.ui.tabs.impl.JBTabsImpl
 import com.intellij.util.ui.JBUI
 import java.awt.Container
 import java.awt.Dimension
@@ -17,7 +17,7 @@ internal class ProjectTabsContainerLayout(
     override fun minimumLayoutSize(parent: Container): Dimension = withTabHeight(parent, original.minimumLayoutSize(parent))
 
     private fun withTabHeight(parent: Container, size: Dimension): Dimension {
-        val tabs = parent.components.filterIsInstance<WindowTabsComponent>().singleOrNull() ?: return size
+        val tabs = parent.components.filterIsInstance<JBTabsImpl>().singleOrNull() ?: return size
         val contentHeight = tabs.tabs.maxOfOrNull { info ->
             val label = tabs.getTabLabel(info)
             label?.layout?.preferredLayoutSize(label)?.height ?: 0

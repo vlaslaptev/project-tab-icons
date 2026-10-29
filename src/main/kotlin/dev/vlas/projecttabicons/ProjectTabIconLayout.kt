@@ -28,7 +28,7 @@ internal class ProjectTabIconLayout(
 
     override fun layoutContainer(parent: Container) {
         // IDEA задаёт TabLabel высоту 30 px. Полоса получает высоту из внешнего layout.
-        val tabs = parent.parent as? com.intellij.ui.mac.WindowTabsComponent
+        val tabs = parent.parent as? com.intellij.ui.tabs.impl.JBTabsImpl
         if (tabs != null && parent.height > 0 && tabs.height > parent.height) {
             parent.setSize(parent.width, tabs.height)
         }

@@ -32,6 +32,7 @@ import com.intellij.ui.mac.WindowTabsComponent
 import com.intellij.ui.IconDeferrer
 import com.intellij.ui.DeferredIconImpl
 import com.intellij.ui.tabs.TabInfo
+import com.intellij.ui.tabs.impl.JBTabsImpl
 import com.intellij.util.messages.MessageBusConnection
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -70,6 +71,7 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         requestRefresh = { requestRefresh() },
         report = { error, incompatible ->
             LOG.warn(if (incompatible) "Project window tab API is incompatible; decoration is disabled"
+                else if (SystemInfoRt.isWindows) "Cannot refresh project window tabs; Windows switcher hidden, retrying"
                 else "Cannot refresh project window tabs; original appearance restored, retrying", error)
         },
     )
@@ -77,18 +79,27 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
     private val invalidateIcons = AtomicBoolean()
     private val iconFileEvents = java.util.concurrent.ConcurrentLinkedQueue<IconConfigurationEvents>()
     @Volatile private var iconDirectories = emptySet<String>()
-    private data class ProjectIconDelegate(val path: java.nio.file.Path, val size: Int, val name: String, val icon: Icon)
+    private class ProjectIconDelegate(val path: java.nio.file.Path, val size: Int, val name: String, val icon: Icon) {
+        var avatarColor: Color? = null
+    }
     private val projectDelegates = IdentityHashMap<Project, ProjectIconDelegate>()
     private var connection: MessageBusConnection? = null
     private val observations = IdentityHashMap<IdeFrameImpl, FrameObservation>()
-    private val groupLayouts = IdentityHashMap<WindowTabsComponent, ProjectTabGroupLayout>()
+    private val groupLayouts = IdentityHashMap<JBTabsImpl, ProjectTabGroupLayout>()
     private val groupDrag = ProjectTabGroupDrag()
     private val groupVisualState by lazy { ApplicationManager.getApplication().getService(ProjectTabGroupVisualState::class.java) }
-    private val groupOrdering = ProjectTabGroupOrdering(coroutineScope) { tabs, explicit ->
+    private val groupOrdering = if (SystemInfoRt.isMac) ProjectTabGroupOrdering(coroutineScope) { tabs, explicit ->
         if (explicit) groupLayouts[tabs]?.restoreAppearance() else groupLayouts[tabs]?.refreshOrder()
         requestRefresh()
-    }
-    private val tabOwners = IdentityHashMap<TabInfo, WindowTabsComponent>()
+    } else null
+    internal val windowsTabs = if (SystemInfoRt.isWindows) PlatformProjectTabsFactory.EP_NAME.extensionList.firstOrNull()?.create(
+        changed = { requestRefresh() },
+        orderRestored = { tabs, explicit ->
+            if (explicit) groupLayouts[tabs]?.restoreAppearance() else groupLayouts[tabs]?.refreshOrder()
+        },
+        dragFinished = groupDrag::finishWindowsDrag,
+    ) else null
+    private val tabOwners = IdentityHashMap<TabInfo, JBTabsImpl>()
     private val originalIcons = IdentityHashMap<TabInfo, Icon?>()
     private val originalTabTitles = IdentityHashMap<TabInfo, String>()
     private val appliedTabTitles = IdentityHashMap<TabInfo, String>()
@@ -124,8 +135,24 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         ProjectTabBranchProvider.EP_NAME.addChangeListener(coroutineScope, Runnable { requestRefresh() })
     }
 
+    internal suspend fun joinAndArrangeGroupedProjects(anchor: Project, projects: List<Project>): Boolean {
+        if (disposed || anchor.isDisposed) return false
+        val arranged = if (SystemInfoRt.isMac) {
+            val frame = joinMacGroupedProjectWindows(anchor, projects) ?: return false
+            groupOrdering?.arrangeFor(frame) == true
+        } else windowsTabs?.joinAndArrangeGroupedProjects(anchor, projects) == true
+        if (arranged) withContext(Dispatchers.EDT) {
+            // New tab bars may not have their decorators yet. Restore the persistent
+            // appearance state too, so the following refresh matches an explicit Arrange.
+            val groups = ApplicationManager.getApplication().getService(ProjectGroups::class.java).resolvedState
+            groupVisualState.restore(groups.groups.map { it.id }.toSet())
+        }
+        requestRefresh()
+        return arranged
+    }
+
     fun requestRefresh(invalidate: Boolean = false, resetTransientFailure: Boolean = false) {
-        if (disposed || !SystemInfoRt.isMac) return
+        if (disposed || !(SystemInfoRt.isMac || SystemInfoRt.isWindows)) return
         if (resetTransientFailure) {
             if (!SwingUtilities.isEventDispatchThread()) {
                 ApplicationManager.getApplication().invokeLater { requestRefresh(invalidate, resetTransientFailure = true) }
@@ -139,7 +166,7 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         if (recovery.blocked) return
         refreshQueue.submit(prepare = {
             try {
-                val groups = ApplicationManager.getApplication().getService(ProjectGroups::class.java).state
+                val groups = ApplicationManager.getApplication().getService(ProjectGroups::class.java).resolvedState
                 Result.success(groups to GroupAppearanceIcons.prepare(groups))
             }
             catch (error: ProcessCanceledException) { throw error }
@@ -152,18 +179,18 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         }, apply = apply@{ prepared ->
             if (disposed) return@apply
             recovery.run {
-                val appearance = ApplicationManager.getApplication().getService(TabAppearanceSettings::class.java).state
-                if (!appearance.enabled) {
+                val appearance = ApplicationManager.getApplication().getService(TabAppearanceSettings::class.java).state.renderedAppearance()
+                if (!appearance.enabled && !SystemInfoRt.isWindows) {
                     // Возвращаем штатные значки, layout, высоту и отступы крестика.
                     // Сервис остаётся доступен для повторного включения через Apply.
+                    if (invalidateIcons.getAndSet(false)) IconDeferrer.getInstance().clearCache()
                     cleanup()
-                    invalidateIcons.set(true)
                     return@run
                 }
                 connectIfNeeded()
                 val (groups, groupIcons) = prepared.getOrThrow()
                 // Подготовка SVG не блокирует EDT. После Apply готовим новую версию.
-                if (groups != ApplicationManager.getApplication().getService(ProjectGroups::class.java).state) {
+                if (groups != ApplicationManager.getApplication().getService(ProjectGroups::class.java).resolvedState) {
                     requestRefresh()
                     return@run
                 }
@@ -178,7 +205,7 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
             bus.subscribe(AnActionListener.TOPIC, object : AnActionListener {
                 override fun afterActionPerformed(action: AnAction, event: AnActionEvent, result: AnActionResult) {
                     if (ActionManager.getInstance().getId(action) == "MergeAllWindowsAction") {
-                        groupOrdering.windowsMerged(); requestRefresh()
+                        groupOrdering?.windowsMerged(); requestRefresh()
                     }
                 }
             })
@@ -226,7 +253,9 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
 
         observations.keys.filter { it !in frames }.forEach { frame -> observations.remove(frame)?.close() }
         groupVisualState.retain(groups.groups.map { it.id }.toSet())
-        groupOrdering.update(frames)
+        if (previousAppearance != appearance || previousGroups != groups) windowsTabs?.cancelInteractions()
+        groupOrdering?.update(frames)
+        windowsTabs?.update(frames, groups)
         frames.keys.forEach { frame ->
             val root = frame.rootPane
             val previous = observations[frame]
@@ -238,12 +267,19 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
                     frame, root,
                     changed = { requestRefresh() },
                     titleChanged = { requestRefresh() },
+                    tabsKey = if (SystemInfoRt.isWindows) null else WINDOW_TABS_CONTAINER_KEY,
                 ).also { observations[frame] = it }
             }
-            observation.update()
+            // Merged Windows tabs live in the outer JFrame, outside the project root pane.
+            if (SystemInfoRt.isWindows) observation.update(windowsTabs?.tabsFor(frame)) else observation.update()
         }
 
-        val branches = projectExtraInfo(frames.values.toSet(), appearance)
+        val tabStrips = frames.keys.mapNotNull { frame ->
+            if (SystemInfoRt.isWindows) windowsTabs?.tabsFor(frame)
+            else findWindowTabs(frame.rootPane.getClientProperty(WINDOW_TABS_CONTAINER_KEY) as? Component)
+        }.distinct()
+        val tabProjects = tabStrips.flatMap { tabs -> tabs.tabs.mapNotNull { frames[it.`object`] } }.toSet()
+        val branches = projectExtraInfo(tabProjects, appearance)
         if (invalidateIcons.getAndSet(false)) {
             iconReads.clear()
             iconWrappers.clear()
@@ -262,7 +298,7 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
             }
         }
 
-        val projectColors = ApplicationManager.getApplication().getService(ProjectOutlineColors::class.java)
+        val projectColors = ApplicationManager.getApplication().getService(ProjectOutlineColors::class.java).resolvedState
         if (previousAppearance != appearance) { iconWrappers.clear(); groupIconWrappers.clear() }
         if (previousGroups != groups) groupIconWrappers.clear()
         previousAppearance = appearance
@@ -286,10 +322,13 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         val activeDelegates = identitySet<Icon>()
         val activeLabels = identitySet<JComponent>()
         val activeContainers = identitySet<JComponent>()
-        val activeGroupLayouts = identitySet<WindowTabsComponent>()
+        val activeGroupLayouts = identitySet<JBTabsImpl>()
         val presentations = IdentityHashMap<Project, TabPresentation>()
         fun presentationFor(project: Project, label: JComponent?): TabPresentation? {
             presentations[project]?.let { return it }
+            if (!appearance.enabled && SystemInfoRt.isWindows) {
+                return TabPresentation(null, defaultProjectTabAccent(), null).also { presentations[project] = it }
+            }
             val path = recentProjects.getProjectPath(project) ?: return null
             val group = groups.groupFor(projectIconPathKey(path))
             if (group != null) {
@@ -318,12 +357,13 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
                 readIcon(delegate, label, appearance.iconSize.pixels, path)
             } else null
             val overrides = projectColors.overrides(path)
+            cached.avatarColor = overrides.icon
             // Ручной цвет буквенного аватара не перекрашивает сторонние SVG/PNG.
             val iconColor = if (read?.avatar != null) overrides.icon ?: read.color else read?.color
             val icon = if (appearance.showIcons) iconWrappers.getOrPut(delegate) {
                 CenteredProjectIcon(delegate, appearance.iconSize.pixels,
                     artwork = { preparedArtwork(delegate, project, appearance.iconSize.pixels) },
-                    avatarColor = { projectColors.iconColor(path) },
+                    avatarColor = { cached.avatarColor },
                     initials = appearance.iconInitials, letterWeight = appearance.iconLetterWeight,
                     projectName = { project.name })
             } else null
@@ -332,14 +372,12 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
                 if (appearance.showTabBackground) overrides.tab ?: iconColor else null,
             ).also { presentations[project] = it }
         }
-        frames.keys.forEach { frame ->
-            val container = frame.rootPane.getClientProperty(WINDOW_TABS_CONTAINER_KEY) as? Component
-            val tabs = findWindowTabs(container) ?: return@forEach
-            val groupLayout = if (groups.groups.isNotEmpty() || appearance.groupSpacing > 0 || appearance.showGroupOutline ||
-                appearance.showGroupSeparator || appearance.showGroupIcon) {
+        tabStrips.forEach { tabs ->
+            val groupLayout = if (appearance.enabled && (groups.groups.isNotEmpty() || appearance.groupSpacing > 0 || appearance.showGroupOutline ||
+                appearance.showGroupSeparator || appearance.showGroupIcon)) {
                 activeGroupLayouts.add(tabs)
                 groupLayouts.getOrPut(tabs) { ProjectTabGroupLayout(tabs, groupVisualState, groupDrag,
-                    { groupOrdering.isOrdering }, { requestRefresh() }) }.also { layout ->
+                    { groupOrdering?.isOrdering == true || windowsTabs?.isOrdering == true }, { requestRefresh() }) }.also { layout ->
                     val memberships = tabs.tabs.mapNotNull { info ->
                         val project = frames[info.`object`] ?: return@mapNotNull null
                         val path = recentProjects.getProjectPath(project) ?: return@mapNotNull null
@@ -354,8 +392,7 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
                 decorateTabsContainer(tabsContainer, appearance.tabHeight, groupLayout)
             }
             tabs.tabs.forEach tab@{ info ->
-                // Каждый frame содержит копию всей полосы. Значок относится к frame из TabInfo,
-                // а не к проекту окна, внутри которого сейчас рисуется полоса.
+                // Значок относится к frame из TabInfo, а не к активному проекту контейнера.
                 val targetFrame = info.`object` as? IdeFrameImpl ?: return@tab
                 val project = frames[targetFrame] ?: return@tab
                 val label = tabs.getTabLabel(info)
@@ -469,7 +506,7 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         return tabs.isDisplayable && tabs.getTabLabel(info) != null
     }
 
-    private fun decorateTabLabel(label: JComponent, tabs: WindowTabsComponent, info: TabInfo,
+    private fun decorateTabLabel(label: JComponent, tabs: JBTabsImpl, info: TabInfo,
                                  groupLayout: ProjectTabGroupLayout?,
                                  appearance: TabAppearanceState, icon: CenteredProjectIcon?, color: Color?, tabColor: Color?) {
         val fontChanged = if (appearance.tabFontSize == 0) restoreTabFont(label) else {
@@ -480,6 +517,7 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
             tabs.revalidateAndRepaint()
         }
         decorateTabLayout(label, tabs, icon, appearance)
+        val separatorColor = if (SystemInfoRt.isWindows && !appearance.enabled) defaultProjectTabSeparatorColor() else null
         // Выделение активного таба работает и без иконок, обводки и цветной заливки.
         // Полное отключение плагина восстанавливает border через cleanup().
         val applied = appliedLabelBorders[label]
@@ -497,7 +535,8 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
             if (applied.outlineColor != color || applied.tabColor != tabColor || applied.outlineThickness != appearance.outlineThickness ||
                 applied.outlineStyle != appearance.outlineStyle || applied.tabFillInset != appearance.tabFillInset ||
                 applied.tabFillIntensity != appearance.tabFillIntensity || applied.inactiveTabDimming != appearance.inactiveTabDimming ||
-                applied.activeTabHighlight != appearance.activeTabHighlight) {
+                applied.activeTabHighlight != appearance.activeTabHighlight || applied.tabCorners != appearance.tabCorners ||
+                applied.trailingSeparatorColor != separatorColor) {
                 applied.outlineColor = color
                 applied.tabColor = tabColor
                 applied.outlineThickness = appearance.outlineThickness
@@ -506,6 +545,8 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
                 applied.tabFillIntensity = appearance.tabFillIntensity
                 applied.inactiveTabDimming = appearance.inactiveTabDimming
                 applied.activeTabHighlight = appearance.activeTabHighlight
+                applied.tabCorners = appearance.tabCorners
+                applied.trailingSeparatorColor = separatorColor
                 changed = true
             }
             if (changed) {
@@ -518,7 +559,8 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         val border = ProjectTabBorder(label.border, icon, color,
             appearance.outlineThickness, appearance.outlineStyle, tabColor, appearance.tabFillInset, appearance.tabFillIntensity,
             groupLayout = groupLayout, groupTab = info, inactiveTabDimming = appearance.inactiveTabDimming,
-            activeTabHighlight = appearance.activeTabHighlight)
+            activeTabHighlight = appearance.activeTabHighlight, tabCorners = appearance.tabCorners,
+            trailingSeparatorColor = separatorColor)
         label.border = border
         appliedLabelBorders[label] = border
         label.revalidate()
@@ -530,7 +572,7 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
             appearance.closeButtonPosition != TabCloseButtonPosition.LEFT || appearance.tabHeight != DEFAULT_TAB_HEIGHT ||
             appearance.tabFontSize != 0 || appearance.moreInfo().isGit || appearance.showGroupOutline || appearance.showGroupIcon
 
-    private fun decorateTabLayout(label: JComponent, tabs: WindowTabsComponent,
+    private fun decorateTabLayout(label: JComponent, tabs: JBTabsImpl,
                                   icon: CenteredProjectIcon?, appearance: TabAppearanceState) {
         // Пустой слот крестика сохраняется и при выключенных иконках/обводке:
         // смена стороны кнопки не должна перемещать область названия.
@@ -628,8 +670,8 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         disposed = true
         retryJob?.cancel()
         recovery.dispose()
-        if (SwingUtilities.isEventDispatchThread()) { groupOrdering.dispose(); cleanup() }
-        else SwingUtilities.invokeLater { groupOrdering.dispose(); cleanup() }
+        if (SwingUtilities.isEventDispatchThread()) { groupOrdering?.dispose(); cleanup(); windowsTabs?.close() }
+        else SwingUtilities.invokeLater { groupOrdering?.dispose(); cleanup(); windowsTabs?.close() }
     }
 
     private fun cleanup(keepRefreshListeners: Boolean = false) {
@@ -639,7 +681,8 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
             observations.values.forEach(FrameObservation::close)
             observations.clear()
         }
-        groupOrdering.reset()
+        groupOrdering?.reset()
+        windowsTabs?.cancelInteractions()
         groupLayouts.values.forEach(ProjectTabGroupLayout::close)
         groupLayouts.clear()
         originalIcons.forEach { (info, original) ->
@@ -670,6 +713,8 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         previousAppearance = null
         previousGroups = null
         groupIconWrappers.clear()
+        // Сначала снять оформление и drag hooks, затем освободить TabInfo и ссылки на проекты.
+        windowsTabs?.hide()
     }
 
     companion object {

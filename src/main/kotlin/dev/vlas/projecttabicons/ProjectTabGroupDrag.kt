@@ -3,6 +3,7 @@ package dev.vlas.projecttabicons
 import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.tabs.TabInfo
+import com.intellij.ui.tabs.impl.JBTabsImpl
 import com.intellij.util.ui.JBUI
 import java.awt.Rectangle
 import java.awt.event.KeyEvent
@@ -158,5 +159,10 @@ internal class ProjectTabGroupDrag {
 
     fun invalidate(layout: ProjectTabGroupLayout) {
         session?.takeIf { layout in it.peers }?.let { finish(it, commit = false) }
+    }
+
+    /** Windows завершает визуальное состояние и общий порядок в одном событии EDT. */
+    fun finishWindowsDrag(tabs: JBTabsImpl, commit: Boolean) {
+        session?.takeIf { it.layout.tabs === tabs }?.let { finish(it, commit) }
     }
 }

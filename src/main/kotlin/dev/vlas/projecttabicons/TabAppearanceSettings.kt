@@ -5,10 +5,13 @@ import com.intellij.openapi.components.SerializablePersistentStateComponent
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.intellij.openapi.util.SystemInfoRt
+import com.intellij.ui.JBColor
 import com.intellij.util.xmlb.annotations.OptionTag
 import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.JBUI
 import java.awt.Font
+import java.awt.Color
 
 internal enum class TabIconSize(val pixels: Int, private val title: String) {
     SMALL(20, "Small · 20 px"),
@@ -45,6 +48,20 @@ internal enum class TabCloseButtonPosition(private val title: String) {
 
     override fun toString(): String = title
 }
+
+internal fun defaultTabCloseButtonPosition(): TabCloseButtonPosition =
+    if (SystemInfoRt.isWindows) TabCloseButtonPosition.RIGHT else TabCloseButtonPosition.LEFT
+
+internal fun defaultProjectTabAccent(): Color = JBColor.namedColor("Checkbox.Background.Selected",
+    JBColor.namedColor("Component.focusColor", Color(0x3574F0)))
+
+/** Windows owns its tab strip even when customization is disabled. Never persist this fallback. */
+internal fun TabAppearanceState.renderedAppearance(): TabAppearanceState =
+    if (enabled || !SystemInfoRt.isWindows) this else TabAppearanceState.forPreset(TabAppearancePreset.DZEN, false).copy(
+        outlineThickness = 2,
+        closeButtonPosition = TabCloseButtonPosition.RIGHT,
+        inactiveTabDimming = 0.0,
+    )
 
 internal enum class TabMoreInfo(val title: String) {
     NONE("None"), PROJECT_PATH("Project path"), GIT_BRANCH("Git branch"),
@@ -119,6 +136,12 @@ internal enum class TabOutlineStyle(private val title: String) {
     override fun toString(): String = title
 }
 
+internal enum class TabCornerMode(private val title: String) {
+    AUTO("Auto"), SQUARE("Square"), IDEA_THEME("IDEA theme");
+
+    override fun toString(): String = title
+}
+
 // XMLB в SDK 262 пропускает final-скаляры без явной аннотации хранения.
 // Значения конструктора задают смысл полей, опущенных в XML.
 // Для первого запуска и кнопки сброса используется defaults().
@@ -129,8 +152,10 @@ internal data class TabAppearanceState(
     @field:OptionTag @JvmField val iconPosition: TabIconPosition = TabIconPosition.RIGHT,
     @field:OptionTag @JvmField val outlineThickness: Int = DEFAULT_OUTLINE_THICKNESS,
     @field:OptionTag @JvmField val outlineStyle: TabOutlineStyle = TabOutlineStyle.ROUNDED,
-    @field:OptionTag @JvmField val closeButtonPosition: TabCloseButtonPosition = TabCloseButtonPosition.LEFT,
+    @field:OptionTag @JvmField val closeButtonPosition: TabCloseButtonPosition = defaultTabCloseButtonPosition(),
     @field:OptionTag @JvmField val tabHeight: Int = DEFAULT_TAB_HEIGHT,
+    // Старые XML и пресеты сохраняют геометрию темы; первый запуск и Reset используют AUTO.
+    @field:OptionTag @JvmField val tabCorners: TabCornerMode = TabCornerMode.IDEA_THEME,
     @field:OptionTag @JvmField val showProjectPath: Boolean = false,
     @field:OptionTag @JvmField val showGitBranch: Boolean = false,
     @field:OptionTag @JvmField val gitBranchFormat: TabGitBranchFormat = TabGitBranchFormat.FULL,
@@ -172,7 +197,8 @@ internal data class TabAppearanceState(
         iconSize = iconSize ?: TabIconSize.LARGE,
         iconPosition = iconPosition ?: TabIconPosition.RIGHT,
         outlineStyle = outlineStyle ?: TabOutlineStyle.ROUNDED,
-        closeButtonPosition = closeButtonPosition ?: TabCloseButtonPosition.LEFT,
+        tabCorners = tabCorners ?: TabCornerMode.IDEA_THEME,
+        closeButtonPosition = closeButtonPosition ?: defaultTabCloseButtonPosition(),
         branchPosition = branchPosition ?: TabBranchPosition.RIGHT,
         preset = preset ?: TabAppearancePreset.CUSTOM,
         iconInitials = iconInitials ?: DEFAULT_ICON_INITIALS,
@@ -210,8 +236,9 @@ internal data class TabAppearanceState(
         else -> TabMoreInfo.NONE
     }
 
-    /** Встроенный стиль вкладок не сбрасывает независимо настроенное оформление групп. */
+    /** Встроенные стили сохраняют независимо настроенные углы вкладок и оформление групп. */
     fun withGroupLayoutFrom(value: TabAppearanceState): TabAppearanceState = copy(
+        tabCorners = value.tabCorners,
         groupSpacing = value.groupSpacing,
         showGroupOutline = value.showGroupOutline,
         groupHighlightStyle = value.groupHighlightStyle,
@@ -234,6 +261,7 @@ internal data class TabAppearanceState(
             branchPosition = TabBranchPosition.RIGHT,
             outlineStyle = TabOutlineStyle.BOTTOM,
             tabHeight = 33,
+            tabCorners = TabCornerMode.AUTO,
             preset = TabAppearancePreset.DEFAULT,
             iconInitials = DEFAULT_ICON_INITIALS,
         )

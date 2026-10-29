@@ -1,4 +1,4 @@
-<p>Recognize open projects in macOS window tabs with their icons, outlines and optional colored fills.</p>
+<p>Recognize open projects with icons, outlines and optional colored fills in macOS window tabs and merged Windows project tabs.</p>
 <ul>
   <li>Use quick actions in Tools and Find Action to edit the current project icon or colors and switch presets, with customizable shortcuts.</li>
   <li>Give each project group its own icon and colors. Members inherit them automatically, including newly assigned and reopened projects. Projects show Inherited from and keep inherited values readable; Edit group opens the matching group. Ungroup restores individual appearance.</li>
@@ -49,8 +49,11 @@
   <li>Icons follow the corresponding project when switching between merged windows.</li>
   <li>Disabling the plugin restores the previous tab icons, borders, and layouts.</li>
 </ul>
-<p>Requires macOS and IntelliJ IDEA 2026.2.3 or a later update in the 2026.2 branch,
-with multiple project windows merged into window tabs. The plugin starts when a
+<p>Requires macOS or Windows and IntelliJ IDEA 2026.2.3 or a later update in the 2026.2 branch.
+Enable Automatically open projects in tabs in plugin settings, or merge project windows using Window → Merge All Project Windows, also available in Find Action.
+On macOS, automatic tabs follow the system Always preference or can be enabled only for this IDE without changing other applications. The macOS and Windows preferences are stored separately.
+On Windows, Separate All Project Windows restores independent windows. Closing the outer window closes the active project through the standard IDE close flow. Full-screen and presentation modes restore independent Windows project windows before using the IDE’s native mode.
+The plugin starts when a
 project opens. Manage all open projects under Settings → Appearance &amp; Behavior → Project Tab Icons,
 or keep using the IDE's standard project icon chooser. Project names are preserved.</p>
 <p>Applying a new SVG replaces the selected project's light and dark icon variants.

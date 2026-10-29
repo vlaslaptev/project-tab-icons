@@ -18,6 +18,10 @@ local.properties
 private-evidence/
 /artifacts/
 
+# Local agent instructions and private VM connection notes.
+AGENTS.md
+agents.md
+
 # Original screenshots and local selection sheets for the README gallery.
 /screenshots/preview-gallery-*/
 

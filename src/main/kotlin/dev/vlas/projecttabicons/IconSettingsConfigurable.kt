@@ -367,6 +367,7 @@ class IconSettingsConfigurable : Configurable, Configurable.NoScroll, Configurab
 
     override fun apply() {
         val view = panel ?: return
+        view.commitPendingGroupEdit()
         if (!isModified()) return
         val sharedSettings = SharedIconSettingsStore()
         val colorStore = ApplicationManager.getApplication().getService(ProjectOutlineColors::class.java)
@@ -405,7 +406,7 @@ class IconSettingsConfigurable : Configurable, Configurable.NoScroll, Configurab
             }, "Saving project icons", false, project, view.component)
             else { commitSettings(); true }
             failure?.let { error ->
-                writes.forEach { ProjectIconStore.refreshUi(it.project, it.path, it.expected) }
+                ProjectIconStore.refreshUiAll(writes.map { ProjectIconRefresh(it.project, it.path, it.expected) })
                 if (error is ProcessCanceledException) throw error
                 if (error is ConfigurationException && error.suppressed.isEmpty()) throw error
                 LOG.warn("Cannot save project icons or prepare the icon library", error)
@@ -421,7 +422,9 @@ class IconSettingsConfigurable : Configurable, Configurable.NoScroll, Configurab
             view.showImportedCategories(0)
             pending.forEach { row -> row.saved(row.target.path?.let(installed::get),
                 row.target.path?.let(colorStore::overrides) ?: row.colorOverrides) }
-            writes.forEach { write -> installed[write.path]?.let { ProjectIconStore.refreshUi(write.project, write.path, it) } }
+            ProjectIconStore.refreshUiAll(writes.mapNotNull { write ->
+                installed[write.path]?.let { ProjectIconRefresh(write.project, write.path, it) }
+            })
             app.getService(ProjectTabIconsService::class.java).requestRefresh()
             view.saved()
         } finally {

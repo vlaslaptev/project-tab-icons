@@ -1,6 +1,7 @@
 package dev.vlas.projecttabicons
 
 import com.intellij.ui.scale.JBUIScale
+import com.intellij.openapi.util.SystemInfoRt
 import com.intellij.util.ui.JBFont
 import java.awt.BasicStroke
 import java.awt.Color
@@ -29,21 +30,48 @@ internal object PreviewWindowChrome {
             g.stroke = BasicStroke(1f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
             g.color = palette.stripBackground
             g.fillRect(0, 0, w.toInt(), h.toInt())
-            toolbar(g, w, palette.chrome, activeTitle, activeBranch)
-            if (showEditor) editor(g, w, h, bottom + 6, palette.chrome, activeTitle, tabCount)
+            val windows = SystemInfoRt.isWindows
+            if (windows) windowsCaption(g, w, bottom, palette)
+            val toolbarGraphics = g.create() as Graphics2D
+            try {
+                if (windows) toolbarGraphics.translate(0.0, bottom)
+                toolbar(toolbarGraphics, w, palette.chrome, activeTitle, activeBranch)
+            } finally { toolbarGraphics.dispose() }
+            val contentTop = bottom + if (windows) TOOLBAR_HEIGHT else 0
+            if (showEditor) editor(g, w, h, contentTop + 6, palette.chrome, activeTitle, tabCount)
         } finally { g.dispose() }
     }
 
-    private fun toolbar(g: Graphics2D, width: Double, colors: PreviewChromePalette, activeTitle: String, activeBranch: String) {
+    private fun windowsCaption(g: Graphics2D, width: Double, height: Double, palette: PreviewThemePalette) {
+        val buttonWidth = WindowsCaptionMetrics.PREVIEW_BUTTON_WIDTH.toDouble()
+        val centerY = height / 2
+        g.color = palette.foreground
+        val minimizeX = width - buttonWidth * 2.5
+        g.draw(Line2D.Double(minimizeX - 5, centerY, minimizeX + 5, centerY))
+        val maximizeX = width - buttonWidth * 1.5
+        g.draw(java.awt.geom.Rectangle2D.Double(maximizeX - 5, centerY - 5, 10.0, 10.0))
+        val closeX = width - buttonWidth / 2
+        g.draw(Line2D.Double(closeX - 5, centerY - 5, closeX + 5, centerY + 5))
+        g.draw(Line2D.Double(closeX + 5, centerY - 5, closeX - 5, centerY + 5))
+    }
+
+    private fun toolbar(g: Graphics2D, windowWidth: Double, colors: PreviewChromePalette, activeTitle: String, activeBranch: String) {
+        val width = windowWidth
         g.color = colors.toolbarBackground
-        g.fillRect(0, 0, width.toInt(), TOOLBAR_HEIGHT)
-        // Всегда видимый macOS-светофор; кнопки намеренно не реагируют на наведение/клики.
-        listOf(0xFF5F57, 0xFEBC2E, 0x28C840).forEachIndexed { index, rgb ->
-            val circle = Ellipse2D.Double(17.0 + index * 20, 14.0, 12.0, 12.0)
-            g.color = Color(rgb)
-            g.fill(circle)
-            g.color = Color(0, 0, 0, 28)
-            g.draw(circle)
+        g.fillRect(0, 0, windowWidth.toInt(), TOOLBAR_HEIGHT)
+        if (SystemInfoRt.isWindows) {
+            file(g, 20.0, 14.0, colors.accent)
+            g.color = colors.toolbarForeground
+            repeat(3) { index -> g.draw(Line2D.Double(48.0, 15.0 + index * 5, 62.0, 15.0 + index * 5)) }
+        } else {
+            // macOS-превью сохраняет прежнюю геометрию и цвета.
+            listOf(0xFF5F57, 0xFEBC2E, 0x28C840).forEachIndexed { index, rgb ->
+                val circle = Ellipse2D.Double(17.0 + index * 20, 14.0, 12.0, 12.0)
+                g.color = Color(rgb)
+                g.fill(circle)
+                g.color = Color(0, 0, 0, 28)
+                g.draw(circle)
+            }
         }
         val text = g.create() as Graphics2D
         try {
@@ -125,7 +153,8 @@ internal object PreviewWindowChrome {
                 content.clipRect(41, (top + 31).toInt(), (width - 49).toInt().coerceAtLeast(0),
                     (height - top - 39).toInt().coerceAtLeast(0))
                 content.font = Font(Font.MONOSPACED, Font.PLAIN, 12)
-                val lines = listOf("# $activeTitle workspace", "$tabCount projects. One window.")
+                val caption = "$tabCount projects. One window."
+                val lines = listOf("# $activeTitle workspace", caption)
                 lines.forEachIndexed { index, line ->
                     val baseline = (top + 50 + index * 18).toFloat()
                     content.color = colors.muted

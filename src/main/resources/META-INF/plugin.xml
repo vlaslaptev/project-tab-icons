@@ -1,22 +1,30 @@
-<idea-plugin>
+<idea-plugin xmlns:xi="http://www.w3.org/2001/XInclude">
   <id>dev.vlas.projecttabicons</id>
   <name>Project Tab Icons</name>
-  <version>0.3.35</version>
+  <version>0.4.11</version>
   <vendor>Vlas</vendor>
   <idea-version since-build="262.10968.63" strict-until-build="262.*"/>
   <depends>com.intellij.modules.platform</depends>
-  <depends>com.intellij.modules.os.mac</depends>
+  <!-- target-platform -->
   <depends optional="true" config-file="dev.vlas.projecttabicons-git.xml">Git4Idea</depends>
+
+  <xi:include href="/META-INF/project-tab-icons-windows.xml"><xi:fallback/></xi:include>
+
+  <applicationListeners>
+    <listener class="dev.vlas.projecttabicons.MacProjectTabsApplicationListener" topic="com.intellij.ide.AppLifecycleListener"/>
+  </applicationListeners>
 
   <extensionPoints>
     <extensionPoint qualifiedName="dev.vlas.projecttabicons.branchProvider"
                     interface="dev.vlas.projecttabicons.ProjectTabBranchProvider" dynamic="true"/>
+    <extensionPoint qualifiedName="dev.vlas.projecttabicons.platformTabs"
+                    interface="dev.vlas.projecttabicons.PlatformProjectTabsFactory" dynamic="true"/>
   </extensionPoints>
 
   <description><![CDATA[
-    Shows project icons, configurable outlines and optional colored fills in macOS window tabs.
+    Shows project icons, configurable outlines and optional colored fills in macOS window tabs and merged Windows project tabs.
     Enable tab customization globally and choose Custom, Default, Filled, Bold or Dzen appearance presets.
-    Preview changes in a miniature IDE window with macOS traffic lights, a toolbar, three project tabs and an editor fragment.
+    Preview changes in a miniature IDE window with platform-specific window controls, a toolbar, three project tabs and an editor fragment.
     Choose bottom, rounded or full outlines from 1 to 6 px.
     Choose one letter or two initials in uppercase or mixed case (Ab), with normal or bold text for generated letter icons.
     Toggle icons and outlines independently, and choose Small (20 px), Medium (24 px) or Large (28 px).
@@ -26,19 +34,39 @@
     Saved project SVGs are preserved. Corners follow the current theme.
     Manage all open projects in a compact table with separate icon, outline and tab colors.
     Fill tabs at 50% opacity, matching the icon color by default, with an optional 0–6 px edge inset.
-    Search and browse 121 filled icons by name or category,
+    Search and browse 100+ filled icons by name or category,
     select a color with the IDE color picker, or reuse a custom SVG from a project.
     Custom icons follow the IDE's project icon settings; generated letter icons
     have centered text and padding.
-    Requires IntelliJ IDEA 2026.2.3 or a later 2026.2 update, with project windows
-    merged into tabs. Selected icons are saved as native project SVG files.
+    Requires IntelliJ IDEA 2026.2.3 or a later 2026.2 update. Enable Automatically open projects in tabs
+    or run Window → Merge All Project Windows. On macOS, automatic tabs can be enabled only for this IDE without changing system settings.
+    Selected icons are saved as native project SVG files.
   ]]></description>
   <change-notes><![CDATA[
+    Preserve manual Windows tab order when customization is off and make Arrange Tabs by Group work in that mode.
+    Keep keyboard focus on project tabs during repeated arrow navigation.
+    Restore and switch between distinct .ipr projects in the same directory.
+    Preserve normal window bounds when merging maximized windows, separating projects and closing down to one tab.
+    Choose Auto, Square or IDEA theme corners for project tabs on Windows and macOS.
+    Auto uses square corners on Windows and follows the IDEA theme on macOS.
+    Apply the same geometry to backgrounds, outlines, groups and previews, including while dragging.
+    Preserve existing styles and include corner preferences in saved presets and style bundles.
+    Open All Grouped Projects opens missing projects from every saved group and then arranges their tabs by group.
+    Available beside Arrange Tabs by Group and in the Project Tab Icons menu, independently of automatic tab opening.
+    Place automatic project opening above tab customization with a separator between the independent settings.
+    Remove the inline macOS explanation from the settings page; system-controlled states retain a tooltip.
+    Automatic project tabs on macOS, with a checkbox in settings and the plugin menu.
+    Reflect the system Always preference or enable automatic tabs for this IDE only.
+    Keep macOS and Windows preferences independent.
+    Keep existing independent windows and restored session membership unchanged.
+    Windows Merge All Project Windows action in the Window menu and Find Action.
+    Project tabs appear only in the merged container. Separate All Project Windows restores independent windows.
     Show the current Git branch before or after the project name when project paths are hidden.
     Keep the ending of long branch names visible and preview both positions live.
   ]]></change-notes>
 
   <extensions defaultExtensionNs="com.intellij">
+    <notificationGroup id="Project Tab Icons" displayType="BALLOON"/>
     <applicationConfigurable
         parentId="appearance"
         instance="dev.vlas.projecttabicons.IconSettingsConfigurable"
@@ -50,7 +78,7 @@
         os="mac"/>
   </extensions>
   <actions>
-    <group id="ProjectTabIcons.Actions" text="Project Tab Icons" popup="true">
+    <group id="ProjectTabIcons.Actions" class="dev.vlas.projecttabicons.ProjectTabActionsGroup" text="Project Tab Icons" popup="true">
       <add-to-group group-id="ToolsMenu" anchor="last"/>
       <action id="ProjectTabIcons.ChangeIcon" class="dev.vlas.projecttabicons.ChangeProjectTabIconAction" text="Change Project Tab Icon…">
         <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift I"/>
@@ -66,6 +94,8 @@
         <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift N"/>
       </action>
       <separator/>
+      <action id="ProjectTabIcons.OpenGroupedProjects" class="dev.vlas.projecttabicons.OpenGroupedProjectsAction" text="Open All Grouped Projects"/>
+      <action id="ProjectTabIcons.AutomaticallyOpenInTabs" class="dev.vlas.projecttabicons.AutomaticallyOpenProjectTabsAction" text="Automatically open projects in tabs"/>
       <action id="ProjectTabIcons.Settings" class="dev.vlas.projecttabicons.OpenProjectTabSettingsAction" text="Project Tab Icons Settings…"/>
     </group>
   </actions>

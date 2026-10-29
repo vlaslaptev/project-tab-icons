@@ -1,6 +1,6 @@
 {
   "suggestedName": "project-tab-icons",
-  "description": "Project icons, colored outlines, adjustable fills and Git context for IntelliJ IDEA macOS window tabs.",
+  "description": "Project icons, outlines, fills and Git context for IntelliJ IDEA project window tabs on macOS and Windows (beta).",
   "suggestedVisibility": "public",
   "topics": [
     "intellij-plugin",
@@ -8,14 +8,15 @@
     "kotlin",
     "project-icons",
     "window-tabs",
-    "developer-tools"
+    "developer-tools",
+    "windows"
   ],
   "socialPreview": "docs/media/social-preview.png",
   "license": "MIT",
-  "version": "0.3.120",
+  "version": "0.4.16",
   "githubUrl": "https://github.com/vlaslaptev/project-tab-icons",
-  "status": "Published 0.3.120: IDE-wide settings, shared presets, consistent numeric controls and current UI screenshots",
-  "releaseUrl": "https://github.com/vlaslaptev/project-tab-icons/releases/tag/v0.3.120",
+  "status": "Prepared 0.4.16: macOS preview fix and separate Windows beta package",
+  "releaseUrl": "https://github.com/vlaslaptev/project-tab-icons/releases/tag/v0.4.16",
   "publishedRelease": "0.3.120",
   "releasePublishedOn": "2026-10-25"
 }

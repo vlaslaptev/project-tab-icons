@@ -1,18 +1,53 @@
 # Project Tab Icons
 
+[![Windows: Beta](docs/media/windows-beta.svg)](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.16/project-tab-icons-0.4.16-windows.zip)
+
 Project icons, colored outlines, adjustable fills and Git context for IntelliJ IDEA's **macOS project window tabs**.
+Windows support is available as a separate **beta** package.
 
-### [↓ Download ZIP 0.3.120](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.3.120/project-tab-icons-0.3.120.zip)
+### Download 0.4.16
 
-This guide describes **0.3.120**. The Settings screenshots were recaptured from the
-installed plugin on 25 October 2026. See the [changelog](CHANGELOG.md) for changes
-since 0.3.107.
+[macOS ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.16/project-tab-icons-0.4.16-macos.zip) ·
+[Windows ZIP · Beta](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.16/project-tab-icons-0.4.16-windows.zip) ·
+[Release notes and checksums](https://github.com/vlaslaptev/project-tab-icons/releases/tag/v0.4.16)
+
+Requires IntelliJ IDEA **2026.2.3–2026.2.x**. Choose the ZIP for your operating system.
+This guide describes **0.4.16**. The macOS Settings screenshots are from 0.3.120;
+Windows screenshots are from 0.4.14. See the [changelog](CHANGELOG.md) for changes
+since the previous public release and [compatibility](docs/COMPATIBILITY.md) for validation limits.
 
 ## Install in a minute
 
 1. Open **Settings → Plugins → ⚙ → Install Plugin from Disk…** and select the downloaded ZIP.
 2. Open several projects in separate windows, then use **Window → Merge All Project Windows**.
 3. Open **Settings → Appearance & Behavior → Project Tab Icons**, choose a preset, adjust it and click **Apply**.
+
+## Windows support — Beta
+
+[![Windows: Beta](docs/media/windows-beta.svg)](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.16/project-tab-icons-0.4.16-windows.zip)
+
+The Windows package is in **beta** and targets IntelliJ IDEA **2026.2.3–2026.2.x**.
+Install the [Windows ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.16/project-tab-icons-0.4.16-windows.zip)
+from disk, then use **Window → Merge All Project Windows** to place projects in
+one window. You can also enable **Automatically open projects in tabs** in the
+plugin settings. The macOS package remains separate.
+
+![Windows 11: project tabs and native window controls above the IDE toolbar](docs/media/captures/windows-tabs-0.4.14.png)
+
+Project tabs share the top row with the native window controls, with close buttons
+on the right of every tab. Changing **Show Project Gradient** preserves tab styling.
+
+![Windows 11: Project Tab Icons 0.4.14 settings with a matching Windows preview](docs/media/captures/windows-settings-0.4.14.png)
+
+Preview uses the same row order and caption space as the merged Windows window.
+In Islands Dark, the real tabs use the same gray window background as Preview.
+With customization off, tabs have 1 px gray separators, a shared blue 2 px bottom
+line, project names without paths and close buttons on the right.
+Switch between three and five sample tabs, or enable **Full window** to include
+file tabs and an editor fragment. The screenshots above were captured from the
+running Windows plugin. Earlier 0.4.14/0.4.15 builds were checked on **Windows 11 ARM64**;
+0.4.16 has source and packaging checks, with no new GUI pass. Windows x64
+and mixed-DPI configurations have not been verified.
 
 ## Style tabs and groups. Hundreds of combinations. Every IDE theme.
 
@@ -58,7 +93,7 @@ Each section keeps its own scrolling position and draft. Within Appearance,
 **Use IDE font size** follows the IDE automatically; clear it for a fixed size.
 Pixel dimensions use compact number fields. Percentages have a slider and a
 synchronized exact input. Narrow windows stack the columns.
-**Save as new preset** and **Update preset** sit beside **Style / Tab layout / Group layout**.
+**Save as new preset** sits beside **Style / Tab layout / Group layout**.
 
 ## Start with a preset
 
@@ -157,8 +192,9 @@ Use **Tools → Project Tab Icons** or **Find Action** for current-project styli
 preset switching and Settings. View or change shortcuts in **Settings → Keymap**.
 For a grouped project, edit its inherited icon and colors in **Project groups**.
 
-**Save as new preset** creates a named style; **Update preset** replaces the user
-preset you edited. **Manage user presets…** in the shared header renames, duplicates, deletes and reorders
+**Save as new preset** creates a new named style on Windows and macOS.
+Editing a saved preset leaves the original intact. **Manage user presets…** in the
+shared header renames, duplicates, deletes and reorders
 saved presets. Use unique names of up to **32 characters**. Preset changes are saved
 with Apply; Cancel discards the draft.
 

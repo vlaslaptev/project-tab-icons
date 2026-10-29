@@ -1,21 +1,21 @@
 # Compatibility
 
-Release **0.3.120** retains the declared IDE build range below. The current
-Settings screenshots were captured from the installed 0.3.120 plugin.
+Release **0.4.16** provides separate macOS and Windows packages within the IDE
+build range below. Windows support is beta.
 
-| Area | Scope for release 0.3.120 |
+| Area | Scope for release 0.4.16 |
 | --- | --- |
-| Operating system | macOS |
+| Operating system | macOS; Windows beta in a separate ZIP |
 | IDE | IntelliJ IDEA 2026.2.3 and later 2026.2 updates within the declared build range |
 | Since build | `262.10968.63` |
 | Strict upper bound | `262.*` |
-| UI | Local IDE project windows merged into macOS window tabs |
+| UI | Local IDE project windows: native macOS tabs or the Windows merged-window container |
 | Optional integration | Git4Idea for branch and changed-line captions |
 | Installation | Unsigned ZIP through Install Plugin from Disk |
 | Distribution | GitHub; no Marketplace publication is claimed |
 
 This plugin decorates **project window tabs**. It does not decorate editor file
-tabs. Windows, Linux, remote-development Split Mode and the 2026.3 platform branch
+tabs. Linux, remote-development Split Mode and the 2026.3 platform branch
 are outside the declared support scope. Other IntelliJ-based products have not
 been established as supported by this release.
 
@@ -29,6 +29,23 @@ The descriptor keeps a strict `262.*` upper bound. Updating it is a compatibilit
 change, not a way to make an unreviewed build install on a newer IDE.
 
 ## Evidence and limits
+
+### Release 0.4.16
+
+Both platform ZIPs are compiled and packaged against IntelliJ IDEA 2026.2.3 /
+262.10968.63. Source manifests, descriptor versions, OS dependencies and checksums
+are checked before publication. The macOS preview fix was reviewed statically;
+0.4.16 has not had a new installation or GUI validation pass.
+
+Earlier 0.4.15 builds were installed and inspected on macOS ARM64 and Windows 11
+ARM64. Targeted checks covered group draft validation, per-project quick actions,
+Git captions, icon refreshes, automatic window tabs and restoration of settings.
+These checks apply to those builds. They do not establish full acceptance of 0.4.16.
+
+Windows x64, Intel Mac, mixed DPI and the complete drag-and-drop and failure
+scenario matrix remain unverified. Standalone JVM tests, linters and Plugin
+Verifier were not run. The macOS Settings images retain their 0.3.120 provenance;
+the Windows images are from 0.4.14.
 
 ### Release 0.3.120
 

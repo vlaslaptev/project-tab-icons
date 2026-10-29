@@ -1,0 +1,29 @@
+<idea-plugin>
+  <applicationListeners>
+    <listener class="dev.vlas.projecttabicons.WindowsProjectTabsApplicationListener" topic="com.intellij.ide.AppLifecycleListener"/>
+  </applicationListeners>
+  <extensions defaultExtensionNs="com.intellij">
+    <applicationConfigurable
+        parentId="appearance"
+        instance="dev.vlas.projecttabicons.IconSettingsConfigurable"
+        id="dev.vlas.projecttabicons.settings"
+        displayName="Project Tab Icons"
+        os="windows"/>
+    <postStartupActivity
+        implementation="dev.vlas.projecttabicons.WindowsProjectTabsStartupActivity"
+        os="windows"/>
+  </extensions>
+  <extensions defaultExtensionNs="dev.vlas.projecttabicons">
+    <platformTabs implementation="dev.vlas.projecttabicons.WindowsProjectTabsFactory" os="windows"/>
+  </extensions>
+  <actions>
+    <action id="ProjectTabIcons.MergeAllWindows" class="dev.vlas.projecttabicons.MergeAllProjectWindowsAction"
+            text="Merge All Project Windows" description="Merge open project windows into one window with tabs">
+      <add-to-group group-id="OpenProjectWindows" anchor="after" relative-to-action="MergeAllWindowsAction"/>
+    </action>
+    <action id="ProjectTabIcons.SeparateAllWindows" class="dev.vlas.projecttabicons.SeparateAllProjectWindowsAction"
+            text="Separate All Project Windows" description="Restore separate windows for all merged projects">
+      <add-to-group group-id="OpenProjectWindows" anchor="after" relative-to-action="ProjectTabIcons.MergeAllWindows"/>
+    </action>
+  </actions>
+</idea-plugin>
