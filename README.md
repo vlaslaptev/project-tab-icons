@@ -1,57 +1,36 @@
 # Project Tab Icons
 
-[![Windows: Beta](docs/media/windows-beta.svg)](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.16/project-tab-icons-0.4.16-windows.zip)
+Project icons, colored outlines, adjustable fills, groups and Git context for
+**IntelliJ IDEA project window tabs on macOS** and merged project windows on Windows.
+Editor file tabs keep their usual appearance.
 
-Project icons, colored outlines, adjustable fills and Git context for IntelliJ IDEA's **macOS project window tabs**.
-Windows support is available as a separate **beta** package.
+## Installation
 
-### Download 0.4.16
-
-[macOS ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.16/project-tab-icons-0.4.16-macos.zip) ·
-[Windows ZIP · Beta](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.16/project-tab-icons-0.4.16-windows.zip) ·
-[Release notes and checksums](https://github.com/vlaslaptev/project-tab-icons/releases/tag/v0.4.16)
-
-Requires IntelliJ IDEA **2026.2.3–2026.2.x**. Choose the ZIP for your operating system.
-This guide describes **0.4.16**. The macOS Settings screenshots are from 0.3.120;
-Windows screenshots are from 0.4.14. See the [changelog](CHANGELOG.md) for changes
-since the previous public release and [compatibility](docs/COMPATIBILITY.md) for validation limits.
-
-## Install in a minute
+- [macOS ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.16/project-tab-icons-0.4.16-macos.zip)
+- [Windows ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.16/project-tab-icons-0.4.16-windows.zip) [![Beta](assets/readme/windows-beta.svg)](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.16/project-tab-icons-0.4.16-windows.zip)
 
 1. Open **Settings → Plugins → ⚙ → Install Plugin from Disk…** and select the downloaded ZIP.
 2. Open several projects in separate windows, then use **Window → Merge All Project Windows**.
 3. Open **Settings → Appearance & Behavior → Project Tab Icons**, choose a preset, adjust it and click **Apply**.
 
-## Windows support — Beta
+## Automatic project tabs on macOS
 
-[![Windows: Beta](docs/media/windows-beta.svg)](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.16/project-tab-icons-0.4.16-windows.zip)
+Enable **Tools → Project Tab Icons → Automatically open projects in tabs**, or use
+the same option in the plugin settings and click **Apply**.
 
-The Windows package is in **beta** and targets IntelliJ IDEA **2026.2.3–2026.2.x**.
-Install the [Windows ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.16/project-tab-icons-0.4.16-windows.zip)
-from disk, then use **Window → Merge All Project Windows** to place projects in
-one window. You can also enable **Automatically open projects in tabs** in the
-plugin settings. The macOS package remains separate.
+When macOS prefers tabs **Always**, the option is already selected and disabled.
+With **Manually** or **In Full Screen**, you can enable automatic tabs just for IDEA.
+The plugin leaves macOS preferences unchanged and stores this choice separately
+from its Windows preference and appearance presets.
 
-![Windows 11: project tabs and native window controls above the IDE toolbar](docs/media/captures/windows-tabs-0.4.14.png)
-
-Project tabs share the top row with the native window controls, with close buttons
-on the right of every tab. Changing **Show Project Gradient** preserves tab styling.
-
-![Windows 11: Project Tab Icons 0.4.14 settings with a matching Windows preview](docs/media/captures/windows-settings-0.4.14.png)
-
-Preview uses the same row order and caption space as the merged Windows window.
-In Islands Dark, the real tabs use the same gray window background as Preview.
-With customization off, tabs have 1 px gray separators, a shared blue 2 px bottom
-line, project names without paths and close buttons on the right.
-Switch between three and five sample tabs, or enable **Full window** to include
-file tabs and an editor fragment. The screenshots above were captured from the
-running Windows plugin. Earlier 0.4.14/0.4.15 builds were checked on **Windows 11 ARM64**;
-0.4.16 has source and packaging checks, with no new GUI pass. Windows x64
-and mixed-DPI configurations have not been verified.
+A new project joins the most recently active tab group. If there is no group,
+it joins the previously active project. Enabling the option does not merge
+existing windows, and disabling it does not separate their tabs.
+Choose **New Window** if IDEA asks where to open a project.
 
 ## Style tabs and groups. Hundreds of combinations. Every IDE theme.
 
-![Real Preview screenshots across all eight IDE themes, with different tab and group styles](docs/media/appearance-gallery.png)
+![Real Preview screenshots across all eight IDE themes, with different tab and group styles](assets/readme/appearance-gallery.png)
 
 Choose tab height, text size, icon position, outline, fill and group styling independently.
 The gallery shows ten examples from the plugin's real Preview renderer, with everyday
@@ -60,6 +39,7 @@ tab sizes and readable colors. They are a small selection of the available combi
 ## Make each project easy to recognize
 
 - Set tab height, text size and close-button position.
+- Choose Auto, Square or IDEA theme corners. Auto follows the theme on macOS and uses square corners on Windows.
 - Choose a bottom line, rounded lower outline or full frame, with independent outline and fill colors.
 - Adjust fill intensity and inset, and place project icons on either side of the title.
 - Start with a built-in preset or save up to 10 named presets. Custom remembers your last manual appearance.
@@ -70,12 +50,12 @@ tab sizes and readable colors. They are a small selection of the available combi
 
 The **Light** preview uses light tab surfaces and readable text while keeping its dark toolbar.
 **Full window** adds file tabs and an editor fragment; Preview starts compact.
-The examples gallery above was captured from 0.3.97; the Settings images below were
-recaptured from installed 0.3.120 on 25 October 2026.
+The Appearance screenshot below shows installed 0.4.15-macos, captured on 29 October 2026.
+The examples gallery is from 0.3.97; Git and Project groups captures are from 0.3.120.
 
 ## Compact controls, a live preview
 
-![Settings 0.3.120: shared preset choices, section navigation, compact Preview and Style](docs/media/appearance-presets.png)
+![Settings 0.4.15-macos: automatic project tabs, shared preset choices, section navigation, compact Preview and Style](assets/readme/appearance-presets.png)
 
 Project Tab Icons is an **IDE-wide** settings page under **Appearance & Behavior**.
 The enable switch, **Presets** and **User presets** stay above all three sections
@@ -122,13 +102,13 @@ In **Projects**, **Inherited from …** explains the source and **Edit group** o
 the matching group. Inherited values stay readable. **Ungroup** restores each
 project's personal styling.
 
-![Shared presets, Project groups navigation, table header and Add group in 0.3.120](docs/media/captures/groups-settings.png)
+![Shared presets, Project groups navigation, table header and Add group in 0.3.120](assets/readme/captures/groups-settings.png)
 
 Only the header and Add group row are shown; saved working groups are outside the crop.
 Use **+** in **Actions** to search for projects and add several at once. Every opening
 starts with an empty selection, independent of checkboxes in Projects. The edit button
 changes the name, membership and fixed positions; the trash button removes a group.
-Save group changes with **Apply**.
+Settings **Apply** or **OK** also saves and validates an unfinished group edit.
 
 Under **Group layout → Group highlight → Variant**, choose **Shared background** or
 **Joined tabs**. Both follow regular tab dimensions, theme corners, fill settings,
@@ -143,14 +123,16 @@ the grouped appearance. Transparent drag margins keep neighboring tabs readable.
 Groups are placed on the left in group-table order when windows merge, followed by
 ungrouped projects. Use **↑ / ↓** to reorder groups and optional fixed member positions
 to put a project first within its group. Manual rearrangement remains available;
-**Arrange Tabs by Group** reapplies the saved order. A manually split group's shared
+**Arrange Tabs by Group** reapplies the saved order.
+**Open All Grouped Projects** opens missing group members, merges their windows
+and arranges the tabs; it is also available in **Tools → Project Tab Icons**. A manually split group's shared
 decoration stays hidden until **Arrange Tabs by Group** succeeds. Moving the tabs
 back manually, applying settings, merging windows again or restarting the IDE does
 not restore that decoration. Members keep their inherited project styling.
 
 ## 100+ shapes. Your colors.
 
-![A selection from 100+ bundled icons, rendered from the plugin's actual SVG resources](docs/media/icon-library.png)
+![A selection from 100+ bundled icons, rendered from the plugin's actual SVG resources](assets/readme/icon-library.png)
 
 Search icons by name or category, choose a color with the native IDE picker, a HEX
 value or one of 14 swatches, and select **20, 24 or 28 px** icon sizes.
@@ -169,7 +151,7 @@ Use self-contained, static SVGs without scripts, foreignObject, DOCTYPE or exter
 
 ## Git context beside the project name
 
-![Compact Preview and the current Git controls in Tab layout](docs/media/git-context.png)
+![Compact Preview and the current Git controls in Tab layout](assets/readme/git-context.png)
 
 Show full or compact Git branches, tracked added/removed-line counts, or both.
 Choose whether extra information appears before or after the project name.
@@ -214,24 +196,47 @@ Apply saves only the shared settings sections you edited. If another window chan
 the same section, it reports a conflict and keeps your draft. Use the settings page's
 **Revert changes** action to load the latest values, then repeat your edits.
 
-## Requirements and installation help
+## Windows support — Beta
 
-Requires **macOS** and **IntelliJ IDEA 2026.2.3**, builds `262.10968.63` through `262.*`.
-The plugin customizes project window tabs; editor file tabs use the IDE's normal appearance.
-See the [installation guide](docs/INSTALLATION.md) for updates, missing tabs and removal.
+[![Beta](assets/readme/windows-beta.svg)](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.16/project-tab-icons-0.4.16-windows.zip)
 
-## Local by design
+The Windows package is in **beta** and targets IntelliJ IDEA **2026.2.3–2026.2.x**.
+Install the [Windows ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.16/project-tab-icons-0.4.16-windows.zip)
+from disk, then use **Window → Merge All Project Windows** to place projects in
+one window. You can also enable **Automatically open projects in tabs** in the
+plugin settings. The macOS package remains separate.
 
-No accounts, telemetry or plugin network requests. [Privacy](PRIVACY.md).
-The unsigned ZIP is distributed through GitHub. This experimental plugin uses
-internal IntelliJ and AppKit APIs; [compatibility notes](docs/COMPATIBILITY.md)
-describe the supported environment and recorded validation limits.
+![Windows 11: project tabs and native window controls above the IDE toolbar](assets/readme/captures/windows-tabs-0.4.14.png)
 
-- [Feature guide](docs/FEATURES.md)
-- [Changelog](CHANGELOG.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Contributing](CONTRIBUTING.md)
-- [Third-party artwork and licenses](THIRD_PARTY_NOTICES.md)
-- [Media sources](docs/media/README.md)
+Project tabs share the top row with the native window controls, with close buttons
+on the right of every tab. Changing **Show Project Gradient** preserves tab styling.
 
-MIT licensed. Independent of JetBrains; not an official JetBrains product.
+![Windows 11: Project Tab Icons 0.4.14 settings with a matching Windows preview](assets/readme/captures/windows-settings-0.4.14.png)
+
+Preview uses the same row order and caption space as the merged Windows window.
+In Islands Dark, the real tabs use the same gray window background as Preview.
+With customization off, tabs have 1 px gray separators, a shared blue 2 px bottom
+line, project names without paths and close buttons on the right.
+Switch between three and five sample tabs, or enable **Full window** to include
+file tabs and an editor fragment. The screenshots above were captured from the
+running Windows plugin. Windows support remains beta.
+
+## Compatibility
+
+Use the ZIP for your operating system. Requires **IntelliJ IDEA 2026.2.3–2026.2.x**,
+builds `262.10968.63` through `262.*`. The packages are unsigned and installed from disk.
+Windows support is beta. Linux and the 2026.3 platform branch are not supported.
+
+## Privacy and licenses
+
+Project Tab Icons works locally. It has no accounts, telemetry, advertising or
+independent network requests. Project paths and branch names stay on your machine.
+Git captions use the IDE's repository model and a local background diff, with no fetch.
+
+Applying a project icon replaces its native IDEA light/dark icon variants. The
+imported source file is unchanged. Applying appearance settings alone does not rewrite
+project icons. Saved native icons remain available after removing the plugin.
+
+The project uses the [MIT license](LICENSE). Bundled artwork and the Gradle Wrapper
+retain their [third-party notices](licenses/THIRD_PARTY_NOTICES.txt) and [licenses](licenses).
+Independent of JetBrains; not an official JetBrains product.

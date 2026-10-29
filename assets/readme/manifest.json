@@ -1,5 +1,5 @@
 {
-  "version": "0.3.120",
+  "version": "0.4.15-macos",
   "kind": "illustrations and compositions of real Settings screenshots",
   "iconCountLabel": "100+",
   "files": [
@@ -23,8 +23,8 @@
       "width": 1600,
       "height": 1000,
       "kind": "screenshot composition",
-      "pluginVersion": "0.3.120",
-      "description": "Real screenshot of Project Tab Icons 0.3.120 Settings in IntelliJ IDEA. group_git preset, global preset rows, Appearance navigation, compact Preview and Style, built-in Preview demo data. Cropped without redrawing UI pixels; presented on an illustrated frame.",
+      "pluginVersion": "0.4.15-macos",
+      "description": "Real screenshot of Project Tab Icons 0.4.15-macos Settings in IntelliJ IDEA. Custom preset, automatic project tabs, global preset rows, Appearance navigation, compact Preview and Style, built-in Preview demo data. Cropped without redrawing UI pixels; presented on an illustrated frame.",
       "capture": "captures/appearance-settings.png",
       "provenance": "captures/provenance.json"
     },

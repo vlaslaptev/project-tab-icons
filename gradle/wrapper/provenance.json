@@ -1,0 +1,9 @@
+{
+  "version": "9.8.1",
+  "bootstrapJarVersion": "9.8.0",
+  "source": "https://raw.githubusercontent.com/gradle/gradle/v9.8.1/",
+  "jarSha256": "238e777fcddd7e34f9708186085def2abd6e08e658505b38718d79d74c21abd5",
+  "distributionSha256": "dce76f55f8e251a3a1f130eb120f30b3d271de2b76c9b0729d316b5a1b6dc01f",
+  "checksumSource": "https://services.gradle.org/distributions/gradle-9.8.0-wrapper.jar.sha256",
+  "note": "The Gradle v9.8.1 source repository contains the officially published 9.8.0 bootstrap wrapper JAR. The configured distribution is 9.8.1."
+}

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="20" role="img" aria-label="Beta">
+  <title>Beta</title>
+  <rect width="40" height="20" rx="3" fill="#d99b17"/>
+  <g fill="#161616" font-family="Verdana,DejaVu Sans,sans-serif" font-size="11" text-anchor="middle">
+    <text x="20" y="14">Beta</text>
+  </g>
+</svg>

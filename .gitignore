@@ -17,6 +17,7 @@ out/
 local.properties
 private-evidence/
 /artifacts/
+/docs/
 
 # Local agent instructions and private VM connection notes.
 AGENTS.md

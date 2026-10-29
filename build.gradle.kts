@@ -134,10 +134,10 @@ intellijPlatform {
     pluginConfiguration {
         version = "${project.version}-$pluginTarget"
         description = providers.fileContents(
-            layout.projectDirectory.file("docs/marketplace/description.html")
+            layout.projectDirectory.file("plugin/description.html")
         ).asText
         changeNotes = providers.fileContents(
-            layout.projectDirectory.file("docs/marketplace/change-notes.html")
+            layout.projectDirectory.file("plugin/change-notes.html")
         ).asText
         ideaVersion {
             sinceBuild = "262.10968.63"
