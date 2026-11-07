@@ -1,9 +1,9 @@
 <idea-plugin xmlns:xi="http://www.w3.org/2001/XInclude">
   <id>dev.vlas.projecttabicons</id>
   <name>Project Tab Icons</name>
-  <version>0.4.11</version>
+  <version>0.4.22</version>
   <vendor>Vlas</vendor>
-  <idea-version since-build="262.10968.63" strict-until-build="262.*"/>
+  <idea-version since-build="262.10968.63" strict-until-build="@pluginUntilBuild@"/>
   <depends>com.intellij.modules.platform</depends>
   <!-- target-platform -->
   <depends optional="true" config-file="dev.vlas.projecttabicons-git.xml">Git4Idea</depends>
@@ -38,11 +38,15 @@
     select a color with the IDE color picker, or reuse a custom SVG from a project.
     Custom icons follow the IDE's project icon settings; generated letter icons
     have centered text and padding.
-    Requires IntelliJ IDEA 2026.2.3 or a later 2026.2 update. Enable Automatically open projects in tabs
+    Supports IntelliJ IDEA 2026.2.3–2026.2.x and 2026.3.x on macOS and Windows Beta.
+    Enable Automatically open projects in tabs
     or run Window → Merge All Project Windows. On macOS, automatic tabs can be enabled only for this IDE without changing system settings.
     Selected icons are saved as native project SVG files.
   ]]></description>
   <change-notes><![CDATA[
+    Add Windows Beta compatibility with IntelliJ IDEA 2026.3 while retaining 2026.2.3 and later 2026.2 updates.
+    Connect Windows window integration to the JNA module extracted in IDEA 2026.3.
+    Add macOS compatibility with IntelliJ IDEA 2026.3 while retaining 2026.2.3 and later 2026.2 updates.
     Preserve manual Windows tab order when customization is off and make Arrange Tabs by Group work in that mode.
     Keep keyboard focus on project tabs during repeated arrow navigation.
     Restore and switch between distinct .ipr projects in the same directory.

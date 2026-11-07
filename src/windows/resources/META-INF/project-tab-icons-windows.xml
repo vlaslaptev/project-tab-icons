@@ -1,4 +1,6 @@
 <idea-plugin>
+  <!-- 262 exposes JNA from the core loader; 263 moves it into this bundled plugin. -->
+  <depends optional="true" config-file="dev.vlas.projecttabicons-jna.xml">com.intellij.modules.jna</depends>
   <applicationListeners>
     <listener class="dev.vlas.projecttabicons.WindowsProjectTabsApplicationListener" topic="com.intellij.ide.AppLifecycleListener"/>
   </applicationListeners>

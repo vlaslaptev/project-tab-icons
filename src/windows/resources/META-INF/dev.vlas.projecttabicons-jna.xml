@@ -1,0 +1,5 @@
+<idea-plugin>
+  <!-- The optional plugin dependency supplies JNA on 263. No extra extensions are
+       needed; 262 keeps using JNA from the core loader. Content-module dependencies
+       are ignored in optional depends sub-descriptors, so do not declare one here. -->
+</idea-plugin>

@@ -6,8 +6,11 @@ Editor file tabs keep their usual appearance.
 
 ## Installation
 
-- [macOS ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.20/project-tab-icons-0.4.20-macos.zip)
-- [Windows ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.20/project-tab-icons-0.4.20-windows.zip) [![Beta](assets/readme/windows-beta.svg)](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.20/project-tab-icons-0.4.20-windows.zip)
+The latest release is **0.4.22**, supporting IntelliJ IDEA
+**2026.2.3–2026.2.x and 2026.3.x** on macOS and Windows Beta.
+
+- [macOS ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.22/project-tab-icons-0.4.22-macos.zip)
+- [Windows ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.22/project-tab-icons-0.4.22-windows.zip) [![Beta](assets/readme/windows-beta.svg)](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.22/project-tab-icons-0.4.22-windows.zip)
 
 1. Open **Settings → Plugins → ⚙ → Install Plugin from Disk…** and select the downloaded ZIP.
 2. Open several projects in separate windows, then use **Window → Merge All Project Windows**.
@@ -207,10 +210,11 @@ the same section, it reports a conflict and keeps your draft. Use the settings p
 
 ## Windows support — Beta
 
-[![Beta](assets/readme/windows-beta.svg)](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.20/project-tab-icons-0.4.20-windows.zip)
+[![Beta](assets/readme/windows-beta.svg)](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.22/project-tab-icons-0.4.22-windows.zip)
 
-The Windows package is in **beta** and targets IntelliJ IDEA **2026.2.3–2026.2.x**.
-Install the [Windows ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.20/project-tab-icons-0.4.20-windows.zip)
+The Windows package is in **beta**. Release **0.4.22** supports IntelliJ IDEA
+**2026.2.3–2026.2.x and 2026.3.x**.
+Install the [Windows ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.22/project-tab-icons-0.4.22-windows.zip)
 from disk, then use **Window → Merge All Project Windows** to place projects in
 one window. You can also enable **Automatically open projects in tabs** in the
 plugin settings. The macOS package remains separate.
@@ -232,9 +236,36 @@ running Windows plugin. Windows support remains beta.
 
 ## Compatibility
 
-Use the ZIP for your operating system. Requires **IntelliJ IDEA 2026.2.3–2026.2.x**,
-builds `262.10968.63` through `262.*`. The packages are unsigned and installed from disk.
-Windows support is beta. Linux and the 2026.3 platform branch are not supported.
+Use the ZIP for your operating system. Compatibility of **0.4.22**:
+
+| Package | IntelliJ IDEA | Build range |
+| --- | --- | --- |
+| macOS | **2026.2.3–2026.2.x and 2026.3.x** | `262.10968.63` through `263.*` |
+| Windows Beta | **2026.2.3–2026.2.x and 2026.3.x** | `262.10968.63` through `263.*` |
+
+Both packages compile against the oldest supported SDK, **2026.2.3**, with Java 25.
+The upper limits are configured separately in `gradle.properties`; support for a new
+IDE branch requires checking the native window and internal tab APIs as well as the UI.
+The packages are unsigned and installed from disk. Linux is not supported.
+
+On Windows, 0.4.22 declares an optional dependency on the bundled JNA plugin
+(`com.intellij.modules.jna`) introduced in 2026.3. This makes its native window
+integration see JNA on 2026.3 while retaining the core-loader JNA on 2026.2.
+
+The macOS update was checked on **2026.3, IU-263.7307.200**: startup, merged windows,
+automatic tabs, group arrangement, icons, Git information, appearance presets,
+Preview, and disabling/re-enabling customization. The previous working baseline is
+**2026.2.3, IU-262.10968.63**; the update changes compatibility metadata and retains
+the same compiled plugin classes.
+
+Windows was checked manually on **Windows 11 ARM64**, using IDEA **2026.2.3,
+IU-262.10968.63**, and **2026.3, IU-263.7307.200**. Both versions loaded 0.4.22
+and restored three project windows into one tabbed container. The 2026.3 run also
+covered tab switching, appearance settings, Filled and Custom presets, Preview
+3/5 and Full window, customization OFF/ON, Separate/Merge and maximize/restore.
+Windows x64 and mixed-DPI setups were not revalidated in this run.
+
+Drag-and-drop was subsequently checked by the project owner.
 
 ## Privacy and licenses
 

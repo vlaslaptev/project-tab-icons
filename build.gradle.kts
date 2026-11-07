@@ -30,11 +30,14 @@ tasks.named<Zip>("buildPlugin") {
 }
 val preparePlatformDescriptor = tasks.register<Copy>("preparePlatformDescriptor") {
     val platformId = if (pluginTarget == "macos") "mac" else "windows"
+    val pluginUntilBuild = providers.gradleProperty("${pluginTarget}UntilBuild").get()
     inputs.property("targetPlatform", platformId)
+    inputs.property("strictUntilBuild", pluginUntilBuild)
     from("src/main/resources/META-INF/plugin.xml")
     into(layout.buildDirectory.dir("generated/platform-descriptor"))
     filter { line: String ->
         line.replace("<!-- target-platform -->", "<dependencies><plugin id=\"com.intellij.modules.os.$platformId\"/></dependencies>")
+            .replace("@pluginUntilBuild@", pluginUntilBuild)
     }
 }
 tasks.named<PatchPluginXmlTask>("patchPluginXml") {

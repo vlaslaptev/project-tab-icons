@@ -7,7 +7,7 @@ body:
     id: ide
     attributes:
       label: IDE version and build
-      placeholder: IntelliJ IDEA 2026.2.3, IU-262.10968.63
+      placeholder: IntelliJ IDEA 2026.3, IU-263.7307.200 (or 2026.2.3, IU-262.10968.63)
     validations:
       required: true
   - type: input
