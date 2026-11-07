@@ -14,7 +14,9 @@ import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JPanel
 
-internal class TextIconEditor(project: Project, initial: TextIconSpec?, color: Color, private val changed: () -> Unit) : JPanel(GridBagLayout()) {
+internal class TextIconEditor(project: Project, private val source: SvgAsset?, color: Color, inheritedGroup: ProjectTabGroup? = null,
+                              private val changed: () -> Unit) : JPanel(GridBagLayout()) {
+    private val initial = source?.textIcon
     val textField = JBTextField(initial?.text ?: "DB", 12)
     private val style = ComboBox(TextIconStyle.entries.toTypedArray())
     private val fontFamily = ComboBox(TextIconFont.entries.toTypedArray())
@@ -45,26 +47,31 @@ internal class TextIconEditor(project: Project, initial: TextIconSpec?, color: C
         row(0, "Text:", textField)
         row(1, "Style:", style)
         row(2, "Font:", fontFamily)
-        val more = JButton("More colors…").apply {
-            addActionListener {
-                ColorChooserService.getInstance().showDialog(project, this@TextIconEditor, "Text icon color",
-                    parseIconColor(hex.text), enableOpacity = false)?.let(::chooseColor)
+        if (inheritedGroup != null) {
+            row(3, "Color:", JBLabel("Inherited from ${settingsLiteral(inheritedGroup.name)}").apply {
+                icon = inheritedGroup.memberColors().icon?.let(::ColorSwatch)
+            })
+        } else {
+            val more = JButton("More colors…").apply {
+                addActionListener {
+                    ColorChooserService.getInstance().showDialog(project, this@TextIconEditor, "Text icon color",
+                        parseIconColor(hex.text), enableOpacity = false)?.let(::chooseColor)
+                }
             }
+            row(3, "Color:", JPanel(java.awt.BorderLayout(JBUI.scale(8), 0)).apply {
+                add(hex, java.awt.BorderLayout.CENTER); add(more, java.awt.BorderLayout.EAST)
+            })
+            row(4, "", JPanel(java.awt.FlowLayout(java.awt.FlowLayout.LEADING, JBUI.scale(4), 0)).apply {
+                COLOR_PRESETS.forEach { preset ->
+                    add(JButton(ColorSwatch(preset.bright)).apply {
+                        toolTipText = preset.name
+                        accessibleContext.accessibleName = "Text icon color: ${preset.name}"
+                        preferredSize = JBUI.size(36, 30)
+                        addActionListener { chooseColor(preset.bright) }
+                    })
+                }
+            })
         }
-        row(3, "Color:", JPanel(java.awt.BorderLayout(JBUI.scale(8), 0)).apply {
-            add(hex, java.awt.BorderLayout.CENTER); add(more, java.awt.BorderLayout.EAST)
-        })
-        val palette = JPanel(java.awt.FlowLayout(java.awt.FlowLayout.LEADING, JBUI.scale(4), 0)).apply {
-            COLOR_PRESETS.forEach { preset ->
-                add(JButton(ColorSwatch(preset.bright)).apply {
-                    toolTipText = preset.name
-                    accessibleContext.accessibleName = "Text icon color: ${preset.name}"
-                    preferredSize = JBUI.size(36, 30)
-                    addActionListener { chooseColor(preset.bright) }
-                })
-            }
-        }
-        row(4, "", palette)
         add(settingsHint("1–$MAX_TEXT_ICON_LENGTH characters · DB, QA, API, αβ · Transparent background"), GridBagConstraints().apply {
             gridx = 0; gridy = 5; gridwidth = 2; anchor = GridBagConstraints.WEST
         })
@@ -87,12 +94,15 @@ internal class TextIconEditor(project: Project, initial: TextIconSpec?, color: C
     }
 
     private fun refresh(notify: Boolean = true) {
-        val value = textField.text.trim()
+        val input = textField.text
+        val value = if (input == initial?.text) input else input.trim()
         val color = parseIconColor(hex.text)
         validationError = textIconError(value) ?: if (color == null) "Enter a six-digit HEX color, for example #60A5FA." else null
         choice = if (validationError != null || color == null) null else try {
-            IconChoice(TextIconSpec(value, style.selectedItem as TextIconStyle, fontFamily.selectedItem as TextIconFont,
-                color.hex()).asset(), color)
+            val spec = TextIconSpec(value, style.selectedItem as TextIconStyle, fontFamily.selectedItem as TextIconFont, color.hex())
+            val asset = if (source != null && initial?.copy(colorHex = spec.colorHex) == spec)
+                source.withTextColor(color) else spec.asset()
+            IconChoice(asset, color)
         } catch (error: IllegalArgumentException) {
             validationError = error.message ?: "Enter visible characters."
             null

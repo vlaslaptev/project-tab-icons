@@ -41,6 +41,8 @@ internal class WindowsSessionRestore(saved: WindowsTabSessionState) {
         val selection = if (!selectionChanged && state.selected in merged && state.selected !in present)
             state.selected else selected
         state = WindowsTabSessionState(merged.toMutableList(), selection, bounds.x, bounds.y, bounds.width, bounds.height, maximized)
+        // Automatic joins during restoration must be removable just like restored members.
+        joined.addAll(present)
         joined.retainAll(present)
     }
 }

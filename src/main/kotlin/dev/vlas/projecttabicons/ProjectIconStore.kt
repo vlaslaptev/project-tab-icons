@@ -136,6 +136,7 @@ internal object ProjectIconStore {
 
     fun install(projectPath: Path, expected: IconSnapshot, asset: SvgAsset,
                 files: IconFileOperations = IconFileOperations()): IconSnapshot {
+        if (asset.bytes.size > MAX_ICON_BYTES) throw SvgValidationException(SvgImportProblem.TOO_LARGE)
         val before = snapshot(projectPath)
         require(before.fingerprint == expected.fingerprint && before.directory == expected.directory) {
             "The project icon changed outside these settings. Reload the current icon before applying your selection."

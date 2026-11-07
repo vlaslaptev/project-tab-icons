@@ -115,8 +115,8 @@ internal class ProjectIconsTable(
                         toolTipText = problem ?: settingsLiteral(path)
                     }, BorderLayout.NORTH)
                     row.inheritedGroup?.let { group ->
-                        add(settingsHint("Inherited from ${settingsLiteral(group.name)}").apply {
-                            toolTipText = "Icon and colors inherited from ${settingsLiteral(group.name)} · Use Edit group to change them"
+                        add(settingsHint("Colors inherited from ${settingsLiteral(group.name)}").apply {
+                            toolTipText = "Use Edit group to change the inherited colors"
                         }, BorderLayout.SOUTH)
                     }
                 }, BorderLayout.SOUTH)
@@ -130,7 +130,7 @@ internal class ProjectIconsTable(
             line.add(JPanel(BorderLayout(0, JBUI.scale(2))).apply {
                 isOpaque = false
                 add(JBLabel(settingsLiteral(row.inheritedGroup?.name ?: "—")).apply {
-                    toolTipText = row.inheritedGroup?.let { "Icon and colors inherited from ${settingsLiteral(it.name)}" } ?: "No project group"
+                    toolTipText = row.inheritedGroup?.let { "Colors inherited from ${settingsLiteral(it.name)}" } ?: "No project group"
                     accessibleContext.accessibleName = "Group for ${row.target.name}: ${row.inheritedGroup?.name ?: "—"}"
                 }, BorderLayout.NORTH)
                 row.inheritedGroup?.let { group ->
@@ -149,9 +149,10 @@ internal class ProjectIconsTable(
                        run: () -> Unit) {
                 projectActions.add(ProjectAction(button, button.isEnabled, preserveIconWhenDisabled))
                 button.putClientProperty("projectIconAction", "${row.key}/$name")
-                if (name == "icon") SettingsPendingChange(button).update(row.svgModified || row.inheritedModified)
+                if (name == "icon") SettingsPendingChange(button).update(row.svgModified)
                 ProjectColorTarget.entries.firstOrNull { name == it.name.lowercase() + "Color" }?.let {
-                    SettingsPendingChange(button).update(row.colorModified(it) || row.inheritedModified)
+                    val inheritsColor = it != ProjectColorTarget.ICON || row.editableIconColor
+                    SettingsPendingChange(button).update(row.colorModified(it) || inheritsColor && row.inheritedModified)
                 }
                 if (button.getClientProperty("projectIconAction") == focusKey) restoredFocus = button
                 if (name == "icon" && (focusKey as? String)?.startsWith("${row.key}/") == true) fallbackFocus = button
@@ -161,19 +162,18 @@ internal class ProjectIconsTable(
             val iconName = projectSettingsIconName(row)
             val artwork = projectSettingsArtwork(row, appearance)
             action(SettingsValueButton(iconName, artwork).apply {
-                isEnabled = row.inheritedGroup == null && row.ready && !row.conflicted
-                toolTipText = row.inheritedGroup?.let { "Inherited from ${settingsLiteral(it.name)} · Edit in Project groups" }
-                    ?: "Choose icon · ${settingsLiteral(row.activeChoice?.asset?.label ?: iconName)}"
-                accessibleContext.accessibleName = row.inheritedGroup?.let {
-                    "Inherited icon for ${row.target.name} from ${it.name}"
-                } ?: "Change icon for ${row.target.name} · ${row.target.path}"
-            }, "icon", preserveIconWhenDisabled = row.inheritedGroup != null) { chooseIcon(row) }
+                isEnabled = row.ready && !row.conflicted
+                toolTipText = "Choose icon · ${settingsLiteral(row.ownChoice?.asset?.label ?: iconName)}"
+                accessibleContext.accessibleName = "Change icon for ${row.target.name} · ${row.target.path}"
+            }, "icon") { chooseIcon(row) }
             ProjectColorTarget.entries.forEach { target ->
                 val original = target == ProjectColorTarget.ICON && !row.editableIconColor
                 val inherited = row.inheritedGroup
-                val automatic = !original && (if (inherited == null) row.colorOverrides.value(target) == null else
-                    (if (target == ProjectColorTarget.OUTLINE) inherited.outlineColor else inherited.tabColor).isBlank()) &&
-                    (target != ProjectColorTarget.ICON || row.automaticIcon)
+                val automatic = when (target) {
+                    ProjectColorTarget.ICON -> row.automaticIcon && inherited == null && row.colorOverrides.icon == null
+                    ProjectColorTarget.OUTLINE -> inherited?.outlineColor?.isBlank() ?: (row.colorOverrides.outline == null)
+                    ProjectColorTarget.TAB -> inherited?.tabColor?.isBlank() ?: (row.colorOverrides.tab == null)
+                }
                 val value = row.color(target)
                 action(SettingsValueButton(when {
                     original -> "Original"
@@ -181,13 +181,14 @@ internal class ProjectIconsTable(
                     else -> value?.let(::colorName) ?: "Custom"
                 }, value?.let { ColorSwatch(it) } ?: EmptyIcon.create(JBUI.scale(18))).apply {
                     isEnabled = inherited == null && row.ready && !row.conflicted && !original
-                    toolTipText = inherited?.let { "Inherited from ${settingsLiteral(it.name)} · Edit in Project groups" } ?: when {
+                    toolTipText = when {
                         original -> "Original SVG/PNG colors are preserved"
+                        inherited != null -> "Inherited from ${settingsLiteral(inherited.name)} · Edit in Project groups"
                         automatic -> "${value?.hex() ?: "Automatic"} · " +
                             if (target == ProjectColorTarget.ICON) "Follows the IDE project color" else "Matches the icon color"
                         else -> "${value?.hex() ?: "Custom"} · Change ${target.title.lowercase()}"
                     } + if (target == ProjectColorTarget.TAB) " · Uses Intensity in Style → Fill" else ""
-                    accessibleContext.accessibleName = if (inherited != null)
+                    accessibleContext.accessibleName = if (inherited != null && !original)
                         "Inherited ${target.title.lowercase()} for ${row.target.name} from ${inherited.name}" else
                         "${if (original) "Original" else "Change"} ${target.title.lowercase()} for ${row.target.name} · ${row.target.path}"
                 }, target.name.lowercase() + "Color", preserveIconWhenDisabled = original || inherited != null) { chooseColor(row, target) }

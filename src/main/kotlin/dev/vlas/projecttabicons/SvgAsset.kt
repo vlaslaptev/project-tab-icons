@@ -1,8 +1,10 @@
 package dev.vlas.projecttabicons
 
+import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.xml.sax.SAXParseException
 import org.xml.sax.helpers.DefaultHandler
+import java.awt.Color
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.nio.file.Files
@@ -24,10 +26,37 @@ internal data class BuilderSelection(val contourId: String, val colorHex: String
 internal data class SvgAsset(val bytes: ByteArray, val label: String, val builder: BuilderSelection? = null,
                              val textIcon: TextIconSpec? = null) {
     val digest: String = sha256(bytes)
+    val editableColorHex: String? get() = textIcon?.colorHex ?: builder?.colorHex
 
     /** Убирает только старую подложку конструктора из отображения, не меняя сохранённый SVG. */
     private val cleanedArtwork: ByteArray? by lazy { cleanTabArtwork() }
     fun tabArtwork(): ByteArray? = cleanedArtwork
+
+    fun tabArtwork(tintHex: String): ByteArray = recolor(tabArtwork() ?: bytes, tintHex)
+
+    /** При смене цвета сохраняем пути из исходного SVG, даже если локальные шрифты отличаются. */
+    fun withTextColor(color: Color): SvgAsset {
+        val text = requireNotNull(textIcon)
+        val hex = color.hex()
+        if (text.colorHex.equals(hex, ignoreCase = true)) return this
+        return copy(bytes = recolor(bytes, hex), textIcon = text.copy(colorHex = hex), builder = builder?.copy(colorHex = hex))
+    }
+
+    private fun recolor(source: ByteArray, tintHex: String): ByteArray {
+        val original = editableColorHex ?: return source
+        if (original.equals(tintHex, ignoreCase = true)) return source
+        val document = parseSvgDocument(source)
+        val elements = document.getElementsByTagName("*")
+        for (index in 0 until elements.length) {
+            val element = elements.item(index) as Element
+            for (attribute in listOf("fill", "stroke", "color")) {
+                if (element.getAttribute(attribute).equals(original, ignoreCase = true))
+                    element.setAttribute(attribute, tintHex)
+            }
+        }
+        document.documentElement.setAttribute("data-project-tab-icons-color", tintHex)
+        return svgDocumentBytes(document)
+    }
 
     private fun cleanTabArtwork(): ByteArray? {
         if (builder?.background != true) return null
@@ -47,17 +76,7 @@ internal data class SvgAsset(val bytes: ByteArray, val label: String, val builde
             } ?: return null
         root.removeChild(backdrop)
         root.setAttribute("data-project-tab-icons-background", "none")
-        val factory = TransformerFactory.newInstance().apply {
-            setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
-            setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "")
-            setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "")
-        }
-        val output = ByteArrayOutputStream()
-        factory.newTransformer().apply {
-            setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
-            setOutputProperty(OutputKeys.ENCODING, "UTF-8")
-        }.transform(DOMSource(document), StreamResult(output))
-        return output.toByteArray()
+        return svgDocumentBytes(document)
     }
 
     companion object {
@@ -107,6 +126,20 @@ internal data class SvgAsset(val bytes: ByteArray, val label: String, val builde
                 throw SvgValidationException(SvgImportProblem.EXTERNAL_RESOURCES)
         }
     }
+}
+
+private fun svgDocumentBytes(document: Document): ByteArray {
+    val factory = TransformerFactory.newInstance().apply {
+        setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
+        setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "")
+        setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "")
+    }
+    val output = ByteArrayOutputStream()
+    factory.newTransformer().apply {
+        setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
+        setOutputProperty(OutputKeys.ENCODING, "UTF-8")
+    }.transform(DOMSource(document), StreamResult(output))
+    return output.toByteArray()
 }
 
 private fun parseSvgDocument(bytes: ByteArray) = DocumentBuilderFactory.newInstance().apply {

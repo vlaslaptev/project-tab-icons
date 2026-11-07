@@ -31,8 +31,35 @@ internal enum class StyleConflict(val title: String) {
 }
 private const val MAX_BUNDLE_BYTES = 24 * 1024 * 1024
 
+/** The reader and writer share portable limits, including generated Text icons categories. */
+private class StyleBundleLimits(presets: Int, categories: Int) {
+    private var svgBytes = 0L
+    init {
+        require(presets <= MAX_USER_APPEARANCE_PRESETS) { "A bundle can contain up to $MAX_USER_APPEARANCE_PRESETS presets." }
+        require(categories <= MAX_LIBRARY_SETS) { "A bundle can contain up to $MAX_LIBRARY_SETS categories." }
+    }
+    fun category(icons: Int) {
+        require(icons in 1..MAX_SET_ICONS) { "A category must contain 1–$MAX_SET_ICONS icons." }
+    }
+    fun svg(bytes: Int) {
+        require(bytes <= MAX_ICON_BYTES) { "An SVG in this bundle is too large." }
+        svgBytes += bytes
+        require(svgBytes <= MAX_LIBRARY_BYTES) { "The SVG library in this bundle exceeds 16 MiB." }
+    }
+}
+
+internal fun validateStyleBundleLimits(bundle: StyleBundle) {
+    require(!bundle.empty) { "Select at least one item." }
+    val limits = StyleBundleLimits(bundle.presets.size, bundle.categories.size)
+    bundle.categories.forEach { category ->
+        limits.category(category.icons.size)
+        category.icons.forEach { limits.svg(it.asset.bytes.size) }
+    }
+}
+
 /** Переносимый формат не содержит ID проектов, путей или назначений иконок. */
 internal fun writeStyleBundle(path: Path, bundle: StyleBundle, files: IconFileOperations = IconFileOperations()) {
+    validateStyleBundleLimits(bundle)
     val json = JsonObject().apply {
         addProperty("format", "project-tab-icons"); addProperty("version", 1)
         add("presets", JsonArray().apply { bundle.presets.forEach { preset -> add(JsonObject().apply {
@@ -64,25 +91,22 @@ internal fun readStyleBundle(path: Path): StyleBundle {
     val root = JsonParser.parseString(source).objectValue()
     require(root.string("format") == "project-tab-icons" && root.integer("version", 0) == 1) { "Unsupported Project Tab Icons style bundle." }
     val presetsJson = root.array("presets")
-    require(presetsJson.size() <= MAX_USER_APPEARANCE_PRESETS) { "A bundle can contain up to $MAX_USER_APPEARANCE_PRESETS presets." }
+    val categoriesJson = root.array("categories")
+    val limits = StyleBundleLimits(presetsJson.size(), categoriesJson.size())
     val presets = presetsJson.map { item ->
         val value = item.objectValue()
         val name = normalizeUserPresetName(value.string("name"))
         require(userPresetNameError(name, emptyList()) == null) { "Invalid preset name: $name" }
         UserAppearancePreset(UUID.randomUUID().toString(), name, decodeAppearance(value.getAsJsonObject("appearance")))
     }
-    val categoriesJson = root.array("categories")
-    require(categoriesJson.size() <= MAX_LIBRARY_SETS) { "A bundle can contain up to $MAX_LIBRARY_SETS categories." }
-    var total = 0L
     val categories = categoriesJson.map { item ->
         val value = item.objectValue(); val name = value.name(MAX_ICON_SET_NAME_LENGTH); val icons = value.array("icons")
-        require(icons.size() in 1..MAX_SET_ICONS) { "A category must contain 1–$MAX_SET_ICONS icons." }
+        limits.category(icons.size())
         ImportedIconSet(UUID.randomUUID().toString(), name, icons.map { element ->
             val icon = element.objectValue(); val label = icon.name(128); val svg = icon.string("svg")
             require(svg.length <= MAX_ICON_BYTES * 4 / 3 + 8) { "An SVG in this bundle is too large." }
             val raw = Base64.getDecoder().decode(svg)
-            total += raw.size
-            require(total <= MAX_LIBRARY_BYTES) { "The SVG library in this bundle exceeds 16 MiB." }
+            limits.svg(raw.size)
             val asset = SvgAsset.validate(raw, "$label · $name")
             IconChoice(asset, svgIconColor(asset))
         })

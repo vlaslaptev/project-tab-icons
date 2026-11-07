@@ -319,7 +319,9 @@ internal class WindowsMergedProjectWindow(
     private var closed = false
     // Keep arrow navigation on the label through delayed shell-activation events.
     private var focusTabLabel = false
+    // Native resize recovery keeps its cadence; header traversal is driven by structural changes.
     private val timer = Timer(250) { reconcile() }
+    private var reconcileQueued = false
     private val focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager()
     private val activationListener = PropertyChangeListener { event ->
         val frame = event.newValue as? IdeFrameImpl
@@ -420,7 +422,7 @@ internal class WindowsMergedProjectWindow(
             val parent = HWND(Native.getComponentPointer(canvas))
             projects.forEach { (frame, project) ->
                 if (frame !in members) {
-                    val member = EmbeddedProjectWindow(frame, project, container)
+                    val member = EmbeddedProjectWindow(frame, project, container, ::requestReconcile)
                     // Запись до первого изменения позволяет откатить незавершённое встраивание.
                     members[frame] = member
                     member.embed(parent)
@@ -544,6 +546,12 @@ internal class WindowsMergedProjectWindow(
         if (!User32.INSTANCE.GetWindowRect(parent, rect)) return
         bounds.setLocation(rect.left, rect.top)
         members.values.forEach { it.resize(bounds) }
+    }
+
+    private fun requestReconcile() {
+        if (closed || reconcileQueued) return
+        reconcileQueued = true
+        SwingUtilities.invokeLater { reconcileQueued = false; reconcile() }
     }
 
     private fun reconcile() {

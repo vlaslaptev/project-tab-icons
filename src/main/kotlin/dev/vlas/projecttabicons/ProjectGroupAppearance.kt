@@ -6,7 +6,7 @@ import java.awt.Color
 import java.util.Base64
 import javax.swing.Icon
 
-/** Собственная копия SVG группы: проекты ссылаются на неё, не меняя свои .idea/icon.*. */
+/** Собственная копия SVG для общего значка группы. */
 internal data class ProjectGroupIcon(
     @field:OptionTag @JvmField val svg: String = "",
     @field:OptionTag @JvmField val name: String = "Folder",
@@ -65,7 +65,11 @@ internal object GroupAppearanceIcons {
     }
 }
 
-internal fun ProjectTabGroup.colors(choice: IconChoice): ProjectColorOverrides = ProjectColorOverrides(
-    icon = choice.color, outline = parseIconColor(outlineColor), tab = parseIconColor(tabColor),
+internal fun ProjectTabGroup.colors(choice: IconChoice?): ProjectColorOverrides = ProjectColorOverrides(
+    icon = choice?.color ?: parseIconColor(icon.color), outline = parseIconColor(outlineColor), tab = parseIconColor(tabColor),
 )
+/** Automatic у участников следует цвету группы, в том числе для проектов с многоцветной иконкой. */
+internal fun ProjectTabGroup.memberColors(choice: IconChoice? = GroupAppearanceIcons.choice(icon)): ProjectColorOverrides =
+    colors(choice).let { it.copy(outline = it.outline ?: it.icon, tab = it.tab ?: it.icon) }
+
 internal fun ProjectGroupsState.groupFor(key: String): ProjectTabGroup? = memberships[key]?.let { id -> groups.firstOrNull { it.id == id } }

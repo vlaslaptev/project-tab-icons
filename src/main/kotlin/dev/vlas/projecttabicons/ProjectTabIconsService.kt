@@ -80,7 +80,20 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
     private val iconFileEvents = java.util.concurrent.ConcurrentLinkedQueue<IconConfigurationEvents>()
     @Volatile private var iconDirectories = emptySet<String>()
     private class ProjectIconDelegate(val path: java.nio.file.Path, val size: Int, val name: String, val icon: Icon) {
-        var avatarColor: Color? = null
+        private var source: IconColorRead? = null
+        private var tint: Color? = null
+        var wrapper: CenteredProjectIcon? = null
+
+        fun tabIcon(read: IconColorRead?, color: Color?, appearance: TabAppearanceState): CenteredProjectIcon {
+            if (source === read && tint == color) wrapper?.let { return it }
+            source = read
+            tint = color
+            val image = if (read?.editableSvg != null && color != null && color != read.color)
+                projectSvgIcon(read.editableSvg, size, color) else read?.artwork
+            return CenteredProjectIcon(icon, size, artwork = { image }, avatarColor = { color },
+                initials = appearance.iconInitials, letterWeight = appearance.iconLetterWeight,
+                projectName = { name }).also { wrapper = it }
+        }
     }
     private val projectDelegates = IdentityHashMap<Project, ProjectIconDelegate>()
     private var connection: MessageBusConnection? = null
@@ -108,14 +121,13 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
     private val branchCaptions = IdentityHashMap<JComponent, NativeProjectTabBranchCaption>()
     private data class GitWatch(val provider: ProjectTabBranchProvider, val includeStatus: Boolean, val lifetime: Disposable)
     private val branchWatches = IdentityHashMap<Project, GitWatch>()
-    private val iconWrappers = IdentityHashMap<Icon, CenteredProjectIcon>()
     private val appliedLabelBorders = IdentityHashMap<JComponent, ProjectTabBorder>()
     private val appliedLabelLayouts = IdentityHashMap<JComponent, ProjectTabIconLayout>()
     private val appliedLabelFonts = IdentityHashMap<JComponent, ProjectTabFont>()
     private val appliedContainerLayouts = IdentityHashMap<JComponent, ProjectTabsContainerLayout>()
     private val projectNames = IdentityHashMap<Project, String>()
     // Только очищенные изображения, независимо от смены DeferredIcon и сброса его кеша.
-    private val lastPreparedArtwork = IdentityHashMap<Project, MutableMap<Int, Icon>>()
+    private val lastPreparedArtwork = IdentityHashMap<Project, MutableMap<Int, IconColorRead>>()
     private val iconReadQueue = ProjectIconReadQueue(
         coroutineScope, Dispatchers.IO, Dispatchers.UI,
         postToUi = { SwingUtilities.invokeLater(it) },
@@ -123,7 +135,7 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
     )
     private val iconReads = ProjectIconReadCache(iconReadQueue,
         resolve = { it.copy(color = it.avatar?.presentation?.color1 ?: it.color) },
-        changed = { delegate, ready -> if (ready) iconWrappers.remove(delegate); requestRefresh() },
+        changed = { _, _ -> requestRefresh() },
         report = { LOG.debug("Cannot determine the project icon color", it) })
     private var previousAppearance: TabAppearanceState? = null
     private var previousGroups: ProjectGroupsState? = null
@@ -282,13 +294,12 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         val branches = projectExtraInfo(tabProjects, appearance)
         if (invalidateIcons.getAndSet(false)) {
             iconReads.clear()
-            iconWrappers.clear()
             projectDelegates.clear()
             IconDeferrer.getInstance().clearCache()
             changedProjects.addAll(frames.values)
         }
         changedProjects.forEach { project ->
-            projectDelegates.remove(project)?.icon?.let { delegate -> iconReads.invalidate(delegate); iconWrappers.remove(delegate) }
+            projectDelegates.remove(project)?.icon?.let(iconReads::invalidate)
             projectPaths[project]?.let(RecentProjectIconHelper::refreshProjectIcon)
         }
         frames.forEach { (frame, project) ->
@@ -299,17 +310,16 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         }
 
         val projectColors = ApplicationManager.getApplication().getService(ProjectOutlineColors::class.java).resolvedState
-        if (previousAppearance != appearance) { iconWrappers.clear(); groupIconWrappers.clear() }
+        if (previousAppearance != appearance) {
+            projectDelegates.values.forEach { it.wrapper = null }
+            groupIconWrappers.clear()
+        }
         if (previousGroups != groups) groupIconWrappers.clear()
         previousAppearance = appearance
         previousGroups = groups
 
-        val groupColors = groups.groups.mapNotNull { group ->
-            val automatic = groupIcons[group.icon]?.choice?.color ?: parseIconColor(group.icon.color)
-                ?: return@mapNotNull null
-            group.id to ProjectTabGroupColors(parseIconColor(group.outlineColor) ?: automatic,
-                parseIconColor(group.tabColor) ?: automatic)
-        }.toMap()
+        val palettes = groups.groups.associate { it.id to it.memberColors(groupIcons[it.icon]?.choice) }
+        val groupColors = palettes.mapValues { (_, palette) -> palette.groupSurfaceColors(neutralGroupSeparatorColor) }
         val sharedIconSize = appearance.iconSize.pixels
         val sharedGroupIcons = if (appearance.showGroupIcon) groups.groups.mapNotNull { group ->
             val artwork = groupIcons[group.icon]?.artwork?.get(sharedIconSize) ?: return@mapNotNull null
@@ -330,19 +340,7 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
                 return TabPresentation(null, defaultProjectTabAccent(), null).also { presentations[project] = it }
             }
             val path = recentProjects.getProjectPath(project) ?: return null
-            val group = groups.groupFor(projectIconPathKey(path))
-            if (group != null) {
-                val prepared = groupIcons[group.icon] ?: return null
-                val artwork = prepared.artwork.getValue(appearance.iconSize.pixels)
-                val icon = if (appearance.showIcons) groupIconWrappers.getOrPut(group.icon to appearance.iconSize.pixels) {
-                    CenteredProjectIcon(artwork, appearance.iconSize.pixels, artwork = { artwork })
-                } else null
-                val source = prepared.choice.color
-                return TabPresentation(icon,
-                    if (appearance.showOutline) parseIconColor(group.outlineColor) ?: source else null,
-                    if (appearance.showTabBackground) parseIconColor(group.tabColor) ?: source else null,
-                ).also { presentations[project] = it }
-            }
+            val inherited = groups.memberships[projectIconPathKey(path)]?.let(palettes::get)
             // Каждое окно содержит копию всей полосы; данные проекта вычисляем один раз за проход.
             // Поля провайдера по 2px: запрос 24/28/32px даёт изображение 20/24/28px.
             // IconDeferrer сбрасывается платформой даже при нерелевантных VFS-событиях.
@@ -353,24 +351,20 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
                     .also { projectDelegates[project] = it }
             val delegate = cached.icon
             activeDelegates.add(delegate)
-            val read = if (appearance.showOutline || appearance.showIcons || appearance.showTabBackground) {
+            val read = if (appearance.showIcons || inherited == null && (appearance.showOutline || appearance.showTabBackground)) {
                 readIcon(delegate, label, appearance.iconSize.pixels, path)
             } else null
             val overrides = projectColors.overrides(path)
-            cached.avatarColor = overrides.icon
-            // Ручной цвет буквенного аватара не перекрашивает сторонние SVG/PNG.
             val iconColor = if (read?.avatar != null) overrides.icon ?: read.color else read?.color
-            val icon = if (appearance.showIcons) iconWrappers.getOrPut(delegate) {
-                CenteredProjectIcon(delegate, appearance.iconSize.pixels,
-                    artwork = { preparedArtwork(delegate, project, appearance.iconSize.pixels) },
-                    avatarColor = { cached.avatarColor },
-                    initials = appearance.iconInitials, letterWeight = appearance.iconLetterWeight,
-                    projectName = { project.name })
+            val icon = if (appearance.showIcons) {
+                val source = preparedIconSource(read, project, size)
+                val tint = inherited?.icon ?: overrides.icon.takeIf { source?.artwork == null }
+                cached.tabIcon(source, tint, appearance)
             } else null
-            return TabPresentation(icon,
-                if (appearance.showOutline) overrides.outline ?: iconColor else null,
-                if (appearance.showTabBackground) overrides.tab ?: iconColor else null,
-            ).also { presentations[project] = it }
+            val outline = if (inherited != null) inherited.outline else overrides.outline ?: iconColor
+            val fill = if (inherited != null) inherited.tab else overrides.tab ?: iconColor
+            return TabPresentation(icon, outline.takeIf { appearance.showOutline }, fill.takeIf { appearance.showTabBackground })
+                .also { presentations[project] = it }
         }
         tabStrips.forEach { tabs ->
             val groupLayout = if (appearance.enabled && (groups.groups.isNotEmpty() || appearance.groupSpacing > 0 || appearance.showGroupOutline ||
@@ -419,7 +413,6 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         appliedBranchTooltips.keys.filter { it !in activeTabs }.forEach(::restoreBranchTooltip)
         tabOwners.keys.retainAll(activeTabs)
         originalIcons.keys.retainAll(activeTabs)
-        iconWrappers.keys.retainAll(activeDelegates)
         iconReads.retain(activeDelegates)
         branchCaptions.keys.filter { it !in activeLabels }.toList().forEach { branchCaptions.remove(it)?.restore() }
         appliedLabelBorders.keys.filter { it !in activeLabels }.forEach(::restoreTabLabelBorder)
@@ -636,15 +629,14 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         }
     }
 
-    private fun preparedArtwork(delegate: Icon, project: Project, size: Int): Icon? {
-        val current = iconReads.get(delegate, size)
+    private fun preparedIconSource(current: IconColorRead?, project: Project, size: Int): IconColorRead? {
         if (current?.avatar != null) {
             lastPreparedArtwork[project]?.remove(size)
-            return null
+            return current
         }
-        current?.artwork?.let { image ->
-            lastPreparedArtwork.getOrPut(project) { mutableMapOf() }[size] = image
-            return image
+        if (current?.artwork != null) {
+            lastPreparedArtwork.getOrPut(project) { mutableMapOf() }[size] = current
+            return current
         }
         return lastPreparedArtwork[project]?.get(size)
     }
@@ -699,7 +691,6 @@ class ProjectTabIconsService(private val coroutineScope: CoroutineScope) : Dispo
         originalTabTitles.clear()
         tabOwners.clear()
         originalIcons.clear()
-        iconWrappers.clear()
         appliedLabelFonts.keys.toList().forEach { restoreTabFont(it) }
         appliedLabelBorders.keys.toList().forEach(::restoreTabLabelBorder)
         appliedLabelLayouts.keys.toList().forEach(::restoreTabLabelLayout)

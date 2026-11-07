@@ -53,7 +53,9 @@ internal class IconSelectionDialog(
     available: List<IconChoice>,
     sets: List<ImportedIconSet>,
     private val immediate: Boolean = false,
+    private val inheritedGroup: ProjectTabGroup? = null,
 ) : DialogWrapper(parent, true) {
+    private val inheritedColor = inheritedGroup?.memberColors()?.icon
     private val saveHint = if (immediate) "Applies immediately · Replaces light and dark icon variants" else "Saved with Apply · Replaces light and dark icon variants"
     private val body = JPanel(BorderLayout(0, JBUI.scale(16)))
     private val preview = IconPreviewWell()
@@ -80,20 +82,20 @@ internal class IconSelectionDialog(
     private val customIcons = mutableMapOf<String, Icon>()
     private val shapes = IconChoiceGrid<LibraryIcon>({ it.title }) { item ->
         shapeIcons.getOrPut(item.id) {
-            projectSvgIcon(item.choice(color).asset, 28)
+            projectSvgIcon(item.choice(color).asset, 28, inheritedColor)
         }
     }
     private val customGrid = IconChoiceGrid<IconChoice>(
         { it.asset.label.substringBefore(" · ") }, { it.asset.label.substringAfter(" · ", "") },
     ) { choice ->
-        customIcons.getOrPut(choice.asset.digest) { projectSvgIcon(choice.asset, 28) }
+        customIcons.getOrPut(choice.asset.digest) { projectSvgIcon(choice.asset, 28, inheritedColor) }
     }
     private val importButton = JButton("Import SVG…")
     private val importFolderButton = JButton("Import folder…")
     private var iconSets = sets
     private val addedSets = mutableListOf<ImportedIconSet>()
     private var library = libraryItems()
-    private val textEditor = TextIconEditor(project, initial?.asset?.textIcon, color) { showSelection() }
+    private val textEditor = TextIconEditor(project, initial?.asset, color, inheritedGroup) { showSelection() }
     private var gallery = (listOfNotNull(initial) + available).distinctBy { it.asset.digest }
     private var custom = initial
     private var shapeId = initial?.asset?.builder?.contourId?.let { "builtin:$it" }
@@ -287,7 +289,7 @@ internal class IconSelectionDialog(
         }
         customGrid.emptyText.text = if (gallery.isEmpty()) "No project SVGs yet. Import an SVG to get started."
             else "No SVGs found. Try another name."
-        customCount.text = "${visible.size} project SVG${if (visible.size == 1) "" else "s"} · Original colors"
+        customCount.text = "${visible.size} project SVG${if (visible.size == 1) "" else "s"}"
         revealSelection(customGrid)
     }
 
@@ -410,11 +412,13 @@ internal class IconSelectionDialog(
             status.toolTipText = null
         }
         val selected = selection()
-        preview.icon = selected?.let { projectSvgIcon(it.asset, 32) }
+        preview.icon = selected?.let { projectSvgIcon(it.asset, 32, inheritedColor) }
         selectionLabel.text = selected?.asset?.label?.let { settingsLiteral(it.substringBefore(" · ")) } ?: "Choose an icon"
         selectionLabel.toolTipText = selected?.asset?.label?.let(::settingsLiteral)
         selectionDetail.text = when {
             selected == null -> "Select a result to preview it at tab sizes."
+            inheritedGroup != null && inheritedColor != null && selected.asset.editableColorHex != null ->
+                "Color inherited from ${settingsLiteral(inheritedGroup.name)} · ${inheritedColor.hex()}"
             selected.asset.textIcon != null -> "${selected.asset.textIcon.font.title} · ${selected.asset.textIcon.style.title} · ${selected.color?.hex()}"
             tabs.selectedIndex == 0 && selected.asset.builder != null -> "Built-in icon · ${colorName(color)}"
             else -> selected.asset.label.substringAfter(" · ", "SVG") + " · Original colors"
@@ -423,7 +427,7 @@ internal class IconSelectionDialog(
         if (selected != null) listOf(20, 24, 28).forEach { size ->
             samples.add(JPanel(BorderLayout(0, JBUI.scale(4))).apply {
                 preferredSize = JBUI.size(44, 56)
-                add(JBLabel(projectSvgIcon(selected.asset, size)).apply {
+                add(JBLabel(projectSvgIcon(selected.asset, size, inheritedColor)).apply {
                     horizontalAlignment = SwingConstants.CENTER
                     verticalAlignment = SwingConstants.CENTER
                 }, BorderLayout.CENTER)

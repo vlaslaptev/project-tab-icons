@@ -10,6 +10,9 @@ import java.awt.geom.Rectangle2D
 
 internal data class ProjectTabGroupColors(val outline: Color, val background: Color)
 
+internal fun ProjectColorOverrides.groupSurfaceColors(neutral: Color): ProjectTabGroupColors =
+    ProjectTabGroupColors(outline ?: neutral, tab ?: neutral)
+
 internal data class ProjectTabGroupSurfaceState(
     val appearance: TabAppearanceState,
     val geometry: ProjectTabGeometry,

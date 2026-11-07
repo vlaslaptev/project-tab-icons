@@ -63,12 +63,17 @@ internal class IconSetLibrary : SerializablePersistentStateComponent<IconSetLibr
         require(additions.all { it.icons.size <= MAX_SET_ICONS }) { "Too many icons in a category." }
         val existing = snapshot.sets.filterNot { stored -> additions.any { it.id == stored.id } }
         require(existing.size + additions.size <= MAX_LIBRARY_SETS) { "The icon library can contain up to $MAX_LIBRARY_SETS imported categories." }
+        // Stored SVGs use standard Base64; padding belongs to the encoding, not the raw byte limit.
+        val existingBytes = existing.sumOf { set -> set.icons.sumOf { icon ->
+            icon.svg.length.toLong() * 3 / 4 - icon.svg.takeLast(2).count { it == '=' }
+        } }
+        val addedBytes = additions.sumOf { set -> set.icons.sumOf { it.asset.bytes.size.toLong() } }
+        require(existingBytes + addedBytes <= MAX_LIBRARY_BYTES) {
+            "The imported icon library is full (16 MiB). Import a smaller folder."
+        }
         val encoded = additions.map { set -> StoredIconSet(set.id, set.name, set.icons.map {
             StoredSetIcon(it.asset.label.substringBeforeLast(" · "), Base64.getEncoder().encodeToString(it.asset.bytes))
         }) }
-        require((existing + encoded).sumOf { set -> set.icons.sumOf { it.svg.length.toLong() } } <= MAX_LIBRARY_BYTES * 4L / 3) {
-            "The imported icon library is full (16 MiB). Import a smaller folder."
-        }
         val replacements = encoded.associateBy { it.id }
         // Замены остаются на прежних местах; добавления идут в конец библиотеки.
         return IconSetLibraryState(snapshot.sets.map { replacements[it.id] ?: it } +

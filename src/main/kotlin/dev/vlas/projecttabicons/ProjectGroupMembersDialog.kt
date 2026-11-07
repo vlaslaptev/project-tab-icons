@@ -74,7 +74,7 @@ internal class ProjectGroupMembersDialog(
                 add(clear, BorderLayout.EAST)
             }, BorderLayout.NORTH)
             add(transfer, BorderLayout.CENTER)
-            add(settingsHint("Group icon and colors are inherited · Save with Apply"), BorderLayout.SOUTH)
+            add(settingsHint("Members use the group's colors · Save with Apply"), BorderLayout.SOUTH)
         }, BorderLayout.SOUTH)
     }
 

@@ -358,7 +358,7 @@ internal class ProjectGroupsTable(
             ?: choice?.asset?.label ?: "Loading…"
         val artwork = choice?.let { projectSvgIcon(it.asset, 24) }
         value(SettingsValueButton(settingsLiteral(iconLabel), artwork).apply {
-            toolTipText = "Group icon · Inherited by all members, including closed and newly assigned projects"
+            toolTipText = "Shown before the group's first tab when Show group icon is enabled"
             accessibleContext.accessibleName = "Change icon for group ${group?.name.orEmpty()}"
         }, "icon", ready, previous?.icon != style.icon) { chooseIcon(requireNotNull(group).id) }
         ProjectColorTarget.entries.forEach { target ->

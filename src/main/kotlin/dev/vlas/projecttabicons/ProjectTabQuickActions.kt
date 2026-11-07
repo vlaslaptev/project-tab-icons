@@ -51,9 +51,9 @@ abstract class ProjectTabQuickAction(private val mode: String) : SupportedProjec
             .getService(TabAppearanceSettings::class.java).state.enabled
         val group = path?.let { ApplicationManager.getApplication().getService(ProjectGroups::class.java)
             .resolvedState.groupFor(projectIconPathKey(it)) }
-        if (group != null) {
+        if (group != null && mode != "icon") {
             event.presentation.isEnabled = false
-            event.presentation.description = "Inherited from ${group.name}. Edit its appearance in Project groups."
+            event.presentation.description = "Colors inherited from ${group.name}. Edit them in Project groups."
         } else event.presentation.description = "Edit this project's own icon or color"
     }
     override fun perform(event: AnActionEvent) {
@@ -62,10 +62,9 @@ abstract class ProjectTabQuickAction(private val mode: String) : SupportedProjec
         val target = openProjectIconTargets().firstOrNull { it.project === project && it.path != null } ?: return
         val path = target.path ?: return
         val app = ApplicationManager.getApplication()
-        if (app.getService(ProjectGroups::class.java).resolvedState.groupFor(projectIconPathKey(path)) != null) {
-            ShowSettingsUtil.getInstance().showSettingsDialog(project, IconSettingsConfigurable::class.java)
-            return
-        }
+        val groups = app.getService(ProjectGroups::class.java)
+        val projectKey = projectIconPathKey(path)
+        fun currentGroup() = groups.resolvedState.groupFor(projectKey)
         var loaded: LoadedProjectIcon? = null
         var sets = emptyList<ImportedIconSet>()
         var gallery = emptyList<IconChoice>()
@@ -81,17 +80,24 @@ abstract class ProjectTabQuickAction(private val mode: String) : SupportedProjec
             }) return
         if (project.isDisposed) return
         val colorStore = app.getService(ProjectOutlineColors::class.java)
-        val row = ProjectIconSettingsRow(loaded ?: return, colorStore.overrides(path))
+        val row = ProjectIconSettingsRow(loaded?.withResolvedAvatarColor() ?: return, colorStore.overrides(path))
         if (!row.ready) { Messages.showErrorDialog(project, row.failure ?: "Cannot load this project icon.", "Project Tab Icons"); return }
         var additions = emptyList<ImportedIconSet>()
         while (!project.isDisposed) {
+            row.inherit(currentGroup())
             if (mode == "icon") {
-                val dialog = IconSelectionDialog(parent, project, project.name, row.color ?: COLOR_PRESETS.first().bright,
-                    row.activeChoice, gallery, (sets + additions).associateBy { it.id }.values.toList(), immediate = true)
+                val dialog = IconSelectionDialog(parent, project, project.name, row.personalIconColor ?: COLOR_PRESETS.first().bright,
+                    row.ownChoice, gallery, (sets + additions).associateBy { it.id }.values.toList(), immediate = true,
+                    inheritedGroup = row.inheritedGroup)
                 if (!dialog.showAndGet() || project.isDisposed) return
+                row.inherit(currentGroup())
                 dialog.selection()?.let(row::choose) ?: return
                 additions += dialog.importedSets()
             } else {
+                if (row.inheritedGroup != null) {
+                    ShowSettingsUtil.getInstance().showSettingsDialog(project, IconSettingsConfigurable::class.java)
+                    return
+                }
                 val channel = ProjectColorTarget.valueOf(mode)
                 if (channel == ProjectColorTarget.ICON && !row.editableIconColor) {
                     Messages.showInfoMessage(project, "This SVG or PNG keeps its original colors. Choose a built-in or text icon to edit its color.", "Project Tab Icons")
@@ -114,9 +120,15 @@ abstract class ProjectTabQuickAction(private val mode: String) : SupportedProjec
                 check(snapshot.fingerprint == row.snapshot?.fingerprint && snapshot.directory == row.snapshot?.directory) {
                     "The project icon changed while the editor was open. Open the action again."
                 }
-                val writes = if (row.svgModified) listOf(ProjectIconWrite(project, path, row.snapshot!!, row.activeChoice!!.asset))
+                val writes = if (row.svgModified) listOf(ProjectIconWrite(project, path, row.snapshot!!, row.ownChoice!!.asset))
                     else emptyList()
-                installed = ProjectIconStore.installAll(writes) { colorStore.apply(mapOf(path to row.colorChanges())) }[path]
+                installed = ProjectIconStore.installAll(writes) {
+                    SharedIconSettingsLock.withLock {
+                        val group = currentGroup()
+                        check(mode == "icon" || group == null) { "Colors are now inherited from ${group?.name}. Edit them in Project groups." }
+                        if (group == null && row.colorModified) colorStore.apply(mapOf(path to row.colorChanges()))
+                    }
+                }[path]
             }
             if (!success) {
                 row.snapshot?.let { ProjectIconStore.refreshUi(project, path, it) }
@@ -164,9 +176,12 @@ private fun appearanceChoices(): List<AppearanceChoice> {
     val app = ApplicationManager.getApplication()
     val current = app.getService(TabAppearanceSettings::class.java).state
     val enabled = current.enabled
+    val custom = if (current.preset == TabAppearancePreset.CUSTOM && current.userPresetId == null) current
+        else app.getService(LastCustomAppearanceSettings::class.java).state.appearance
+            ?: TabAppearanceState.defaults().asCustomAppearance()
     return TabAppearancePreset.entries.map { preset ->
         AppearanceChoice(preset.title, if (preset == TabAppearancePreset.CUSTOM)
-            (app.getService(LastCustomAppearanceSettings::class.java).state.appearance ?: TabAppearanceState.defaults().asCustomAppearance()).copy(enabled = enabled)
+            custom.copy(enabled = enabled)
             else TabAppearanceState.forPreset(preset, enabled).withGroupLayoutFrom(current))
     } + app.getService(UserAppearancePresets::class.java).state.presets.map {
         AppearanceChoice(it.name, it.appearance.copy(enabled = enabled, userPresetId = it.id))

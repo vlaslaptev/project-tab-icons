@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage
 import javax.swing.Icon
 
 internal data class IconColorRead(val color: Color? = null, val avatar: AvatarIcon? = null,
-                                  val artwork: Icon? = null)
+                                  val artwork: Icon? = null, val editableSvg: SvgAsset? = null)
 
 /** Ограниченное чтение только активного варианта; цвет avatar читается отдельно на EDT. */
 internal fun projectIconColor(delegate: Icon, unscaledSize: Int, path: Path, dark: Boolean): IconColorRead {
@@ -40,8 +40,8 @@ internal fun projectIconColor(delegate: Icon, unscaledSize: Int, path: Path, dar
         // Даже SVG без старого фона рисуем только из проверенной копии байтов.
         // Исходный ProjectFileIcon не используется в paint и больше не обходит очистку.
         val artwork = projectSvgIcon(asset, unscaledSize)
-        val color = (asset.textIcon?.colorHex ?: asset.builder?.colorHex)?.let(::parseIconColor) ?: sampleIconColor(data, true)
-        return IconColorRead(color = color, artwork = artwork)
+        val color = asset.editableColorHex?.let(::parseIconColor) ?: sampleIconColor(data, true)
+        return IconColorRead(color = color, artwork = artwork, editableSvg = asset.takeIf { it.editableColorHex != null })
     }
     return IconColorRead(color = sampleIconColor(data, false),
         artwork = projectPngIcon(data, unscaledSize))
@@ -49,7 +49,7 @@ internal fun projectIconColor(delegate: Icon, unscaledSize: Int, path: Path, dar
 
 /** IO-поток; используется также для цвета в таблице и предпросмотра выбранного SVG. */
 internal fun svgIconColor(asset: SvgAsset): Color? =
-    (asset.textIcon?.colorHex ?: asset.builder?.colorHex)?.let(::parseIconColor) ?: sampleIconColor(asset.bytes, true)
+    asset.editableColorHex?.let(::parseIconColor) ?: sampleIconColor(asset.bytes, true)
 
 internal fun sampleIconColor(data: ByteArray, svg: Boolean): Color? {
     // Отдельный экземпляр: offscreen-выбор цвета не сбрасывает HiDPI-кеш иконки вкладки.

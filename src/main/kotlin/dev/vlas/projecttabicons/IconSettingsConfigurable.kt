@@ -145,15 +145,7 @@ class IconSettingsConfigurable : Configurable, Configurable.NoScroll, Configurab
                 if (disposed || !loadingTask.accepts(token) || lifetime !== scope) return@invokeLater
                 result.fold(onSuccess = { loaded ->
                     val colors = ApplicationManager.getApplication().getService(ProjectOutlineColors::class.java)
-                    val active = loaded.rows.filterNot { it.target.project.isDisposed }.map { row ->
-                        // DeferredIcon может ещё показывать EmptyIcon. Цвет буквенного аватара
-                        // получаем из того же штатного источника на EDT, независимо от paintIcon.
-                        if (row.color == null && row.snapshot?.files?.isEmpty() == true) {
-                            row.copy(color = row.target.path?.let {
-                                ProjectWindowCustomizerService.getInstance().getRecentProjectIconColor(it).first
-                            })
-                        } else row
-                    }
+                    val active = loaded.rows.filterNot { it.target.project.isDisposed }.map { it.withResolvedAvatarColor() }
                     models.keys.retainAll(active.map { it.target.key }.toSet())
                     active.forEach { row ->
                         val overrides = row.target.path?.let(colors::overrides) ?: ProjectColorOverrides()
@@ -179,14 +171,15 @@ class IconSettingsConfigurable : Configurable, Configurable.NoScroll, Configurab
 
     private fun chooseIcon(row: ProjectIconSettingsRow) {
         val view = panel ?: return
-        if (!stillOpen(row) || row.inheritedGroup != null || !row.ready || row.conflicted) return
-        val initialColor = row.builder?.colorHex?.let(::parseIconColor) ?: row.color ?: COLOR_PRESETS.first().bright
+        if (!stillOpen(row) || !row.ready || row.conflicted) return
+        val initialColor = row.personalIconColor ?: COLOR_PRESETS.first().bright
         val expected = row.snapshot
+        val assigned = assignedIcons(view) ?: return
         val dialog = IconSelectionDialog(view.component, row.target.project, row.target.name, initialColor,
-            row.activeChoice, gallery + models.values.mapNotNull { it.activeChoice }, effectiveIconSets())
+            row.ownChoice, gallery + assigned, effectiveIconSets(), inheritedGroup = row.inheritedGroup)
         dialogs[dialog] = row.key
         try {
-            if (dialog.showAndGet() && stillOpen(row) && row.inheritedGroup == null) {
+            if (dialog.showAndGet() && stillOpen(row)) {
                 dialog.selection()?.let(row::choose)
                 pendingIconSets = pendingIconSets + dialog.importedSets()
                 view.showImportedCategories(pendingIconSets.size)
@@ -273,7 +266,8 @@ class IconSettingsConfigurable : Configurable, Configurable.NoScroll, Configurab
     private fun exportStyles() {
         val view = panel ?: return
         val sets = effectiveIconSets().toMutableList()
-        val textIcons = models.values.mapNotNull { it.activeChoice }.filter { it.asset.textIcon != null }
+        val assigned = assignedIcons(view) ?: return
+        val textIcons = assigned.filter { it.asset.textIcon != null }
             .distinctBy { it.asset.digest }.filter { icon -> sets.none { set -> set.icons.any { it.asset.digest == icon.asset.digest } } }
         if (textIcons.isNotEmpty()) {
             var name = "Text icons"
@@ -306,13 +300,25 @@ class IconSettingsConfigurable : Configurable, Configurable.NoScroll, Configurab
 
     private fun effectiveIconSets(): List<ImportedIconSet> = (iconSets + pendingIconSets).associateBy { it.id }.values.toList()
 
+    private fun assignedIcons(view: IconSettingsPanel): List<IconChoice>? {
+        val groups = view.projectGroups()
+        val groupIcons = groups.groups.map { it.icon }.distinct()
+        var choices = groupIcons.mapNotNull(GroupAppearanceIcons::choice)
+        if (choices.size != groupIcons.size && !transferWork("Loading group icons") {
+            val prepared = GroupAppearanceIcons.prepare(groups)
+            choices = groupIcons.map { prepared.getValue(it).choice }
+        }) return null
+        return models.values.mapNotNull { it.ownChoice } + choices
+    }
+
     private fun chooseGroupIcon(id: String) {
         val view = panel ?: return
         val group = view.projectGroups().groups.firstOrNull { it.id == id } ?: return
+        val assigned = assignedIcons(view) ?: return
         val choice = GroupAppearanceIcons.choice(group.icon) ?: return
         val dialog = IconSelectionDialog(view.component, project, "Group: ${group.name}",
             choice.color ?: COLOR_PRESETS.first().bright, choice,
-            gallery + models.values.mapNotNull { it.activeChoice }, effectiveIconSets())
+            gallery + assigned, effectiveIconSets())
         dialogs[dialog] = "group:$id"
         try {
             if (!dialog.showAndGet() || disposed) return

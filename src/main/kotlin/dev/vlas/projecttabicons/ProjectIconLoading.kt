@@ -1,5 +1,6 @@
 package dev.vlas.projecttabicons
 
+import com.intellij.ide.ProjectWindowCustomizerService
 import com.intellij.ide.RecentProjectsManagerBase
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.progress.ProcessCanceledException
@@ -49,11 +50,18 @@ internal fun loadProjectIcon(target: OpenProjectIconTarget, dark: Boolean): Load
                 val image = projectPngIcon(snapshot.files.getValue(file), 24)
                 target.copy(preview = (target.preview as? CenteredProjectIcon)?.withArtwork(image) ?: image)
             } else target
-            LoadedProjectIcon(prepared, snapshot, svg?.let { IconChoice(it, color) }, color)
+            LoadedProjectIcon(prepared, snapshot, svg?.let { IconChoice(it, color) }, color, darkTheme = dark)
         } catch (error: ProcessCanceledException) {
             throw error
         } catch (error: Exception) {
             LoadedProjectIcon(target, null, null, null, error.message ?: "Cannot read this project's icon.")
         }
     }
+
+/** На EDT получаем цвет инициалов, даже когда DeferredIcon ещё не готов. */
+internal fun LoadedProjectIcon.withResolvedAvatarColor(): LoadedProjectIcon {
+    val path = target.path ?: return this
+    if (color != null || snapshot == null || snapshot.currentFile(darkTheme) != null) return this
+    return copy(color = ProjectWindowCustomizerService.getInstance().getRecentProjectIconColor(path).first)
+}
 

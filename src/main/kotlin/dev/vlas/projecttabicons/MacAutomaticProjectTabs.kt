@@ -4,6 +4,7 @@ import com.intellij.ide.AppLifecycleListener
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.application.ModalityStateListener
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
@@ -56,7 +57,10 @@ class MacProjectTabsApplicationListener : AppLifecycleListener {
 /** Only a new project requests a join. Refresh, switching tabs and detaching do not. */
 @Service(Service.Level.APP)
 internal class MacAutomaticProjectTabs : Disposable {
-    private data class Request(val revision: Long, val candidates: List<Project>, val deadline: Long)
+    private class Request(val revision: Long, val candidates: List<Project>) {
+        val createdAt = System.nanoTime()
+        @Volatile var deadline = createdAt + 10_000_000_000L
+    }
     private val settings = service<ProjectWindowOpeningSettings>()
     private val session = service<MacProjectOpeningSession>()
     private val recentFrames = mutableListOf<IdeFrameImpl>()
@@ -68,6 +72,7 @@ internal class MacAutomaticProjectTabs : Disposable {
         else SwingUtilities.invokeLater { if (!disposed) rememberFocus() }
     }
     @Volatile private var disposed = false
+    @Volatile private var modalStartedAt: Long? = null
     private var joining = false
 
     // Resolve both hooks before touching a native group. The supported SDK is 262.
@@ -84,7 +89,15 @@ internal class MacAutomaticProjectTabs : Disposable {
 
     init {
         focusManager.addPropertyChangeListener("activeWindow", focusListener)
-        ApplicationManager.getApplication().messageBus.connect(this).subscribe(ProjectManager.TOPIC, object : ProjectManagerListener {
+        val connection = ApplicationManager.getApplication().messageBus.connect(this)
+        connection.subscribe(ModalityStateListener.TOPIC, object : ModalityStateListener {
+            override fun beforeModalityStateChanged(entering: Boolean, modalEntity: Any) {
+                if (entering) pauseForModality()
+                else SwingUtilities.invokeLater { resumeAfterModality() }
+            }
+        })
+        if (ModalityState.current() != ModalityState.nonModal()) pauseForModality()
+        connection.subscribe(ProjectManager.TOPIC, object : ProjectManagerListener {
             override fun projectClosed(project: Project) {
                 session.projectClosed(project)
                 pending.remove(project)
@@ -115,7 +128,7 @@ internal class MacAutomaticProjectTabs : Disposable {
             val frames = openFrames().filterValues { it !== project }
             val candidates = (recentFrames.mapNotNull(frames::get) + frames.values).distinct()
             if (candidates.isNotEmpty()) {
-                pending[project] = Request(settings.revision, candidates, System.nanoTime() + 10_000_000_000L)
+                pending[project] = Request(settings.revision, candidates)
                 timer.start()
             }
         }
@@ -124,10 +137,25 @@ internal class MacAutomaticProjectTabs : Disposable {
 
     private fun valid(project: Project, request: Request): Boolean = !disposed && !project.isDisposed &&
         !ApplicationManager.getApplication().isExitInProgress && request.revision == settings.revision &&
-        settings.state.automaticallyOpenInTabsOnMac && System.nanoTime() < request.deadline
+        settings.state.automaticallyOpenInTabsOnMac && modalStartedAt == null && System.nanoTime() < request.deadline
+
+    private fun pauseForModality() {
+        if (modalStartedAt == null) modalStartedAt = System.nanoTime()
+    }
+
+    private fun resumeAfterModality() {
+        if (disposed || ModalityState.current() != ModalityState.nonModal()) return
+        val started = modalStartedAt ?: return
+        val now = System.nanoTime()
+        // Nested dialogs form one pause; requests created inside it get only their own wait back.
+        pending.values.forEach { it.deadline += now - maxOf(started, it.createdAt) }
+        modalStartedAt = null
+    }
 
     private fun joinNext() {
-        if (joining || ModalityState.current() != ModalityState.nonModal()) return
+        if (ModalityState.current() != ModalityState.nonModal()) { pauseForModality(); return }
+        resumeAfterModality()
+        if (joining) return
         pending.entries.removeAll { !valid(it.key, it.value) }
         val (project, request) = pending.entries.firstOrNull() ?: run { timer.stop(); return }
         val frames = openFrames()

@@ -18,6 +18,14 @@ local.properties
 private-evidence/
 /artifacts/
 /docs/
+/releases/
+
+# Local examples and superseded README captures; retained on disk for reference.
+/assets/examples/
+/assets/readme/captures/windows-settings-0.4.13.png
+/assets/readme/captures/windows-tabs-0.4.13.png
+/assets/readme/group-decorations.png
+/assets/readme/group-outline.png
 
 # Local agent instructions and private VM connection notes.
 AGENTS.md

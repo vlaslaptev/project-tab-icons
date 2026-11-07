@@ -19,6 +19,7 @@ internal data class LoadedProjectIcon(
     val choice: IconChoice?,
     val color: Color?,
     val failure: String? = null,
+    val darkTheme: Boolean = false,
 )
 
 /** Черновик строки: до Apply не изменяются ни SVG, ни независимые цвета проекта. */
@@ -29,6 +30,7 @@ internal class ProjectIconSettingsRow(loaded: LoadedProjectIcon, overrides: Proj
         private set
     var current = loaded.choice
         private set
+    private var darkTheme = loaded.darkTheme
     private var currentColor = loaded.color
     var failure = loaded.failure
         private set
@@ -38,7 +40,8 @@ internal class ProjectIconSettingsRow(loaded: LoadedProjectIcon, overrides: Proj
     private var choiceDraft: IconChoice? = null
     var inheritedGroup: ProjectTabGroup? = null
         private set
-    private var inheritedChoice: IconChoice? = null
+    var inheritedColors: ProjectColorOverrides? = null
+        private set
     var inheritedModified = false
         private set
     var conflicted = false
@@ -62,22 +65,23 @@ internal class ProjectIconSettingsRow(loaded: LoadedProjectIcon, overrides: Proj
     val modified: Boolean get() = svgModified || colorModified
     fun colorModified(target: ProjectColorTarget): Boolean =
         colorOverrides.value(target) != colorBaseline.value(target) ||
-            (target == ProjectColorTarget.ICON && (builder != null || textIcon != null) && choiceDraft != null && choiceDraft?.color != current?.color)
+            (target == ProjectColorTarget.ICON && inheritedGroup == null && (builder != null || textIcon != null) &&
+                choiceDraft != null && choiceDraft?.color != current?.color)
     val ownChoice: IconChoice? get() = choiceDraft ?: current
-    val activeChoice: IconChoice? get() = inheritedChoice ?: ownChoice
-    val builder: BuilderSelection? get() = activeChoice?.asset?.builder
-    val textIcon: TextIconSpec? get() = activeChoice?.asset?.textIcon
-    val automaticIcon: Boolean get() = activeChoice == null && snapshot?.files?.isEmpty() == true
+    val builder: BuilderSelection? get() = ownChoice?.asset?.builder
+    val textIcon: TextIconSpec? get() = ownChoice?.asset?.textIcon
+    val activeFile: String? get() = snapshot?.currentFile(darkTheme)
+    val automaticIcon: Boolean get() = ownChoice == null && snapshot != null && activeFile == null
     val editableIconColor: Boolean get() = builder != null || textIcon != null || automaticIcon
-    val sourceColor: Color? get() = if (inheritedChoice != null) inheritedChoice?.color else
-        if (choiceDraft != null) choiceDraft?.color else current?.color ?: currentColor
-    val color: Color? get() = if (automaticIcon) colorOverrides.icon ?: sourceColor else sourceColor
-    val outlineColor: Color? get() = if (inheritedGroup != null) parseIconColor(inheritedGroup!!.outlineColor) ?: color else colorOverrides.outline ?: color
-    val tabColor: Color? get() = if (inheritedGroup != null) parseIconColor(inheritedGroup!!.tabColor) ?: color else colorOverrides.tab ?: color
+    val sourceColor: Color? get() = if (choiceDraft != null) choiceDraft?.color else current?.color ?: currentColor
+    val personalIconColor: Color? get() = if (automaticIcon) colorOverrides.icon ?: sourceColor else sourceColor
+    val color: Color? get() = if (editableIconColor) inheritedColors?.icon ?: personalIconColor else sourceColor
+    val outlineColor: Color? get() = if (inheritedGroup != null) inheritedColors?.outline else colorOverrides.outline ?: color
+    val tabColor: Color? get() = if (inheritedGroup != null) inheritedColors?.tab else colorOverrides.tab ?: color
 
     fun inherit(group: ProjectTabGroup?, changed: Boolean = false) {
         inheritedGroup = group
-        inheritedChoice = group?.let { GroupAppearanceIcons.choice(it.icon) }
+        inheritedColors = group?.memberColors()
         inheritedModified = changed
     }
 
@@ -87,7 +91,7 @@ internal class ProjectIconSettingsRow(loaded: LoadedProjectIcon, overrides: Proj
         ProjectColorTarget.TAB -> tabColor
     }
 
-    fun previewIcon(avatarColor: Color? = colorOverrides.icon,
+    fun previewIcon(avatarColor: Color? = inheritedColors?.icon ?: colorOverrides.icon,
                     initials: TabIconInitials = DEFAULT_ICON_INITIALS,
                     letterWeight: TabIconLetterWeight = TabIconLetterWeight.BOLD): Icon? =
         if (automaticIcon) (target.preview as? CenteredProjectIcon)
@@ -95,19 +99,20 @@ internal class ProjectIconSettingsRow(loaded: LoadedProjectIcon, overrides: Proj
         else target.preview
 
     fun choose(value: IconChoice) {
-        check(inheritedGroup == null) { "Edit this project's group appearance instead." }
         // Явное назначение также объединяет light/dark варианты в один SVG.
         val variants = snapshot?.files?.keys.orEmpty().any { it != "icon.svg" }
         choiceDraft = value.takeIf { it.asset.digest != current?.asset?.digest || variants }
         // Автоматические цвета следуют новой иконке; ручные outline/tab не сбрасываются.
-        colorOverrides = colorOverrides.copy(icon = null)
+        if (inheritedGroup == null) colorOverrides = colorOverrides.copy(icon = null)
     }
 
     fun changeColor(target: ProjectColorTarget, value: Color?) {
         check(inheritedGroup == null) { "Edit this project's group appearance instead." }
         if (target == ProjectColorTarget.ICON && textIcon != null) {
             val selected = requireNotNull(value) { "Choose an icon color." }
-            choose(IconChoice(requireNotNull(textIcon).copy(colorHex = selected.hex()).asset(), selected))
+            val source = requireNotNull(ownChoice).asset
+            val tinted = source.withTextColor(selected)
+            if (tinted !== source) choose(IconChoice(tinted, selected))
         } else if (target == ProjectColorTarget.ICON && builder != null) {
             val generated = requireNotNull(builder)
             val selected = requireNotNull(value) { "Choose an icon color." }
@@ -122,6 +127,7 @@ internal class ProjectIconSettingsRow(loaded: LoadedProjectIcon, overrides: Proj
     }
 
     fun reload(loaded: LoadedProjectIcon, overrides: ProjectColorOverrides, keepDraft: Boolean) {
+        darkTheme = loaded.darkTheme
         if (!keepDraft) {
             target = loaded.target
             snapshot = loaded.snapshot

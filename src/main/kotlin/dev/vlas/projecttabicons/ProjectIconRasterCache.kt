@@ -19,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
+import java.awt.Color
 import java.awt.Component
 import java.awt.Graphics
 import java.awt.Graphics2D
@@ -27,8 +28,12 @@ import javax.swing.CellRendererPane
 import javax.swing.Icon
 import javax.swing.SwingUtilities
 
-internal fun projectSvgIcon(asset: SvgAsset, size: Int): Icon = PreparedProjectIcon(asset.digest, true, size) {
-    asset.tabArtwork() ?: asset.bytes
+internal fun projectSvgIcon(asset: SvgAsset, size: Int, tint: Color? = null): Icon {
+    val tintHex = if (asset.editableColorHex != null) tint?.hex()?.takeUnless { it == asset.editableColorHex } else null
+    val key = if (tintHex == null) asset.digest else "${asset.digest}:$tintHex"
+    return PreparedProjectIcon(key, true, size) {
+        if (tintHex != null) asset.tabArtwork(tintHex) else asset.tabArtwork() ?: asset.bytes
+    }
 }
 
 internal fun projectPngIcon(bytes: ByteArray, size: Int): Icon = PreparedProjectIcon(sha256(bytes), false, size) { bytes }

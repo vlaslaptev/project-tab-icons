@@ -375,6 +375,7 @@ internal class IconSettingsPanel(
     }
 
     fun loading() {
+        exportStylesButton.isEnabled = false
         status.foreground = UIUtil.getContextHelpForeground()
         status.text = "Loading open projects…"
         status.toolTipText = status.text
@@ -382,12 +383,14 @@ internal class IconSettingsPanel(
 
     fun loaded(value: List<ProjectIconSettingsRow>, artwork: PreviewArtwork) {
         rows = value
+        exportStylesButton.isEnabled = true
         preview.showArtwork(artwork)
         refreshRows()
     }
 
     fun refreshRows() {
         projectTable.showRows(rows, appearance())
+        preview.showGroup(groups.previewGroup)
         updateStatus()
     }
 
@@ -406,8 +409,8 @@ internal class IconSettingsPanel(
             presets.presetsModified -> "User presets edited · Save with Apply"
             presets.customModified -> "Custom appearance edited · Save with Apply"
             !pluginEnabled.isSelected -> "Tab customization is disabled."
-            selectedSection == "Projects" -> "Grouped projects inherit icons and colors · Use Edit group to change them."
-            selectedSection == "Project groups" -> "Group icons and colors are inherited by all members."
+            selectedSection == "Projects" -> "Choose a project icon here. Use Edit group to change inherited colors."
+            selectedSection == "Project groups" -> "Set the shared group icon and the colors used by its members."
             else -> "Preview changes here · Save with Apply"
         }
         status.toolTipText = status.text

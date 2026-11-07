@@ -37,7 +37,10 @@ internal class StyleBundleDialog(parent: JComponent, private val bundle: StyleBu
             add(conflicts, BorderLayout.CENTER)
         }, BorderLayout.SOUTH)
     }
-    override fun doValidate(): ValidationInfo? = if (selected().empty) ValidationInfo("Select at least one item.") else null
+    override fun doValidate(): ValidationInfo? = try {
+        validateStyleBundleLimits(selected())
+        null
+    } catch (error: IllegalArgumentException) { ValidationInfo(error.message ?: "Choose fewer items.") }
     fun selected() = StyleBundle(presets.filter { it.second.isSelected }.map { it.first }, categories.filter { it.second.isSelected }.map { it.first })
     fun conflict() = conflicts.selectedItem as StyleConflict
 }

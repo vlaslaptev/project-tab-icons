@@ -37,6 +37,8 @@ internal class ProjectGroupsPanel(
     private var baseline = ProjectGroupsState()
     var draft = baseline
         private set
+    private var lastEditedGroupId: String? = null
+    val previewGroup: ProjectTabGroup? get() = draft.groups.firstOrNull { it.id == lastEditedGroupId } ?: draft.groups.firstOrNull()
     private var filterId: String? = null
     private var syncingFilter = false
     private var editingEnabled = true
@@ -116,6 +118,7 @@ internal class ProjectGroupsPanel(
         projectKeys.filter { it in editableKeys }.forEach { memberships[it] = group.id }
         draft = draft.copy(groups = if (id == null) draft.groups + group else draft.groups.map { if (it.id == id) group else it },
             memberships = memberships).normalized()
+        lastEditedGroupId = group.id
         selected.clear()
         changed()
         return null
@@ -131,6 +134,7 @@ internal class ProjectGroupsPanel(
         val available = allRows.filter { it.target.path != null && !it.target.project.isDisposed && it.key in keys }
         if (available.isEmpty()) return
         draft = draft.copy(memberships = draft.memberships.toMutableMap().apply { available.forEach { put(it.key, id) } }).normalized()
+        lastEditedGroupId = id
         changed()
     }
     private fun memberOptions(id: String): List<ProjectGroupMemberOption> = allRows
@@ -170,8 +174,7 @@ internal class ProjectGroupsPanel(
         allRows.forEach { row ->
             val group = draft.groupFor(row.key)
             val saved = baseline.groupFor(row.key)
-            row.inherit(group, group?.id != saved?.id || group?.icon != saved?.icon ||
-                group?.outlineColor != saved?.outlineColor || group?.tabColor != saved?.tabColor)
+            row.inherit(group, group?.id != saved?.id || group?.memberColors() != saved?.memberColors())
         }
         table.showGroups(draft, baseline, allRows)
         memberDialog?.let { (id, dialog) ->
@@ -204,6 +207,7 @@ internal class ProjectGroupsPanel(
             "Group icons can use up to 16 MiB in total. Choose a smaller SVG."
         }
         draft = draft.copy(groups = groups)
+        lastEditedGroupId = id
         changed()
     }
     fun updateRows(rows: List<ProjectIconSettingsRow>) {

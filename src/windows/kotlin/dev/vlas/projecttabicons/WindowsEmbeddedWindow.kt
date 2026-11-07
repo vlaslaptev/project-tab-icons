@@ -19,12 +19,16 @@ import java.awt.GraphicsConfiguration
 import java.awt.Rectangle
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.awt.event.ContainerAdapter
+import java.awt.event.ContainerEvent
 import java.awt.geom.AffineTransform
+import java.lang.reflect.Method
 import java.util.IdentityHashMap
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
 
-internal class EmbeddedProjectWindow(val frame: IdeFrameImpl, val project: Project, private val shell: JFrame) {
+internal class EmbeddedProjectWindow(val frame: IdeFrameImpl, val project: Project, private val shell: JFrame,
+                                     private val headerChanged: () -> Unit) {
     private val user32 = User32.INSTANCE
     private val hwnd = HWND(Native.getComponentPointer(frame))
     private val originalParent = user32.GetParent(hwnd)
@@ -42,6 +46,14 @@ internal class EmbeddedProjectWindow(val frame: IdeFrameImpl, val project: Proje
     private var layoutConfiguration: GraphicsConfiguration? = null
     private val titleBars = IdentityHashMap<CustomTitleBar, Any?>()
     private val headerListeners = IdentityHashMap<Component, MouseAdapter>()
+    private val headerBars = IdentityHashMap<Component, CustomTitleBar>()
+    private val headerContainers = identitySet<Container>()
+    private var headerStructureChanged = true
+    private val headerStructureListener = object : ContainerAdapter() {
+        private fun changed() { headerStructureChanged = true; headerChanged() }
+        override fun componentAdded(event: ContainerEvent) = changed()
+        override fun componentRemoved(event: ContainerEvent) = changed()
+    }
     private val systemMenus = IdentityHashMap<Component, WindowsSystemMenuBridge>()
     var lastFocus: Component? = frame.mostRecentFocusOwner
         private set
@@ -80,12 +92,12 @@ internal class EmbeddedProjectWindow(val frame: IdeFrameImpl, val project: Proje
         // SDK 262 installs the frame title directly in IdeRootPane.layeredPane.
         // Never walk the editor/tool-window content tree on the reconciliation timer.
         val headers = frame.rootPane.layeredPane.components.filter { it.javaClass.name.contains("customFrameDecorations.header") }
-        val currentComponents = identitySet<Component>()
         val currentBars = identitySet<CustomTitleBar>()
+        val currentHeaders = IdentityHashMap<Component, CustomTitleBar>()
         headers.forEach { header ->
-            val getter = header.javaClass.methods.firstOrNull { it.name == "getCustomTitleBar" && it.parameterCount == 0 }
-                ?: return@forEach
+            val getter = titleBarGetters.get(header.javaClass) ?: return@forEach
             val bar = getter.invoke(header) as? CustomTitleBar ?: return@forEach
+            currentHeaders[header] = bar
             currentBars.add(bar)
             systemMenus.getOrPut(header) { WindowsSystemMenuBridge(header, shell) }.update()
             if (!titleBars.containsKey(bar)) titleBars[bar] = bar.properties["controls.visible"]
@@ -95,26 +107,43 @@ internal class EmbeddedProjectWindow(val frame: IdeFrameImpl, val project: Proje
                 frame.rootPane.revalidate()
                 header.repaint()
             }
-            // A caption gesture must not drag/maximize a child HWND inside the canvas.
-            // These listeners do not consume events or replace any IDE menu listeners.
-            children(header).forEach { component ->
-                currentComponents.add(component)
-                if (headerListeners.containsKey(component)) return@forEach
-                val listener = object : MouseAdapter() {
-                    private fun hit() = bar.forceHitTest(true)
-                    override fun mousePressed(e: MouseEvent) = hit()
-                    override fun mouseReleased(e: MouseEvent) = hit()
-                    override fun mouseClicked(e: MouseEvent) = hit()
-                    override fun mouseEntered(e: MouseEvent) = hit()
-                    override fun mouseMoved(e: MouseEvent) = hit()
-                    override fun mouseDragged(e: MouseEvent) = hit()
-                }
-                component.addMouseListener(listener)
-                component.addMouseMotionListener(listener)
-                headerListeners[component] = listener
-            }
         }
-        headerListeners.keys.filter { it !in currentComponents }.forEach(::removeHeaderListener)
+        val barsChanged = currentHeaders.size != headerBars.size || currentHeaders.any { (header, bar) -> headerBars[header] !== bar }
+        if (headerStructureChanged || barsChanged || frame.rootPane.layeredPane !in headerContainers) {
+            // Rewalk headers only after structural changes, including replacement of a title bar.
+            if (barsChanged) headerListeners.keys.toList().forEach(::removeHeaderListener)
+            val currentComponents = identitySet<Component>()
+            val currentContainers = identitySet<Container>().apply { add(frame.rootPane.layeredPane) }
+            currentHeaders.forEach { (header, bar) ->
+                // A caption gesture must not drag/maximize a child HWND inside the canvas.
+                // These listeners do not consume events or replace any IDE menu listeners.
+                children(header).forEach componentLoop@ { component ->
+                    currentComponents.add(component)
+                    if (component is Container) currentContainers.add(component)
+                    if (headerListeners.containsKey(component)) return@componentLoop
+                    val listener = object : MouseAdapter() {
+                        private fun hit() = bar.forceHitTest(true)
+                        override fun mousePressed(e: MouseEvent) = hit()
+                        override fun mouseReleased(e: MouseEvent) = hit()
+                        override fun mouseClicked(e: MouseEvent) = hit()
+                        override fun mouseEntered(e: MouseEvent) = hit()
+                        override fun mouseMoved(e: MouseEvent) = hit()
+                        override fun mouseDragged(e: MouseEvent) = hit()
+                    }
+                    component.addMouseListener(listener)
+                    component.addMouseMotionListener(listener)
+                    headerListeners[component] = listener
+                }
+            }
+            headerListeners.keys.filter { it !in currentComponents }.forEach(::removeHeaderListener)
+            headerContainers.filter { it !in currentContainers }.forEach { it.removeContainerListener(headerStructureListener) }
+            currentContainers.filter { it !in headerContainers }.forEach { it.addContainerListener(headerStructureListener) }
+            headerContainers.clear()
+            headerContainers.addAll(currentContainers)
+            headerBars.clear()
+            headerBars.putAll(currentHeaders)
+            headerStructureChanged = false
+        }
         systemMenus.keys.filter { it !in headers }.forEach { systemMenus.remove(it)?.close() }
         titleBars.keys.filter { it !in currentBars }.forEach { bar -> bar.putProperty("controls.visible", titleBars.remove(bar)) }
     }
@@ -127,6 +156,10 @@ internal class EmbeddedProjectWindow(val frame: IdeFrameImpl, val project: Proje
     }
 
     private fun restoreHeader() {
+        headerContainers.forEach { it.removeContainerListener(headerStructureListener) }
+        headerContainers.clear()
+        headerBars.clear()
+        headerStructureChanged = true
         systemMenus.values.forEach { it.close() }
         systemMenus.clear()
         headerListeners.keys.toList().forEach(::removeHeaderListener)
@@ -233,6 +266,10 @@ internal class EmbeddedProjectWindow(val frame: IdeFrameImpl, val project: Proje
 
     companion object {
         private val LOG = Logger.getInstance(EmbeddedProjectWindow::class.java)
+        private val titleBarGetters = object : ClassValue<Method?>() {
+            override fun computeValue(type: Class<*>): Method? =
+                type.methods.firstOrNull { it.name == "getCustomTitleBar" && it.parameterCount == 0 }
+        }
         private fun handle(window: HWND?): Long = Pointer.nativeValue(window?.pointer)
     }
 }

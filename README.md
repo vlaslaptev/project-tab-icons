@@ -6,8 +6,8 @@ Editor file tabs keep their usual appearance.
 
 ## Installation
 
-- [macOS ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.16/project-tab-icons-0.4.16-macos.zip)
-- [Windows ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.16/project-tab-icons-0.4.16-windows.zip) [![Beta](assets/readme/windows-beta.svg)](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.16/project-tab-icons-0.4.16-windows.zip)
+- [macOS ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.20/project-tab-icons-0.4.20-macos.zip)
+- [Windows ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.20/project-tab-icons-0.4.20-windows.zip) [![Beta](assets/readme/windows-beta.svg)](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.20/project-tab-icons-0.4.20-windows.zip)
 
 1. Open **Settings → Plugins → ⚙ → Install Plugin from Disk…** and select the downloaded ZIP.
 2. Open several projects in separate windows, then use **Window → Merge All Project Windows**.
@@ -94,13 +94,21 @@ highlighting, shared icons, spacing and pipes. Group membership, individual proj
 icons and colors, and the global customization switch stay unchanged.
 The reset remains a draft until you click Apply; Cancel discards it.
 
-## One group. One shared style.
+## Project icons and group colors
 
-Create and edit groups in **Project groups**. Assign an icon, icon color, outline color
-and tab color to the group; members inherit them, including projects added later.
-In **Projects**, **Inherited from …** explains the source and **Edit group** opens
-the matching group. Inherited values stay readable. **Ungroup** restores each
-project's personal styling.
+Choose each project's icon in **Projects**, including projects in a group.
+In **Project groups**, choose the group's shared icon and its colors.
+For example, a green group can show a folder before its first tab, a notebook on
+one project and initials on another. **Colors inherited from …** identifies the
+group, and **Edit group** opens its settings.
+
+Members inherit the group's outline and fill. **Automatic** uses the group icon color.
+If the icon has no detectable color, the shared highlight uses the theme's neutral
+color wherever **Automatic** is selected. You can still set the outline and fill separately.
+Initials, built-in shapes and text icons use the group icon color on tabs. Custom SVG and PNG
+artwork keeps its original palette. **Ungroup** shows the project's own colors again.
+The Appearance preview uses sample projects and shows the colors and shared icon of
+the last group edited on this page, or the first group when you open Settings.
 
 ![Shared presets, Project groups navigation, table header and Add group in 0.3.120](assets/readme/captures/groups-settings.png)
 
@@ -128,7 +136,7 @@ to put a project first within its group. Manual rearrangement remains available;
 and arranges the tabs; it is also available in **Tools → Project Tab Icons**. A manually split group's shared
 decoration stays hidden until **Arrange Tabs by Group** succeeds. Moving the tabs
 back manually, applying settings, merging windows again or restarting the IDE does
-not restore that decoration. Members keep their inherited project styling.
+not restore that decoration. Members keep their personal icons and inherited colors.
 
 ## 100+ shapes. Your colors.
 
@@ -172,7 +180,8 @@ a leading ellipsis. The full branch remains available in the tooltip.
 
 Use **Tools → Project Tab Icons** or **Find Action** for current-project styling,
 preset switching and Settings. View or change shortcuts in **Settings → Keymap**.
-For a grouped project, edit its inherited icon and colors in **Project groups**.
+For a grouped project, use **Change Project Tab Icon…** to choose its icon.
+Edit its inherited colors in **Project groups**.
 
 **Save as new preset** creates a new named style on Windows and macOS.
 Editing a saved preset leaves the original intact. **Manage user presets…** in the
@@ -181,7 +190,7 @@ saved presets. Use unique names of up to **32 characters**. Preset changes are s
 with Apply; Cancel discards the draft.
 
 **Import styles… / Export styles…** shares selected presets, SVG categories and
-editable text icons as JSON, up to **24 MiB**, with **Keep both / Replace matching
+editable text icons from projects and groups as JSON, up to **24 MiB**, with **Keep both / Replace matching
 names / Skip matching names** choices. Names are trimmed before conflicts are
 resolved. An invalid import leaves the draft unchanged. Project paths and group
 memberships stay local.
@@ -198,10 +207,10 @@ the same section, it reports a conflict and keeps your draft. Use the settings p
 
 ## Windows support — Beta
 
-[![Beta](assets/readme/windows-beta.svg)](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.16/project-tab-icons-0.4.16-windows.zip)
+[![Beta](assets/readme/windows-beta.svg)](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.20/project-tab-icons-0.4.20-windows.zip)
 
 The Windows package is in **beta** and targets IntelliJ IDEA **2026.2.3–2026.2.x**.
-Install the [Windows ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.16/project-tab-icons-0.4.16-windows.zip)
+Install the [Windows ZIP](https://github.com/vlaslaptev/project-tab-icons/releases/download/v0.4.20/project-tab-icons-0.4.20-windows.zip)
 from disk, then use **Window → Merge All Project Windows** to place projects in
 one window. You can also enable **Automatically open projects in tabs** in the
 plugin settings. The macOS package remains separate.

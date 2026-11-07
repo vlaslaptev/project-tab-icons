@@ -27,7 +27,7 @@ import javax.swing.KeyStroke
 import javax.swing.Icon
 import javax.swing.JPanel
 
-internal typealias PreviewArtwork = Map<String, Map<TabIconSize, Icon>>
+internal typealias PreviewArtwork = Map<String, SvgAsset>
 
 private data class PreviewSample(val title: String, val path: String, val branch: String,
                                  val contourId: String?, val color: Color,
@@ -38,6 +38,7 @@ internal enum class PreviewTabCount(val title: String) {
 }
 
 private val PREVIEW_GROUP_COLOR = Color(0xC084FC)
+private val PREVIEW_GROUP_PALETTE = ProjectColorOverrides(PREVIEW_GROUP_COLOR, PREVIEW_GROUP_COLOR, PREVIEW_GROUP_COLOR)
 private val PREVIEW_SAMPLES = listOf(
     PreviewSample("Frontend", "~/web", "feature/improve-project-tabs", "globe-simple", Color(0x60A5FA), groupMember = true),
     PreviewSample("Backend", "~/api", "feature/WASD-3245", null, PREVIEW_GROUP_COLOR, groupMember = true),
@@ -54,7 +55,9 @@ internal class WindowTabsPreview : JPanel(null) {
     private var appearance = TabAppearanceState.defaults()
     private var palette = theme.palette()
     private val groupSeparator = ProjectTabGroupSeparator()
-    private var groupArtwork = emptyMap<TabIconSize, Icon>()
+    private var groupArtwork: SvgAsset? = null
+    private var groupPalette = PREVIEW_GROUP_PALETTE
+    private var groupSurfaceColors = groupPalette.groupSurfaceColors(palette.groupSeparatorColor)
     private var groupIcon: Icon? = null
     private var groupIconSlot = 0
     private var tabCount = PreviewTabCount.THREE
@@ -147,14 +150,14 @@ internal class WindowTabsPreview : JPanel(null) {
             val right = edge + groupIconSlot + tabSpace * (index + 1) / sampleTabs.size + groupOffset
             tab.setBounds(left, top, right - left, actualHeight)
         }
-        val shared = appearance.enabled && appearance.showGroupOutline
+        val shared = groupSurfaceColors.takeIf { appearance.enabled && appearance.showGroupOutline }
         val geometry = groupSurfaceGeometry()
         val bounds = geometry.bounds
         sampleTabs.forEachIndexed { index, tab ->
-            tab.setGroupSurface(if (shared && samples[index].groupMember) ProjectTabGroupSurfaceState(appearance,
+            tab.setGroupSurface(if (shared != null && samples[index].groupMember) ProjectTabGroupSurfaceState(appearance,
                 geometry.copy(bounds = Rectangle2D.Double(bounds.x - tab.x, bounds.y - tab.y, bounds.width, bounds.height)),
                 Rectangle2D.Double(0.0, 0.0, tab.width.toDouble(), tab.height.toDouble()),
-                ProjectTabGroupColors(PREVIEW_GROUP_COLOR, PREVIEW_GROUP_COLOR),
+                shared,
                 index == 0, index == groupTabCount - 1, selectedIndex == index + 1) else null)
             tab.doLayout()
         }
@@ -194,7 +197,7 @@ internal class WindowTabsPreview : JPanel(null) {
                     val state = ProjectTabGroupSurfaceState(appearance,
                         geometry.copy(bounds = Rectangle2D.Double(bounds.x - left, bounds.y - first.y, bounds.width, bounds.height)),
                         Rectangle2D.Double(groupIconSlot.toDouble(), 0.0, first.width.toDouble(), first.height.toDouble()),
-                        ProjectTabGroupColors(PREVIEW_GROUP_COLOR, PREVIEW_GROUP_COLOR),
+                        groupSurfaceColors,
                         true, false, selectedIndex == 1)
                     ProjectTabGroupSurface.paint(prefix, groupIconSlot, first.height, state,
                         first.surfaceColors(), selectedIndex == 0, first.isPreviewHovered())
@@ -217,8 +220,8 @@ internal class WindowTabsPreview : JPanel(null) {
                     (first.height - first.insets.top - first.insets.bottom - icon.iconHeight) / 2)
                 if (appearance.showGroupSeparator) {
                     val next = sampleTabs[groupTabCount]
-                    val color = if (appearance.groupSeparatorColor == GroupSeparatorColor.GROUP) PREVIEW_GROUP_COLOR
-                        else palette.groupSeparatorColor
+                    val color = if (appearance.groupSeparatorColor == GroupSeparatorColor.GROUP)
+                        groupPalette.outline ?: palette.groupSeparatorColor else palette.groupSeparatorColor
                     groupSeparator.paint(g, (last.x + last.width + next.x) / 2.0, first.y.toDouble(), first.height,
                         appearance.groupSeparatorThickness, appearance.groupSeparatorHeight, color)
                 }
@@ -249,8 +252,16 @@ internal class WindowTabsPreview : JPanel(null) {
 
     fun showArtwork(artwork: PreviewArtwork) {
         this.artwork = artwork
-        groupArtwork = artwork[PREVIEW_GROUP_ARTWORK].orEmpty()
         sampleTabs.forEach { it.showArtwork(artwork) }
+        showAppearance(appearance)
+    }
+
+    fun showGroup(group: ProjectTabGroup?) {
+        val choice = group?.let { GroupAppearanceIcons.choice(it.icon) }
+        val colors = group?.memberColors(choice) ?: PREVIEW_GROUP_PALETTE
+        if (groupArtwork === choice?.asset && groupPalette == colors) return
+        groupArtwork = choice?.asset
+        groupPalette = colors
         showAppearance(appearance)
     }
 
@@ -261,13 +272,15 @@ internal class WindowTabsPreview : JPanel(null) {
             rendered.tabHeight.coerceIn(DEFAULT_TAB_HEIGHT, MAX_TAB_HEIGHT)
         } else DEFAULT_TAB_HEIGHT
         palette = theme.palette()
+        groupSurfaceColors = groupPalette.groupSurfaceColors(palette.groupSeparatorColor)
         groupIcon = if (appearance.enabled && appearance.showGroupIcon) {
-            val image = groupArtwork[appearance.iconSize] ?: ProjectInitialsIcon("Gr", PREVIEW_GROUP_COLOR,
+            val image = (groupArtwork ?: artwork[PREVIEW_GROUP_ARTWORK])?.let { projectSvgIcon(it, appearance.iconSize.pixels) }
+                ?: ProjectInitialsIcon("Gr", groupPalette.icon ?: PREVIEW_GROUP_COLOR,
                 appearance.iconSize.pixels, DEFAULT_ICON_INITIALS, TabIconLetterWeight.BOLD, projectName = "Group")
             CenteredProjectIcon(image, appearance.iconSize.pixels, artwork = { image })
         } else null
         sampleTabs.forEachIndexed { index, tab ->
-            tab.showAppearance(rendered, palette, trailingSeparator = SystemInfoRt.isWindows &&
+            tab.showAppearance(rendered, palette, groupPalette, trailingSeparator = SystemInfoRt.isWindows &&
                 !appearance.enabled && index < sampleTabs.lastIndex)
         }
         revalidate()
@@ -282,14 +295,9 @@ internal class WindowTabsPreview : JPanel(null) {
         fun loadArtwork(): PreviewArtwork = PREVIEW_SAMPLES.mapNotNull { sample ->
             sample.contourId?.let { id ->
                 val svg = ContourCatalog.entries.first { it.id == id }.svg(sample.color)
-                id to TabIconSize.entries.associateWith { size ->
-                    projectSvgIcon(SvgAsset(svg, "Preview"), size.pixels)
-                }
+                id to SvgAsset(svg, "Preview", BuilderSelection(id, sample.color.hex(), background = false))
             }
-        }.toMap() + (PREVIEW_GROUP_ARTWORK to TabIconSize.entries.associateWith { size ->
-            val svg = ContourCatalog.entries.first { it.id == "folder" }.svg(PREVIEW_GROUP_COLOR)
-            projectSvgIcon(SvgAsset(svg, "Preview"), size.pixels)
-        })
+        }.toMap() + (PREVIEW_GROUP_ARTWORK to SvgAsset(ContourCatalog.entries.first { it.id == "folder" }.svg(PREVIEW_GROUP_COLOR), "Preview"))
     }
 }
 
@@ -319,7 +327,7 @@ private class PreviewTab(
         toolTipText = fullTitle
     }
     private val close = JBLabel().apply { border = JBUI.Borders.emptyLeft(6) }
-    private var artwork = emptyMap<TabIconSize, Icon>()
+    private var artwork: SvgAsset? = null
     private var tabIcon: CenteredProjectIcon? = null
 
     init {
@@ -354,7 +362,7 @@ private class PreviewTab(
     fun minimumContentHeight(): Int = layout.preferredLayoutSize(this).height
 
     fun showArtwork(icons: PreviewArtwork) {
-        artwork = contourId?.let(icons::get).orEmpty()
+        artwork = contourId?.let(icons::get)
     }
 
     fun setTabIconHidden(hidden: Boolean) {
@@ -368,7 +376,8 @@ private class PreviewTab(
         (border as? ProjectTabBorder)?.sharedGroupSurfacePreview = value != null
     }
 
-    fun showAppearance(appearance: TabAppearanceState, theme: PreviewThemePalette, trailingSeparator: Boolean = false) {
+    fun showAppearance(appearance: TabAppearanceState, theme: PreviewThemePalette, groupPalette: ProjectColorOverrides,
+                       trailingSeparator: Boolean = false) {
         val decorated = appearance.enabled || SystemInfoRt.isWindows
         customizationEnabled = decorated
         palette = theme
@@ -409,8 +418,10 @@ private class PreviewTab(
         }
         layout = previewLayout
         // Backend — буквенный пример; остальные образцы сохраняют свои SVG.
-        val image = artwork[appearance.iconSize] ?: ProjectInitialsIcon(AvatarUtils.initials(title), color,
-            appearance.iconSize.pixels, appearance.iconInitials, appearance.iconLetterWeight, projectName = title)
+        val inherited = groupPalette.takeIf { groupMember }
+        val image = artwork?.let { projectSvgIcon(it, appearance.iconSize.pixels, inherited?.icon) }
+            ?: ProjectInitialsIcon(AvatarUtils.initials(title), inherited?.icon ?: color, appearance.iconSize.pixels,
+                appearance.iconInitials, appearance.iconLetterWeight, projectName = title)
         val icon = if (appearance.showIcons) CenteredProjectIcon(
             image, appearance.iconSize.pixels, artwork = { image },
         ) else null
@@ -419,10 +430,12 @@ private class PreviewTab(
         previewLayout.position = appearance.iconPosition
         previewLayout.closeButtonPosition = appearance.closeButtonPosition
         previewLayout.centerProjectName = mode == TabMoreInfo.NONE
-        val outlineColor = if (!appearance.enabled && SystemInfoRt.isWindows) palette.defaultTabAccent else color
+        val outlineColor = if (!appearance.enabled && SystemInfoRt.isWindows) palette.defaultTabAccent
+            else if (inherited != null) inherited.outline else color
+        val fillColor = if (inherited != null) inherited.tab else color
         border = ProjectTabBorder(baseBorder, icon, outlineColor.takeIf { appearance.showOutline },
             appearance.outlineThickness, appearance.outlineStyle,
-            tabColor = color.takeIf { appearance.showTabBackground }, tabFillInset = appearance.tabFillInset,
+            tabColor = fillColor.takeIf { appearance.showTabBackground }, tabFillInset = appearance.tabFillInset,
             tabFillIntensity = appearance.tabFillIntensity,
             geometryOverride = { width, height -> palette.geometry(width, height, appearance.tabCorners) },
             surfaceColors = { surfaceColors() }, inactiveTabDimming = appearance.inactiveTabDimming,

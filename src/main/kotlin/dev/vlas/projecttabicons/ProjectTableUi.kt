@@ -108,8 +108,8 @@ internal class ProjectRowsPanel : JPanel(GridBagLayout()) {
 /** Общие подписи и artwork для обеих таблиц. */
 internal fun projectSettingsIconName(row: ProjectIconSettingsRow): String = row.textIcon?.let { "Text: ${it.text}" }
     ?: row.builder?.contourId?.let { id -> ContourCatalog.entries.firstOrNull { it.id == id }?.title }
-    ?: if (row.activeChoice != null) "Custom SVG" else if (row.snapshot?.currentFile(!JBColor.isBright()) != null) "Custom icon" else "Default"
+    ?: if (row.ownChoice != null) "Custom SVG" else if (row.activeFile != null) "Custom icon" else "Default"
 
 internal fun projectSettingsArtwork(row: ProjectIconSettingsRow, appearance: TabAppearanceState): Icon? =
-    row.activeChoice?.let { projectSvgIcon(it.asset, 24) }
+    row.ownChoice?.let { projectSvgIcon(it.asset, 24, row.inheritedColors?.icon) }
         ?: row.previewIcon(initials = appearance.iconInitials, letterWeight = appearance.iconLetterWeight)
